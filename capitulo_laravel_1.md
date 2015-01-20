@@ -693,7 +693,7 @@ A continuación vamos a crear el _layout_ principal de nuestro sitio:
 
 * Creamos el fichero `app/views/layouts/master.blade.php`.
 * Le añadimos como contenido la plantilla base HTML que propone Bootstrap en su documentación "http://getbootstrap.com/getting-started/#template", modificando los siguientes elementos:
-  * Cambiamos las rutas para acceder a los assets (_css_ y _js_), las cuales tendrán que ser, por ejemplo: `/assets/bootstrap/css/bootstrap.min.css` (recuerda añadir la barra `/` inicial).
+  * Cambiamos las rutas para acceder a los assets (_css_ y _js_), las cuales tendrán que ser, por ejemplo: `assets/bootstrap/css/bootstrap.min.css` (sin barra `/` inicial).
   * Dentro de la sección `<body>` del HTML incluimos la barra de navegación que hemos guardado antes utilizando el siguiente código:
 <br/>
 ```html
