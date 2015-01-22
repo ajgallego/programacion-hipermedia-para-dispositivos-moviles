@@ -6,7 +6,6 @@
 <!-- ************************************************************************-->
 # Datos de entrada
 
-
 Laravel facilita el acceso a los datos de entrada del usuario a través de solo unos poco métodos. No importa el tipo de petición que se haya realizado (POST, GET, PUT, DELETE), si los datos son de un formulario o si se han añadido a la _query string_, en todos los casos se obtendrán de la misma forma: 
 
 ```php
@@ -303,31 +302,6 @@ Route::group(array('before' => 'auth'), function()
 
 
 
-
-<!-- ************************************************************************-->
-# Unión entre formulario y modelo de datos
-
-Laravel incluye una forma muy sencilla de rellenar de datos un formulario que está basado en un modelo, simplemente tendremos que abrir el formulario utilizando el método `Form::model` en lugar de `Form::open`, pasándole como primer parámetro una instancia del modelo. Por ejemplo: 
-
-```php
-{{ Form::model($user, array('action' => array('Controller@method', $user->id))) }}
-```
-
-El resto de parámetro de este método son exactamente iguales a los que utilizaríamos con `Form::open`. 
-
-Al utilizar este método, todos los campos del formulario cuyo nombre coincida con los del modelo serán rellenados con los datos del campo correspondiente que se ha pasado por parámetro. Pero no solo eso, sino que si se produce un error y se envía al usuario otra vez al formulario (con la opción de `withInput`), entonces el formulario automáticamente cogerá los valores que escribió (o modificó) el usuario y los pondrá (dándoles precedencia sobre los valores que ya estaban en el modelo). 
-
-
-> Nota: Para cerrar el formulario tenemos que seguir usando el mismo método que antes: `Form::close`
-
-
-
-
-
-
-
-
-
 <!-- ************************************************************************-->
 <!-- ************************************************************************-->
 <!-- ************************************************************************-->
@@ -384,14 +358,7 @@ public function run()
 ```
 * Dentro del nuevo método `seedUsers()` realizamos las siguientes acciones: 
   * En primer lugar borramos el contenido de la tabla `users`. 
-  * Y a continuación creamos un par de usuarios de prueba usando el siguiente código de ejemplo: 
-<br/>
-```php
-$user = new User;
-$user->username = 'ajgallego';
-$user->password = Hash::make('1234');
-$user->save();
-```
+  * Y a continuación creamos un par de usuarios de prueba. Recuerda que para guardar el _password_ es necesario encriptarlo manualmente usando el método `Hash::make`.
 
 
 Por último tendremos que ejecutar el comando de artisan que procesa las semillas y una vez realizado esto comprobamos en PHPMyAdmin que se han añadido los usuarios a la tabla _users_. 
@@ -436,7 +403,7 @@ En ambos casos indicaremos que se aplique el filtro `csrf` antes de la ejecució
 
 A continuación vamos a editar la vista `catalog/edit.blade.php` con los siguientes cambios:
 
-* Cambiamos el método de apertura del formulario por `Form::open(array('method' => 'put'))`, para que al enviar los datos se envíen por PUT. 
+* Cambiamos al método de apertura del formulario por `Form::open(array('method' => 'put'))`, para que al enviar los datos se envíen por PUT. 
 * Tenemos que modificar todos los inputs para que en lugar de poner la cadena vacía como valor del campo (2º parámetro de `Form::text`) se ponga el valor correspondiente de la película. Por ejemplo en el primer input tendríamos que poner `$pelicula->title`. 
 
 Por último tenemos que actualizar el controlador `CatalogController` con los dos nuevos métodos: 

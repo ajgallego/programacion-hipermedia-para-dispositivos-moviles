@@ -205,7 +205,7 @@ http://laravel.com/docs/4.2/schema#adding-columns
 <!-- *********************************** -->
 ### Añadir índices
 
-_Scheme_ soporta los siguientes tipos de índices: 
+_Schema_ soporta los siguientes tipos de índices: 
 
 | Comando                                    | Descripción | 
 | ------------------------------------------ | -- |
@@ -226,7 +226,7 @@ $table->string('email')->unique();
 <!-- *********************************** -->
 ### Claves ajenas
 
-Desde _Scheme_ también podemos definir claves ajenas entre tablas:
+Desde _Schema_ también podemos definir claves ajenas entre tablas:
 
 ```php
 $table->integer('user_id')->unsigned();
@@ -284,12 +284,11 @@ class DatabaseSeeder extends Seeder
         // Mostramos información por consola
         $this->command->info('User table seeded!');
     }
-
 }
 
 // Nuestro fichero de semillas
-class UserTableSeeder extends Seeder {
-
+class UserTableSeeder extends Seeder 
+{
     public function run()
     {
         // Dentro del método run es donde tenemos que inicializar la tabla
@@ -300,7 +299,6 @@ class UserTableSeeder extends Seeder {
         // Añadimos una entrada a esta tabla
         User::create(array('email' => 'foo@bar.com'));
     }
-
 }
 ```
 
@@ -369,7 +367,7 @@ $users = DB::table('users')
 ```
 
 
-También podemos utilizar los métodos `orderBy`, `groupBy` y `having` a las consultas: 
+También podemos utilizar los métodos `orderBy`, `groupBy` y `having` en las consultas: 
 
 ```php
 $users = DB::table('users')
@@ -428,7 +426,7 @@ Laravel incluye su propio sistema de ORM llamado _Eloquent_, el cual nos proporc
 Los modelos se guardarán como clases PHP en la carpeta `app/models`. Para definir un modelo que use _Eloquent_ únicamente tenemos que crear una clase que herede de `Eloquent`:
 
 ```php
-// Todos los modelos deben extender la clase Eloquent
+// Todos los modelos tienen que extender la clase Eloquent
 class User extends Eloquent {} 
 ```
 
@@ -443,7 +441,7 @@ class User extends Eloquent
 
 Laravel también asume que cada tabla tiene declarada una clave primaria con el nombre `id`. En el caso de que no sea así y queramos cambiarlo tendremos que sobrescribir el valor de la propiedad protegida `$primaryKey` del modelo, por ejemplo: `protected $primaryKey = 'my_id';`. Es importante definir este valor ya que se utiliza en determinados métodos, como por ejemplo para buscar registros o para crear las relaciones entre modelos. 
 
-Otra propiedad que en ocasiones tendremos que establecer son los _timestamps_ automáticos. Por defecto Eloquent asume que todas las tablas contienen los campos `updated_at` y `created_at` (los cuales los podemos añadir muy fácilmente con _Scheme_ añadiendo `$table->timestamps()` en la migración). Estos campos se actualizarán automáticamente cuando se cree un nuevo registro o se modifique. En el caso de que no queramos utilizarlos (y que no estén añadidos a la tabla) tendremos que indicarlo en el modelo, de otra forma nos daría un error. Para indicar que no los actualice automáticamente tendremos que modificar el valor de la propiedad pública `$timestamps` a _false_, por ejemplo: `public $timestamps = false;`.
+Otra propiedad que en ocasiones tendremos que establecer son los _timestamps_ automáticos. Por defecto Eloquent asume que todas las tablas contienen los campos `updated_at` y `created_at` (los cuales los podemos añadir muy fácilmente con _Schema_ añadiendo `$table->timestamps()` en la migración). Estos campos se actualizarán automáticamente cuando se cree un nuevo registro o se modifique. En el caso de que no queramos utilizarlos (y que no estén añadidos a la tabla) tendremos que indicarlo en el modelo, de otra forma nos daría un error. Para indicar que no los actualice automáticamente tendremos que modificar el valor de la propiedad pública `$timestamps` a _false_, por ejemplo: `public $timestamps = false;`.
 
 A continuación se muestra un ejemplo de un modelo de _Eloquent_ en el que se añaden todas las especificaciones que hemos visto: 
 
@@ -620,15 +618,16 @@ Ahora tendremos que abrir PHPMyAdmin y crear esta base de datos para poder empez
 A continuación vamos a crear la tabla que utilizaremos para almacenar el catálogo de películas. Ejecuta el comando de artisan para crear la migración llamada `create_movies_table` para la tabla `movies`. Una vez creado edita este fichero para añadir todos los campos necesarios, estos son: 
 
 | Campo      | Tipo                   | Valor por defecto |
-| ---------- | ---------------------- | -- |
-| id         | Autoincremental        |    |
-| title      | String                 |    |
-| year       | String de longitud 8   |    |
-| director   | String de longitud 64  |    |
-| poster     | String                 |    |
+| ---------- | ---------------------- | ---- |
+| id         | Autoincremental        |      |
+| title      | String                 |      |
+| year       | String de longitud 8   |      |
+| director   | String de longitud 64  |      |
+| poster     | String                 |      |
 | rented     | Booleano               | false |
-| synopsis   | Text                   |    |
-| timestamps | Timestamps de Eloquent |    |
+| synopsis   | Text                   |      |
+| timestamps | Timestamps de Eloquent |      |
+
 
 > Recuerda que en el método `down` de la migración tienes que deshacer los cambios que has hecho en el método `up`, en este caso sería eliminar la tabla.
 
