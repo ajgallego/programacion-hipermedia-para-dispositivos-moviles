@@ -170,7 +170,7 @@ Para añadir un filtro a una ruta tenemos que editar el fichero `routes.php` e i
 ```php
 Route::get('user', array('before' => 'old', function()
 {
-    return 'You are over 200 years old!';
+    return 'Tienes más de 200 años!';
 }));
 ```
 
@@ -298,7 +298,7 @@ Laravel también permite especificar la URL de envío del formulario indicando l
 Además, si queremos que el formulario pueda enviar archivos tendremos que especificarlo añadiendo el atributo `files` con valor `true` en los parámetros:
 
 ```php
-echo Form::open(array('url' => 'foo/bar', 'files' => true))
+{{ Form::open(array('url' => 'foo/bar', 'files' => true)) }}
 ```
 
 
@@ -605,7 +605,7 @@ Además añadiremos un botón al final con el texto "Añadir película".
 
 **Método getEdit**
 
-Este método permitirá modificar el contenido de una película. El formulario será exactamente igual al de añadir película, así que lo podemos copiar y pegar en esta vista y simplemente cambiar el título. De momento no tendremos que hacer nada más, más adelante lo completaremos para que se complete con los datos de la película a editar.
+Este método permitirá modificar el contenido de una película. El formulario será exactamente igual al de añadir película, así que lo podemos copiar y pegar en esta vista y simplemente cambiar el título y el texto del botón de envío. De momento no tendremos que hacer nada más, más adelante lo completaremos para que se complete con los datos de la película a editar.
 
 
 

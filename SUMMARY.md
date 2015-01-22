@@ -10,11 +10,10 @@
 * [Sencha Touch 1. Introducción](capitulo_sencha_touch_1.md)
 * [Sencha Touch 2. Componentes](capitulo_sencha_touch_2.md)
 * [Sencha Touch 3. Almacenamiento](capitulo_sencha_touch_3.md)
-* [PhoneGap](capitulo_phonegap.md)
-* [PhoneGap avanzado](capitulo_phonegap_avanzado.md)
+* [PhoneGap 1. Introducción](capitulo_phonegap.md)
+* [PhoneGap 2. Avanzado](capitulo_phonegap_avanzado.md)
 * [Laravel 1. Introducción](capitulo_laravel_1.md)
 * [Laravel 2. Controladores, filtros y formularios](capitulo_laravel_2.md)
-
-# * [Laravel 3](capitulo_laravel_3.md)
-# * [Laravel 4](capitulo_laravel_4.md)
+* [Laravel 3. Base de datos](capitulo_laravel_3.md)
+* [Laravel 4. Datos de entrada y control de usuarios](capitulo_laravel_4.md)
 
