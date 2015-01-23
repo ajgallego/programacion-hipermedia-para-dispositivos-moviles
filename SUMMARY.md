@@ -1,5 +1,4 @@
 # Summary
-
 * [Introducción](README.md)
 * [Introducción al desarrollo Web](capitulo_introduccion_web.md)
 * [Introducción a JavaScript](capitulo_introduccion_javascript.md)
@@ -16,4 +15,10 @@
 * [Laravel 2. Controladores, filtros y formularios](capitulo_laravel_2.md)
 * [Laravel 3. Base de datos](capitulo_laravel_3.md)
 * [Laravel 4. Datos de entrada y control de usuarios](capitulo_laravel_4.md)
-
+#* [Laravel 5.](capitulo_laravel_5.md)
+#* [Android. Acceso a la red](capitulo_android_red.md)
+#* [Android. Servicios Rest](capitulo_android_rest.md)
+#* [iOS. Acceso a la red](capitulo_ios_red.md)
+#* [iOS. Servicios Rest](capitulo_ios_rest.md)
+#* [Ejercicios 1](capitulo_android-ios_red_ejercicios.md)
+#* [Ejercicios 2](capitulo_android-ios_rest_ejercicios.md)
