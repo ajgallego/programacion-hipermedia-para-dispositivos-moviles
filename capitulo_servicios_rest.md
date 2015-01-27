@@ -342,13 +342,13 @@ Muchas veces se confunden los métodos PUT y POST. El significado de estos méto
 Podríamos añadir nuevos alumnos de dos formas diferentes. La primera de ellas es haciendo POST sobre el recurso que contiene la lista de alumnos:
 
 ```plain
-POST /alumnos
+POST /alumnos 
 ```
 
 También podríamos hacer PUT sobre el recurso de un alumno concreto:
 
 ```plain
-PUT /alumnos/Esther
+PUT /alumnos/Esther 
 ```
 
 Si _Esther_ existía ya, sobrescribirá sus datos, en casa contrario, creará el nuevo recurso.
@@ -384,17 +384,19 @@ Hasta aquí hemos visto las principales acciones que podemos realizar con los re
 <!-- ************************************************************************-->
 # Aclaraciones
 
-* Cuando utilizamos el término REST nos referimos a la arquitectura y por RESTful a un servicio que implementa dicha arquitectura.
+* Cuando utilizamos el término REST nos referimos a la arquitectura y por RESTful a un servicio que implementa dicha arquitectura. 
 
-* En los ejemplos se ha utilizado como representación de un recurso la notación XML sin embargo se puede utilizar cualquier tipo de notación, siendo JSON la más utilizada actualmente para los servicios web.
+* En los ejemplos se ha utilizado como representación de un recurso la notación XML sin embargo se puede utilizar cualquier tipo de notación, siendo JSON la más utilizada actualmente para los servicios web. 
 
-* No es necesario implementar siempre todos los tipos de peticiones. Esto dependerá de las acciones que queramos permitir que se realicen con un determinado recurso.
+* No es necesario implementar siempre todos los tipos de peticiones. Esto dependerá de las acciones que queramos permitir que se realicen con un determinado recurso. 
 
-* Como respuesta a una petición a uno de estos servicios se tiene que devolver un código en la cabecera indicando si la petición se ha realizado correctamente o no. Mediante este código se puede indicar el tipo de error o información adicional sobre la acción realizada.
+* Como respuesta a una petición a uno de estos servicios se tiene que devolver un código en la cabecera indicando si la petición se ha realizado correctamente o no. Mediante este código se puede indicar el tipo de error o información adicional sobre la acción realizada. 
+
+* Los código indicados para indicar que una operación se ha realizado correctamente o que ha habido un error y el tipo de error dependerán del servicio en cuestión. 
 
 * Tras crear una petición con una petición tipo POST se suele añadir a la cabecera la URI del nuevo recurso creado, por ejemplo: `Location: http://restfuljava.com/alumnos/Ricardo`.
 
-* Como respuesta a las peticiones tipo POST, PUT y DELETE, además de devolver el códico de respuesta se puede incluir informacin adicional. Esto dependerá de la API en custión, y puede ser interesante para por ejemplo añadir el mensaje de error traducidoo o alguna otra información necesaria.
+* Como respuesta a las peticiones tipo POST, PUT y DELETE, además de devolver el códico de respuesta se puede incluir informacin adicional. Esto dependerá de la API en custión, y puede ser interesante para por ejemplo añadir el mensaje de error traducidoo o alguna otra información necesaria. 
 
 
 

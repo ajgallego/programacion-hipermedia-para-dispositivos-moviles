@@ -428,12 +428,16 @@ Route::filter('auth.basic', function()
 });
 ```
 
-Una vez superada la autenticación básica se crea la sesión del usuario y en cliente se almacenaría una cookie con el identificador de la sesión. Si no queremos que la sesión se mantenga (por ejemplo, a través de una API queremos solicitar siempre el usuario y contraseña), simplemente tendremos que cambiar el filtro `auth.basic` por `auth.once`, el cual funciona exactamente igual pero sin persistir la sesión del usuario:
+Una vez superada la autenticación básica se crea la sesión del usuario y en cliente se almacenaría una cookie con el identificador de la sesión. 
+
+Si no queremos que la sesión se mantenga (por ejemplo, en una API si queremos solicitar siempre el usuario y contraseña), simplemente tendremos que cambiar el filtro `auth.basic` por `auth.once`, el cual funciona exactamente igual pero sin persistir la sesión del usuario.
+
+**Importante: ** Este filtro no viene implementado por defecto en el fichero de filtros `app/filters.php`. Así que tenemos que para utilizarlo tendréis que añadir el siguiente código: 
 
 ```php
-Route::filter('basic.once', function()
+Route::filter('auth.once', function()
 {
-    return Auth::onceBasic();
+    return Auth::onceBasic('username');
 });
 ```
 
