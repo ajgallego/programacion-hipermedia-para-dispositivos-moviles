@@ -279,7 +279,7 @@ Posteriormente podremos hacer una redirección a una página principal para usua
 <!-- ************************************* -->
 ## Proteger rutas
 
-El sistema de autenticación de Laravel también incorpora una serie de filtros (ver el fichero `app/filters.php`) para comprobar que el usuario que accede a una determinada ruta o grupo de rutas esté autenticado: 
+El sistema de autenticación de Laravel también incorpora una serie de filtros (ver el fichero `app/filters.php`) para comprobar que el usuario que accede a una determinada ruta o grupo de rutas esté autenticado. Para utilizar este filtro tenemos que editar el fichero `app/routes.php` y modificar las rutas o grupos de rutas que queramos proteger, por ejemplo: 
 
 
 ```php
@@ -375,6 +375,8 @@ En primer lugar editamos el fichero `routes.php` y realizamos las siguientes acc
 
 * Añadimos una nueva ruta tipo POST para la url `login` pero que apunte al método `postLogin` del controlador `UserController`.
 * Añadimos un filtro de tipo grupo que aplique el filtro `auth` antes de la ejecución de las rutas. Este filtro tendrá que proteger todas las rutas menos a la raíz `/` y a la de `login`.
+
+> Nota: El filtro `auth` ya está definido en Laravel, únicamente tendréis que modificar el fichero de rutas para indicar las rutas que queráis proteger (revisar la sección de teoría "Proteger rutas"). 
 
 
 A continuación abrimos el controlador `UserController` para completar los siguientes puntos: 

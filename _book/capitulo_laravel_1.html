@@ -33,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="12" data-basepath="." data-revision="1421750448488">
+    <div class="book"  data-level="12" data-basepath="." data-revision="1422271212353">
     
 
 <div class="book-summary">
@@ -217,7 +217,7 @@
                         
                             <b>10.</b>
                         
-                         PhoneGap
+                         PhoneGap 1. Introducción
                     </a>
                 
             
@@ -233,7 +233,7 @@
                         
                             <b>11.</b>
                         
-                         PhoneGap avanzado
+                         PhoneGap 2. Avanzado
                     </a>
                 
             
@@ -266,6 +266,70 @@
                             <b>13.</b>
                         
                          Laravel 2. Controladores, filtros y formularios
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="14" data-path="capitulo_laravel_3.html">
+            
+                
+                    <a href="./capitulo_laravel_3.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>14.</b>
+                        
+                         Laravel 3. Base de datos
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="15" data-path="capitulo_laravel_4.html">
+            
+                
+                    <a href="./capitulo_laravel_4.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>15.</b>
+                        
+                         Laravel 4. Datos de entrada y control de usuarios
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="16" data-path="capitulo_laravel_5.html">
+            
+                
+                    <a href="./capitulo_laravel_5.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>16.</b>
+                        
+                         Laravel 5. Paquetes, Rest y Curl
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="17" data-path="capitulo_rest.html">
+            
+                
+                    <a href="./capitulo_rest.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>17.</b>
+                        
+                         Servicios Rest
                     </a>
                 
             
@@ -361,7 +425,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_8">
+                    <section class="normal" id="section-gitbook_9">
                     
                         <h1 id="laravel-1---introduccin">Laravel 1 - Introducción</h1>
 <!-- ************************************************************************-->
@@ -409,6 +473,9 @@
 </code></pre>
 <p>Esto nos mostrará la página por defecto de XAMPP, que contiene algunos links para comprobar el estado del software instalado y algunos ejemplos de programación.</p>
 <p><img src="images/web_laravel/xampp-macosx-start.jpg" alt=""></p>
+<blockquote>
+<p>Si ya hubiese un servidor web instalado en el ordenador es posible que entre en conflicto con XAMPP y no permita iniciar el servicio de Apache. En este caso tendremos que detener el otro servidor (<code>sudo apachectl stop</code>) para poder utilizar XAMPP.</p>
+</blockquote>
 <p>Desde la versión 4 de Laravel, la creación de un proyecto nuevo se realiza con Composer. Veamos entonces que es Composer y que necesitamos para usarlo.</p>
 <!-- ********************************** -->
 <h2 id="instalacin-de-composer">Instalación de Composer</h2>
@@ -721,10 +788,10 @@ La hora actual es {{{ time() }}}.
 <!-- *********************************** -->
 <h2 id="incluir-una-plantilla-dentro-de-otra-plantilla">Incluir una plantilla dentro de otra plantilla</h2>
 <p>En <em>Blade</em>, dentro de una plantilla, podemos indicar que se incluyan otras plantillas utilizando la instrucción <code>@include</code>:</p>
-<pre><code class="lang-html">@include('view.name')
+<pre><code class="lang-html">@include('view_name')
 
 <span class="hljs-comment">&lt;!-- También podemos pasarle un array de datos como segundo parámetro --&gt;</span>
-@include('view.name', array('some'=&gt;'data'))
+@include('view_name', array('some'=&gt;'data'))
 </code></pre>
 <!-- *********************************** -->
 <h2 id="_layouts_"><em>Layouts</em></h2>
@@ -822,7 +889,11 @@ La hora actual es {{{ time() }}}.
 <ul>
 <li>Creamos el fichero <code>app/views/layouts/master.blade.php</code>.</li>
 <li>Le añadimos como contenido la plantilla base HTML que propone Bootstrap en su documentación &quot;<a href="http://getbootstrap.com/getting-started/#template" target="_blank">http://getbootstrap.com/getting-started/#template</a>&quot;, modificando los siguientes elementos:<ul>
-<li>Cambiamos las rutas para acceder a los assets (<em>css</em> y <em>js</em>), las cuales tendrán que ser, por ejemplo: <code>/assets/bootstrap/css/bootstrap.min.css</code> (recuerda añadir la barra <code>/</code> inicial).</li>
+<li>Cambiamos las rutas para acceder a los assets (<em>css</em> y <em>js</em>) que hemos almacenado en local. Para generar la ruta completa y que encuentre los recursos tendremos que escribir los siguientes comandos:
+<br/><pre><code class="lang-php">{{ URL::to(<span class="hljs-string">'/assets/bootstrap/css/bootstrap.min.css'</span>) }}
+{{ URL::to(<span class="hljs-string">'/assets/bootstrap/js/bootstrap.min.js'</span>) }}
+</code></pre>
+<code>assets/bootstrap/css/bootstrap.min.css</code> (sin barra <code>/</code> inicial).</li>
 <li>Dentro de la sección <code>&lt;body&gt;</code> del HTML incluimos la barra de navegación que hemos guardado antes utilizando el siguiente código:
 <br/><pre><code class="lang-html">@include(&#39;partials.navbar&#39;)
 </code></pre>
@@ -908,7 +979,7 @@ La hora actual es {{{ time() }}}.
         </div>
 
         
-        <a href="./capitulo_phonegap_avanzado.html" class="navigation navigation-prev " aria-label="Previous page: PhoneGap avanzado"><i class="fa fa-angle-left"></i></a>
+        <a href="./capitulo_phonegap_avanzado.html" class="navigation navigation-prev " aria-label="Previous page: PhoneGap 2. Avanzado"><i class="fa fa-angle-left"></i></a>
         
         
         <a href="./capitulo_laravel_2.html" class="navigation navigation-next " aria-label="Next page: Laravel 2. Controladores, filtros y formularios"><i class="fa fa-angle-right"></i></a>

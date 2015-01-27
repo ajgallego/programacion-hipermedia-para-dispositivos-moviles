@@ -18,6 +18,8 @@
     
     
     
+    <link rel="next" href="./capitulo_laravel_3.html" />
+    
     
     <link rel="prev" href="./capitulo_laravel_1.html" />
     
@@ -31,7 +33,7 @@
 
 
         
-    <div class="book"  data-level="13" data-basepath="." data-revision="1421750448488">
+    <div class="book"  data-level="13" data-basepath="." data-revision="1422271212353">
     
 
 <div class="book-summary">
@@ -215,7 +217,7 @@
                         
                             <b>10.</b>
                         
-                         PhoneGap
+                         PhoneGap 1. Introducción
                     </a>
                 
             
@@ -231,7 +233,7 @@
                         
                             <b>11.</b>
                         
-                         PhoneGap avanzado
+                         PhoneGap 2. Avanzado
                     </a>
                 
             
@@ -264,6 +266,70 @@
                             <b>13.</b>
                         
                          Laravel 2. Controladores, filtros y formularios
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="14" data-path="capitulo_laravel_3.html">
+            
+                
+                    <a href="./capitulo_laravel_3.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>14.</b>
+                        
+                         Laravel 3. Base de datos
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="15" data-path="capitulo_laravel_4.html">
+            
+                
+                    <a href="./capitulo_laravel_4.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>15.</b>
+                        
+                         Laravel 4. Datos de entrada y control de usuarios
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="16" data-path="capitulo_laravel_5.html">
+            
+                
+                    <a href="./capitulo_laravel_5.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>16.</b>
+                        
+                         Laravel 5. Paquetes, Rest y Curl
+                    </a>
+                
+            
+            
+        </li>
+    
+        
+        <li class="chapter " data-level="17" data-path="capitulo_rest.html">
+            
+                
+                    <a href="./capitulo_rest.html">
+                        <i class="fa fa-check"></i>
+                        
+                            <b>17.</b>
+                        
+                         Servicios Rest
                     </a>
                 
             
@@ -359,7 +425,7 @@
                 <div class="page-inner">
                 
                 
-                    <section class="normal" id="section-gitbook_9">
+                    <section class="normal" id="section-gitbook_10">
                     
                         <h1 id="laravel-2---controladores-filtros-y-formularios">Laravel 2 - Controladores, filtros y formularios</h1>
 <!-- ************************************************************************-->
@@ -463,7 +529,7 @@
 <p>Para añadir un filtro a una ruta tenemos que editar el fichero <code>routes.php</code> e incluir, para la ruta en cuestión el filtro como un array asociativo de la forma:</p>
 <pre><code class="lang-php">Route::get(<span class="hljs-string">'user'</span>, <span class="hljs-keyword">array</span>(<span class="hljs-string">'before'</span> =&gt; <span class="hljs-string">'old'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>
 </span>{
-    <span class="hljs-keyword">return</span> <span class="hljs-string">'You are over 200 years old!'</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'Tienes más de 200 años!'</span>;
 }));
 </code></pre>
 <p>Donde <em>before</em> indica que el filtro se ejecutará antes que el procesamiento de la función respuesta (en general será siempre así) y <code>old</code> es el nombre del filtro (el que habíamos creado antes de ejemplo, también podría ser <code>auth</code>, <code>guest</code>, <code>csrf</code> o alguno otro que nos hayamos definido).</p>
@@ -539,7 +605,7 @@
 {{ Form::open(<span class="hljs-keyword">array</span>(<span class="hljs-string">'action'</span> =&gt; <span class="hljs-keyword">array</span>(<span class="hljs-string">'Controller@method'</span>, <span class="hljs-variable">$user</span><span class="hljs-variable">-&gt;id</span>))) }}
 </code></pre>
 <p>Además, si queremos que el formulario pueda enviar archivos tendremos que especificarlo añadiendo el atributo <code>files</code> con valor <code>true</code> en los parámetros:</p>
-<pre><code class="lang-php"><span class="hljs-keyword">echo</span> Form::open(<span class="hljs-keyword">array</span>(<span class="hljs-string">'url'</span> =&gt; <span class="hljs-string">'foo/bar'</span>, <span class="hljs-string">'files'</span> =&gt; <span class="hljs-keyword">true</span>))
+<pre><code class="lang-php">{{ Form::open(<span class="hljs-keyword">array</span>(<span class="hljs-string">'url'</span> =&gt; <span class="hljs-string">'foo/bar'</span>, <span class="hljs-string">'files'</span> =&gt; <span class="hljs-keyword">true</span>)) }}
 </code></pre>
 <h2 id="proteccin-contra-csrf">Protección contra CSRF</h2>
 <p>El CSRF (del inglés <em>Cross-site request forgery</em> o falsificación de petición en sitios cruzados) es un tipo de exploit malicioso de un sitio web en el que comandos no autorizados son transmitidos por un usuario en el cual el sitio web confía.</p>
@@ -785,7 +851,7 @@ Acordaros que en Bootstrap podemos transformar un enlace en un botón, simplemen
 <p>De momento el formulario no tendrá que funcionar ni enviar nada. Más adelante completaremos esta funcionalidad.</p>
 </blockquote>
 <p><strong>Método getEdit</strong></p>
-<p>Este método permitirá modificar el contenido de una película. El formulario será exactamente igual al de añadir película, así que lo podemos copiar y pegar en esta vista y simplemente cambiar el título. De momento no tendremos que hacer nada más, más adelante lo completaremos para que se complete con los datos de la película a editar.</p>
+<p>Este método permitirá modificar el contenido de una película. El formulario será exactamente igual al de añadir película, así que lo podemos copiar y pegar en esta vista y simplemente cambiar el título y el texto del botón de envío. De momento no tendremos que hacer nada más, más adelante lo completaremos para que se complete con los datos de la película a editar.</p>
 
                     
                     </section>
@@ -796,8 +862,10 @@ Acordaros que en Bootstrap podemos transformar un enlace en un botón, simplemen
         </div>
 
         
-        <a href="./capitulo_laravel_1.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: Laravel 1. Introducción"><i class="fa fa-angle-left"></i></a>
+        <a href="./capitulo_laravel_1.html" class="navigation navigation-prev " aria-label="Previous page: Laravel 1. Introducción"><i class="fa fa-angle-left"></i></a>
         
+        
+        <a href="./capitulo_laravel_3.html" class="navigation navigation-next " aria-label="Next page: Laravel 3. Base de datos"><i class="fa fa-angle-right"></i></a>
         
     </div>
 </div>
