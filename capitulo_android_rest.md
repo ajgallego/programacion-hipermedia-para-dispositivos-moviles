@@ -1,137 +1,15 @@
 
+<!-- *********************************************************************** -->
 # Clientes de servicios REST
 
-## Invocación de servicios RESTful desde una clase Java
 
-Vamos a ver como crear un cliente RESTful utilizando una sencilla clase Java, lo cual es aplicable a Android. Para ello vamos a utilizar el API de mensajes proporcionado por Twitter (<a href="http://www.twitter.com">http://www.twitter.com</a>). No va a ser necesario disponer de una cuenta de Twitter ni conocer con detalle qué es Twitter para seguir el ejemplo.
+Como ya hemos visto antes, en Android para descargar el contenido desde una URL podemos utilizar la librería _Http Client_. Dicha librería ofrece una mayor facilidad para controlar y utilizar objetos de conexión HTTP, nos permitirá realizar peticiones tipo GET, POST, PUT, DELETE y además acceder a las cabeceras. 
 
-
-> Nota: Twitter es una plataforma de _micro-blogging_ que permite que múltiples usuarios actualicen su estado utilizando 140 caracteres como máximo cada vez. Además, los usuarios pueden "seguirse" unos a otros formando redes de "amigos". Twitter almacena estas actualizaciones en sus servidores, y por defecto, están disponibles públicamente. Es por ésto por lo que utilizaremos Twitter para crear nuestros ejemplos de clientes REST.
-
-```java
-try {
-      URL twitter = new
-        URL("http://twitter.com/statuses/public_timeline.xml");
-
-      // Abrimos la conexión
-      URLConnection tc = twitter.openConnection();
-
-      // Obtenemos la respuesta del servidor
-      BufferedReader in = new BufferedReader(new
-                InputStreamReader( tc.getInputStream()));
-      String line;
-
-      // Leemos la respuesta del servidor y la imprimimos
-      while ((line = in.readLine()) != null) {
-           tvResult.append(line);
-      }
-      in.close();
-    } catch (MalformedURLException e) {
-           e.printStackTrace();
-    } catch (IOException e) {
-           e.printStackTrace();
-}
-```
-
-Podemos ver que hemos utilizado el paquete estándar `java.net`. La URI del servicio web es: _http://twitter.com/statuses/public_timeline.xml_. Ésta será la URI de nuestro recurso y apuntará a las últimas 20 actualizaciones públicas.
-
-
-Para conectar con el servicio web, primero tenemos que instanciar el objeto URL con la URI del servicio. A continuación, "abriremos" un objeto _URLConnection_ para la instancia de Twitter. La llamada al método _twitter.openConnection()_ ejecuta una petición HTTP GET.
-
-
-Una vez que tenemos establecida la conexión, el servidor devuelve la respuesta HTTP. Dicha respuesta contiene una representación XML de las actualizaciones. Por simplicidad, volcaremos en la salida estandar la respuesta del servidor. Para ello, primero leemos el _stream_ de respuesta en un objeto _BufferedReader_, y a continuación realizamos un bucle para cada línea del _stream_, asignándola a un objeto _String_. Finalmente hemos incluido nuestro código en una sentencia _try/catch_, y enviamos cualquier mensaje de excepción a la salida estándar.
-
-
-Éste es el estado público de la última actualización de Twitter de la estructura XML obtenida (sólo mostramos parte de uno de los _tweets_).
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?> <statuses type="array">
-  ...
-  <status>
-    <created_at>Tue Feb 22 11:43:25 +0000 2011</created_at>
-    <id>40013788233216000</id>
-    <text>Haar doen voor de cam. #ahahah</text>
-    <source>web
-    <truncated>false</truncated>
-    <favorited>false</favorited>
-    <in_reply_to_status_id></in_reply_to_status_id>
-    <in_reply_to_user_id></in_reply_to_user_id>
-    <in_reply_to_screen_name></in_reply_to_screen_name>
-    <retweet_count>0</retweet_count>
-    <retweeted>false</retweeted>
-    <user>
-      <id>250090010</id>
-      <name>Dani&#235;l van der wal</name>
-      <screen_name>DanielvdWall</screen_name>
-      <location>Nederland,   Hoogezand</location>
-      <description></description>
-      <profile_image_url>
-      http://a0.twimg.com/profile_images/1240171940/Picture0003_normal.JPG
-      </profile_image_url>
-      <url>http://daniel694.hyves.nl/</url>
-      <protected>false</protected>
-       <followers_count>50</followers_count>
-       ...
-      <friends_count>74</friends_count>
-      ...
-      <following>false</following>
-      <statuses_count>288</statuses_count>
-      <lang>en</lang>
-      <contributors_enabled>false</contributors_enabled>
-      <follow_request_sent>false</follow_request_sent>
-      <listed_count>0</listed_count>
-      <show_all_inline_media>false</show_all_inline_media>
-      <is_translator>false</is_translator>
-    </user>
-    <geo/>
-    <coordinates/>
-    <place/>
-    <contributors/>
-  </status>
-...
-</statuses>
-```
-
-
-No entraremos en los detallos de la estructura XML, podemos encontrar la documentación del API en <a href="http://dev.twitter.com/">http://dev.twitter.com/</a>
-
-
-La documentación del API nos dice que si cambiamos la extensión _.xml_ obtendremos diferentes representaciones del recurso. Por ejemplo, podemos cambiar _.xml_, por _.json_, _.rss_ o _.atom_. Así, por ejemplo, si quisiéramos recibir la respuesta en formato JSON (JavaScript Object Notation), el único cambio que tendríamos que hacer es en la siguiente línea:
-
-
-```java
-URL twitter =
-      new URL("http://twitter.com/statuses/public_timeline.json");
-```
-
-En este caso, obtendríamos algo como esto:
-
-```bash
-[{"in_reply_to_status_id_str":null,"text":"THAT GAME SUCKED ASS.",
-"contributors":null,"retweeted":false,"in_reply_to_user_id_str"
-:null,"retweet_count":0,"in_reply_to_user_id":null,"source":"web",
-"created_at":"Tue Feb 22 11:55:17 +0000 2011","place":null,
-"truncated":false,"id_str":"40016776221696000","geo":null,
-"favorited":false,"user":{"listed_count":0,"following":null,
-"favourites_count":0,"url":"http:\/\/www.youtube.com\/user\
-/haezelnut","profile_use_background_image":true,...
-```
-
-
-Los detalles sobre JSON se encuentran en la documentación del API.
-
-> Nota: Aunque Twitter referencia este servicio como servicio RESTful, esta API en particular no es completamente RESTful, debido a una elección de diseño. Analizando la documentación del API vemos que el tipo de representación de la petición forma parte de la URI y no de la cabecera _accept_ de HTTP. El API devuelve una representación que solamente depende de la propia URI: _http://twitter.com/statuses/public_timeline.FORMATO_, en donde FORMATO puede ser _.xml_, _.json_, _.rss_, o _.atom_. Sin embargo, esta cuestión no cambia la utilidad del API para utilizarlo como ejemplo para nuestro cliente REST.
-
-
-Otra posibilidad de implementación de nuestro cliente Java para Android es utilizar la librería _Http Client_. Dicha librería ofrece una mayor facilidad para controlar y utilizar objetos de conexión HTTP.
-
-
-El código de nuestra clase cliente utilizando la librería quedaría así:
+Por ejemplo para realizar una petición tipo GET a una URI y obtener su contenido tendríamos que hacer: 
 
 ```java
 HttpClient client = new DefaultHttpClient();
-HttpGet request = new HttpGet(
-                    "http://twitter.com/statuses/public_timeline.xml");
+HttpGet request = new HttpGet("http://<domain>/resource");
 try {
     ResponseHandler<String> handler = new BasicResponseHandler();
     String contenido = client.execute(request, handler);
@@ -145,39 +23,89 @@ try {
 }
 ```
 
-Observamos que primero instanciamos el cliente HTTP y procedemos a crear un objeto que representa el método HTTP GET. Con el cliente y el método instanciado, necesitamos ejecutar la petición con el método `execute`. Si queremos tener un mayor control sobre la respuesta, en lugar de utilizar un `BasicResponseHandler` podríamos ejecutar directamente la petición sobre el cliente, y obtener así la respuesta completa, tal como vimos en la sesión anterior.
+
+Observamos que primero instanciamos el cliente HTTP y procedemos a crear un objeto que representa el método HTTP GET. Con el cliente y el método instanciado, necesitamos ejecutar la petición con el método `execute`. Si queremos tener un mayor control sobre la respuesta, en lugar de utilizar un `BasicResponseHandler` podríamos ejecutar directamente la petición sobre el cliente (`HttpResponse response = client.execute(request);`), y obtener así la respuesta completa, tal como vimos en la sesión anterior.
+
+A partir del objeto `HttpResponse` podemos tener acceso a los **códigos de estado** que se envían en la cabecera, por ejemplo: 
+
+    
+```java
+HttpResponse response = client.execute(request);
+StatusLine statusLine = response.getStatusLine();
+int statusCode = statusLine.getStatusCode();
+
+if (statusCode == 200 ) 
+    // ...
+
+// O también: 
+if (statusCode == HttpStatus.SC_OK) 
+    // ...
+```
+
+En `HttpStatus` están definidos como constantes todos los códigos de estado con los cuales podemos comparar. Para más información podéis consultar: http://developer.android.com/reference/org/apache/http/HttpStatus.html
 
 
-En este caso, hemos visto cómo realizar una petición GET, tal como se vio en sesiones anteriores, para acceder a servicios REST. Sin embargo, para determinadas operaciones hemos visto que REST utiliza métodos HTTP distintos, como POST, PUT o DELETE. Para cambiar el método simplemente tendremos que cambiar el objeto `HttpGet` por el del método que corresponda. Cada tipo incorporará los métodos necesarios para el tipo de petición HTTP que represente. Por ejemplo, a continuación vemos un ejemplo de petición POST. Creamos un objeto `HttpPost` al que le deberemos pasar una entidad que represente el bloque de contenido a enviar (en una petición POST ya no sólo tenemos un bloque de contenido en la respuesta, sino que también lo tenemos en la petición). Podemos crear diferentes tipos de entidades, que serán clases que hereden de `HttpEntity`. La más habitual para los servicios que estamos utilizando será `StringEntity`, que nos facilitará incluir en la petición contenido XML o JSON como una cadena de texto. Además, deberemos especificar el tipo MIME de la entidad de la petición mediante `setContentType` (en el siguiente ejemplo consideramos que es XML). Por otro lado, también debemos especificar el tipo de representación que queremos obtener como respuesta, y como hemos visto anteriormente, esto debe hacerse mediante la cabecera `Accept`. Esta cabecera la deberemos establecer en el objeto que representa la petición POST (`HttpPost`).
+Para obtener el resto de **cabeceras** de la respuesta del servidor usaremos también el objeto `HttpResponse`, de la forma: 
+
+```java
+// Obtener todas las cabeceras
+Header[] headers = response.getAllHeaders();
+for (Header header : headers) {
+	Log.d("Headers", "Key : " + header.getName() 
+         	       + " ,Value : " + header.getValue());
+}
+
+// Obtener una cabecera por su clave
+String server = response.getFirstHeader("Server").getValue();
+```
+
+
+Para obtener el contenido de la respuesta a partir del objeto `HttpResponse` la forma más sencilla es utilizar `EntityUtils` (dado que sino tendríamos que crear un bucle para leer linea a línea del _stream_ de entrada ):
+
+```java
+String contenido = EntityUtils.toString( response.getEntity() );
+```
+
+
+Hemos visto cómo realizar una petición GET, tal como se vio en sesiones anteriores, para acceder a servicios REST. Sin embargo, para determinadas operaciones REST utiliza métodos HTTP distintos, como POST, PUT o DELETE. Para cambiar el método simplemente tendremos que cambiar el objeto `HttpGet` por el del método que corresponda (`HttpPost`, `HttpPut` o `HttpDelete`). Cada tipo incorpora los métodos necesarios para el tipo de petición HTTP que realice. Por ejemplo, a continuación vemos un ejemplo de petición POST. Creamos un objeto `HttpPost` al que le deberemos pasar una entidad que represente el bloque de contenido a enviar (en una petición POST ya no sólo tenemos un bloque de contenido en la respuesta, sino que también lo tenemos en la petición). Podemos crear diferentes tipos de entidades, que serán clases que hereden de `HttpEntity`. La más habitual para los servicios que estamos utilizando será `StringEntity`, que nos facilitará incluir en la petición contenido XML o JSON como una cadena de texto. Además, deberemos especificar el tipo MIME de la entidad de la petición mediante `setContentType` (en el siguiente ejemplo consideramos que es XML). Por otro lado, también debemos especificar el tipo de representación que queremos obtener como respuesta, y como hemos visto anteriormente, esto debe hacerse mediante la cabecera `Accept`. Esta cabecera la deberemos establecer en el objeto que representa la petición POST (`HttpPost`).
 
 ```java
 HttpClient client = new DefaultHttpClient();
 
-HttpPost post = new HttpPost("http://jtech.ua.es/recursos/peliculas");
-StringEntity s = new StringEntity("[contenido xml]");
-s.setContentType("application/xml");
-post.setEntity(s);
-post.setHeader("Accept", "application/xml");
+HttpPost post = new HttpPost("http://<dominio>/peliculas");
 
-ResponseHandler<String> handler = new BasicResponseHandler();
-String respuesta = client.execute(post, handler);
+StringEntity se = new StringEntity(" [contenido xml] ");
+se.setContentType("application/xml");    // O "application/json"
+
+post.setEntity(se);
+post.setHeader("Accept", "application/xml");
+post.setHeader("Content-type", "application/xml");
+
+HttpResponse response = client.execute(post);
+StatusLine statusLine = response.getStatusLine();
+
+if (statusLine.getStatusCode() == 200 ) 
+    String contenido = EntityUtils.toString( response.getEntity() );
+else
+    // error...
 ```
 
-Como podemos ver en el ejemplo anterior, una vez configurada la petición POST la forma de ejecutar la petición es la misma que la vista anteriormente para peticiones GET. Para el resto de métodos HTTP el funcionamiento será similar, simplemente cambiando el tipo del objeto de la petición por el que corresponda (por ejemplo `HttpPut` o `HttpDelete`).
+
+Como podemos ver en el ejemplo anterior, una vez configurada la petición POST la forma de ejecutar la petición es la misma que la vista anteriormente para peticiones GET. Para el resto de métodos HTTP el funcionamiento será similar, simplemente cambiando el tipo del objeto de la petición por el que corresponda (por ejemplo `HttpPut` o `HttpDelete`). Además, en las peticiones tipo POST, PUT y DELETE es importante comprobar el código que se devuelve en la cabecera, para asegurarnos de que la operación se ha realizado correctamente. 
 
 
 
-## Parsing de estructuras XML
 
 
-En las comunicaciones por red es muy común transmitir información en formato XML, el ejemplo más conocido, depués del HTML, son las noticias RSS. En este último caso, al delimitar cada campo de la noticia por tags de XML se permite a los diferentes clientes lectores de RSS obtener sólo aquellos campos que les interese mostrar.
 
+<!-- *********************************************************************** -->
+# Parsing de estructuras XML
 
-### Parsing de XML en Android
+En las comunicaciones por red es muy común transmitir información en formato XML, el ejemplo más conocido depués del HTML, son las noticias RSS. En este último caso, al delimitar cada campo de la noticia por tags de XML se permite a los diferentes clientes lectores de RSS obtener sólo aquellos campos que les interese mostrar.
 
-
-Android nos ofrece dos maneras de trocear o "parsear" XML. El `SAXParser` y el `XmlPullParser`. El parser SAX requiere la implementación de manejadores que reaccionan a eventos tales como encontrar la apertura o cierre de una etiqueta, o encontrar atributos. Menos implementación requiere el uso del parser Pull que consiste en iterar sobre el árbol de XML (sin tenerlo completo en memoria) conforme el código lo va requiriendo, indicándole al parser que tome la siguiente etiqueta (método `next()`) o texto (método nextText()).
-
+Android nos ofrece dos maneras de trocear o "parsear" XML. El `SAXParser` y el `XmlPullParser`: 
+* El parser SAX requiere la implementación de manejadores que reaccionan a eventos tales como encontrar la apertura o cierre de una etiqueta, o encontrar atributos. 
+* Por el contrario `XmlPullParser` necesita menos implementación ya que consiste en iterar sobre el árbol de XML (sin tenerlo completo en memoria) conforme el código lo va requiriendo, indicándole al parser que tome la siguiente etiqueta (método `next()`) o texto (método `nextText()`).
 
 A continuación mostramos un ejemplo sencillo de uso del `XmlPullParser`. Préstese atención a las sentencias y constantes resaltadas, para observar cómo se identifican los distintos tipos de etiqueta, y si son de apertura o cierre. También se puede ver cómo encontrar atributos y cómo obtener su valor.
 
@@ -189,27 +117,31 @@ try {
   XmlPullParser parser = parserCreator.newPullParser();
   parser.setInput(text.openStream(), null);
   int parserEvent = parser.getEventType();
-  while (parserEvent != XmlPullParser.END_DOCUMENT) {
-
+  
+  while (parserEvent != XmlPullParser.END_DOCUMENT) 
+  {
     switch (parserEvent) {
-    case XmlPullParser.START_DOCUMENT:
-      break;
-    case XmlPullParser.END_DOCUMENT:
-      break;
-    case XmlPullParser.START_TAG:
-      String tag = parser.getName();
-      if (tag.equalsIgnoreCase("title")) {
-        Log.i("XML","El titulo es: "+ parser.nextText());
-      } else if(tag.equalsIgnoreCase("meta")) {
-        String name = parser.getAttributeValue(null, "name");
-        if(name.equalsIgnoreCase("description")) {
-          Log.i("XML","La descripción es:" +
-                      parser.getAttributeValue(null,"content"));
-        }
-      }
-      break;
-    case XmlPullParser.END_TAG:
-      break;
+        case XmlPullParser.START_DOCUMENT:
+          break;
+        case XmlPullParser.END_DOCUMENT:
+          break;
+        case XmlPullParser.START_TAG:
+          String tag = parser.getName();
+          if (tag.equalsIgnoreCase("title")) 
+          {
+            Log.i("XML","El titulo es: "+ parser.nextText());
+          } 
+          else if(tag.equalsIgnoreCase("meta")) 
+          {
+            String name = parser.getAttributeValue(null, "name");
+            if(name.equalsIgnoreCase("description")) {
+              Log.i("XML","La descripción es:" +
+                          parser.getAttributeValue(null,"content"));
+            }
+          }
+          break;
+        case XmlPullParser.END_TAG:
+          break;
     }
 
     parserEvent = parser.next();
@@ -219,8 +151,10 @@ try {
 }
 ```
 
+> Nota: el ejemplo anterior, igual que todas las operaciones que requieran acceso a Internet, tendrá que estar en un hilo. 
 
-El ejemplo anterior serviría para imprimir en el LogCat el título del siguiente fragmento de página web, que en este caso sería "Universidad de Alicante", y para encontrar el `meta` cuyo atributo `name` sea "Description" y mostrar el valor de su atributo `content`:
+
+El ejemplo anterior serviría para imprimir en el LogCat el título del siguiente fragmento de página web, que en este caso sería "Universidad de Alicante", y para encontrar el `meta` cuyo atributo `name` sea "description" y mostrar el valor de su atributo `content`:
 
 
 ```html
@@ -237,42 +171,23 @@ El ejemplo anterior serviría para imprimir en el LogCat el título del siguient
 
 
 
+<!-- *********************************************************************** -->
+# Parsing de estructuras JSON
 
-## Parsing de estructuras JSON
+JSON es una representación muy utilizada para formatear los recursos solicitados a un servicio web RESTful. El formato sigue la misma notación de objetos de JavaScript, por lo tanto ocupa muy poco, es texto plano y puede ser manipulado muy fácilmente utilizando JavaScript, PHP u otros lenguajes.
 
-JSON es una representación muy utilizada para formatear los recursos solicitados a un servicio web RESTful. Se trata de ficheros con texto plano que pueden ser manipulados muy fácilmente utilizando JavaScript.
-
-
-La gramática de los objetos JSON es simple y requiere la agrupación de la definición de los datos y valores de los mismos. En primer lugar, los elementos están contenidos dentro de llaves `{` y `}`; los valores de los diferentes elementos se organizan en pares, con la estructura: `"nombre":"valor"`, y están separados por comas; y finalmente, las secuencias de elementos están contenidas entre corchetes `[` y `]`. Y esto es todo :)! Para una descripción detallada de la gramática, podéis consultar <a href="http://www.json.org/fatfree.html"> http://www.json.org/fatfree.html</a>
-
+La gramática de los objetos JSON es simple y requiere la agrupación de la definición de los datos y valores de los mismos. En primer lugar, los elementos están contenidos dentro de llaves `{` y `}` y separados por comas; los valores de los diferentes elementos se organizan en pares con la estructura `"nombre":"valor"`; y finalmente, las secuencias de elementos (o arrays) están contenidas entre corchetes `[` y `]`. Y esto es todo! Para una descripción detallada de la gramática, podéis consultar <a href="http://www.json.org/fatfree.html"> http://www.json.org/fatfree.html</a>
 
 Con la definición de agrupaciones anterior, podemos combinar múltiples conjuntos para crear cualquier tipo de estructura requerido. El siguiente ejemplo muestra una descipción JSON de un objeto con información sobre una lista de mensajes:
 
+```json
+[ 
+    {"texto":"Hola, ¿qué tal?", "usuario":"Pepe" },
+    {"texto":"Fetén", "usuario":"Ana" } 
+]
+```
 
-<source lang="plain">[ {"texto":"Hola, ¿qué tal?", "usuario":"Pepe" },
-  {"texto":"Fetén", "usuario":"Ana" } ]</source>
-
-Antes de visualizar cualquiera de los valores de una respuesta JSON, necesitamos convertirla en una estructura que nos resulte familiar, por ejemplo, sabemos cómo trabajar con las jerarquías de objetos Javascript.
-
-
-Para convertir una cadena JSON en código "usable" utilizaremos la función Javascript nativa _eval()_. En el caso de un _stream_ JSON, _eval()_ transforma dicho _stream_ en un objeto junto con propiedades que son accesibles sin necesidad de manipular ninguna cadenas de caracteres.
-
-
->Nota: Los _streams_ JSON son fragmentos de código Javascript y deben evaluarse utilizando la función _eval()_ antes de poder utilizarse como objetos en tiempo de ejecución. En general, ejecutar Javascript a través de _eval()_ desde fuentes no confiables introducen riesgos de seguridad debido al valor de los parámetros de las funciones ejecutadas como Javascript. Sin embargo, para nuestra aplicación de ejemplo, confiamos en que el JavaScript enviado desde Twitter es una estructura JSON segura.
-
-Debido a que un objeto JSON evaluado es similar a un objeto DOM, podremos atravesar el árbol del objeto utilizando el carácter "punto". Por ejemplo, un elemento raíz denominado `Root` con un sub-elemento denominado `Element` puede ser accedido mediante `Root.Element`
-
-
-> Nota: Si estamos ante una cadena JSON sin ninguna documentación del API correspondiente, tendremos que buscar llaves de apertura y cierre (`{` y `}`). Esto nos llevará de forma inmediata a la definición del objeto. A continuación buscaremos pares de de nombre/valor entre llaves.
-
-El análisis de JSON en Android e iOS es algo más complejo que en Javascript, pero en ambas plataformas encontramos tanto librerías integradas en el SDK, como librerías proporcionadas por terceros.
-
-
-
-
-### Parsing de JSON en Android
-
-Dentro de la API de Android encontramos una serie de clases que nos permiten analizar y componer mensajes JSON. Las dos clases fundamentales son `JSONArray` y `JSONObject`. La primera de ellas representa una lista de elementos, mientras que la segunda representa un objeto con una serie de propiedades. Podemos combinar estos dos tipos de objetos para crear cualquier estructura JSON. Cuando en el JSON encontremos una lista de elementos (`[ ... ]`) se representará mediante `JSONArray`, mientras que cuando encontremos un conjunto de propiedades _clave-valor_ encerrado entre llaves (`{ ... }`) se representará con `JSONObject`. Encontraremos estos dos tipos de elementos anidados según la estructura JSON que estemos leyendo.
+Antes de visualizar cualquiera de los valores de una respuesta JSON, necesitamos convertirla en otro tipo de estructura para poder procesarla. Dentro de la API de Android encontramos una serie de clases que nos permiten analizar y componer mensajes JSON. Las dos clases fundamentales son `JSONArray` y `JSONObject`. La primera de ellas representa una lista de elementos, mientras que la segunda representa un objeto con una serie de propiedades. Podemos combinar estos dos tipos de objetos para crear cualquier estructura JSON. Cuando en el JSON encontremos una lista de elementos (`[ ... ]`) se representará mediante `JSONArray`, mientras que cuando encontremos un conjunto de propiedades _clave-valor_ encerrado entre llaves (`{ ... }`) se representará con `JSONObject`. Por ejemplo, para procesar el JSON del ejemplo anterior podríamos utilizar el siguiente código: 
 
 ```java
 JSONArray mensajes = new JSONArray(contenido);
@@ -283,16 +198,186 @@ for(int i=0;i<mensajes.length();i++) {
     String texto = mensaje.getString("texto");
     String usuario = mensaje.getString("usuario");
 
-    ...
+    //...
 }
 ```
 
-El objeto `JSONArray` nos permite conocer el número de elementos que contiene (`length`), y obtenerlos a partir de su índice, con una serie de métodos `get-`. Los elementos pueden ser de tipos básicos (`boolean`, `double`, `int`, `long`, `String`), o bien ser objetos o listas de objetos (`JSONObject`, `JSONArray`). En el caso del ejemplo anterior cada elemento de la lista es un objeto _mensaje_.
 
-Los objetos (`JSONObject`) tienen una serie de campos, a los que también se accede mediante una serie de métodos `get-` que pueden ser de los mismos tipos que en el caso de las listas. En el ejemplo anterior son cadenas (_texto_, y _usuario_), pero podrían ser listas u objetos anidados.
+
+El objeto `JSONArray` nos permite conocer el número de elementos que contiene (`length`), y obtenerlos a partir de su índice, con una serie de métodos `get-`. Los elementos pueden ser de tipos básicos (`boolean`, `double`, `int`, `long`, `String`), o bien ser objetos o listas de objetos (`JSONObject`, `JSONArray`). 
+
+Los objetos (`JSONObject`) tienen una serie de campos, a los que también se accede mediante una serie de métodos `get-` que pueden ser de los mismos tipos que en el caso de las listas. En el ejemplo anterior son cadenas (_texto_, y _usuario_), pero podrían ser listas u otros objetos anidados.
 
 Esta librería no sólo nos permite analizar JSON, sino que también podemos componer mensajes con este formato. Los objetos `JSONObject` y `JSONArray` tienen para cada método `get-`, un método `put-` asociado que nos permite añadir campos o elementos. Una vez añadida la información necesaria, podemos obtener el texto JSON mediante el método `toString()` de los objetos anteriores.
 
+Además es importante que capturemos las excepciones al procesar cadenas en JSON ya que en caso de intentar obtener un tipo de elemento que no estuviera presente se lanzaría una excepción del tipo `JSONException`. 
+
 Esta librería es sencilla y fácil de utilizar, pero puede generar demasiado código para parsear estructuras de complejidad media. Existen otras librerías que podemos utilizar como *GSON* (<a href="http://sites.google.com/site/gson/gson-user-guide">`http://sites.google.com/site/gson/gson-user-guide`</a>) o *Jackson* (<a href="http://wiki.fasterxml.com/JacksonInFiveMinutes">`http://wiki.fasterxml.com/JacksonInFiveMinutes`</a>) que nos facilitarán notablemente el trabajo, ya que nos permiten mapear el JSON directamente con nuestros objetos Java, con lo que podremos acceder al contenido JSON de forma similar a como se hace en Javascript.
+
+
+
+
+
+<!-- *********************************************************************** -->
+# Autentificación en servicios remotos
+
+Los servicios REST estan fuertemente vinculados al protocolo HTTP, por lo que los mecanismos de seguridad
+utilizados también deberían ser los que define dicho protocolo. Pueden utilizar los diferentes tipos de 
+autentificación definidos en HTTP: _Basic_, _Digest_ y _X.509_. Sin embargo, cuando se
+trata de servicios que se dejan disponibles para que cualquier desarrollador externo pueda acceder a ellos, utilizar 
+directamente estos mecanismos básicos de seguridad puede resultar peligroso. En estos casos la autentificación suele
+realizarse mediante el protocolo OAuth. Este último se sale de los contenidos del curso, en la siguiente sección 
+nos centraremos en la seguridad HTTP básica.
+
+
+
+<!-- ************************************* -->
+## Seguridad HTTP básica
+
+Para acceder a servicios protegidos con seguridad HTTP estándar deberemos
+proporcionar en la llamada al servicio las cabeceras de autentificación con los credenciales que
+nos den acceso a las operaciones solicitadas.   
+    
+Por ejemplo, desde un cliente Android en el que utilicemos la API de red estándar de Java SE deberemos definir 
+un `Authenticator` que proporcione estos datos:
+
+```java
+Authenticator.setDefault(new Authenticator() {
+    protected PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication (
+              "usuario", "password".toCharArray());
+    }
+});
+```
+
+En caso de que utilicemos HttpClient de Apache, se especificará de la siguiente forma:
+
+```java
+DefaultHttpClient client = new DefaultHttpClient();
+client.getCredentialsProvider().setCredentials(
+    new AuthScope("jtech.ua.es", 80),
+    new UsernamePasswordCredentials("usuario", "password")
+);
+```
+
+Aquí además de las credenciales, hay que indicar el ámbito al que se aplican (host y puerto).
+
+Para quienes no estén muy familiarizados con la seguridad en HTTP, conviene mencionar el funcionamiento
+del protocolo a grandes rasgos. Cuando realizamos una petición HTTP a un recurso protegido con seguridad
+básica, HTTP nos devuelve una respuesta indicándonos que necesitamos autentificarnos para acceder. Es 
+entonces cuando el cliente solicita al usuario las credenciales (usuario y password), y entonces se 
+realiza una nueva petición con dichas credenciales incluidas en una cabecera _Authorization_. 
+Si las credenciales son válidas, el servidor nos dará acceso al contenido solicitado.
+
+Este es el funcionamiento habitual de la autentificación. En el caso del acceso mediante HttpClient
+que hemos visto anteriormente, el funcionamiento es el mismo, cuando el servidor nos pida autentificarnos
+la librería lanzará una nueva petición con las credenciales especificadas en el proveedor de credenciales.
+
+Sin embargo, si sabemos de antemano que un recurso va a necesitar autentificación, podemos también autentificarnos 
+de forma preventiva. La autentificación preventiva consiste en mandar las credenciales en la primera petición,
+antes de que el servidor nos las solicite. Con esto ahorramos una petición, pero podríamos estar mandando
+las credenciales en casos en los que no resulta necesario.
+
+Con HttpClient podemos activar o desactivar la autentificación preventiva con el siguiente método:
+
+```java
+client.getParams().setAuthenticationPreemptive(true);
+```
+
+
+
+
+
+
+
+
+
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+
+
+<!-- *********************************************************************** -->
+# Ejercicios
+
+
+## Ejercicio 1 - Cliente Android mediante servicios REST del videoclub (3 puntos)
+
+En este ejercicio se pide realizar una aplicación Android que actue de cliente de los servicios públicos tipo REST del videoclub. Para esto tenéis que crear una nueva aplicación, llamada `Videoclub`, que va a tener solamente dos actividades: un listado con las películas y la vista detalle de una película (la apariencia de estas dos pantallas se deja a vuestra elección). En las plantillas se facilita la clase `Movie.java` que podéis utilizar para almacenar los datos de las películas. 
+
+En la primera actividad, el listado de películas, se tendrá que: 
+* Solicitar en primer lugar el listado al servidor realizando una petición tipo GET a la URL "http://gbrain.dlsi.ua.es/videoclub/api/v1/catalog" (recordad que tiene que ser asíncrona).
+* El servidor podrá devolver: 
+  * El array de películas en JSON y el código de respuesta 200.
+  * Los códigos de error 404 o 500.
+* Una vez completada la descarga tendréis que procesar el JSON (creando una lista de objetos tipo _Movie_).
+* A partir de la lista obtenida se creará un adaptador que irá asociado a la lista. Este adaptador realizará la descarga de las portadas usando la técnica _lazy loading_ (el código de esta parte es muy parecido al del último ejercicio de la sección anterior).
+
+Al pulsar sobre un elemento de esta lista se tendrá que abrir la vista detalle de la misma pasándole (en el _intent_ de llamada) los datos de la película. 
+
+En la vista detalle primero tendréis que recoger el _intent_ de llamada con todos los datos de la película, mostrar la información y crear un hilo para descargar la portada de la película. 
+
+
+
+
+## Ejercicio Opcional - Cliente completo
+
+De forma opcional se pide completar el cliente del videoclub con el resto de métodos. En este caso se tendrá que solicitar en una pantalla inicial el usuario y contraseña, y guardarlos para poder utilizarlos posteriormente en las llamadas que lo soliciten. En el servidor de prueba "http://gbrain.dlsi.ua.es/videoclub" podéis utilizar el usuario "test123" y el password "test123". 
+
+Los métodos RESTful implementados de esta API son: 
+
+| Método | URI                  | Método   |
+| ------ | -------------------- | -------- |
+| GET    | /catalog             | Listado  |
+| GET    | /catalog/{id}        | Elemento |
+| POST   | /catalog             | Crear    |
+| PUT    | /catalog/{id}        | Editar   |
+| PUT    | /catalog/{id}/rent   | Alquilar |
+| PUT    | /catalog/{id}/return | Devolver |
+| DELETE | /catalog/{id}        | Eliminar |
+
+> Todas las URI tienen el prefijo: "http://gbrain.dlsi.ua.es/videoclub/api/v1", por ejemplo, para obtener el listado será: "http://gbrain.dlsi.ua.es/videoclub/api/v1/catalog". 
+
+> Todos los métodos están protegidos con usuario y contraseña usando autenticación HTTP básica (excepto los métodos por GET de obtener el listado y de obtener un elemento). 
+
+> Solo será posible modificar los recursos que creéis vosotros mismos, es decir, tendréis que crear una película para posteriormente poder editarla o eliminarla. Si se intenta modificar o eliminar una película para la cual no tenéis permisos os devolverá el código de error 403. 
+
+> Es importante que al trabajar con la API se indiquen siempre las cabeceras de JSON, sobre todo al enviar los datos al servidor para que pueda procesarlos correctamente. Esta cabecerá tendrá que ser: `Content-Type: application/json`. 
+
+
+Los posibles códigos que devolverá el servidor son: 
+
+| Código | Significado |
+| ------ | ----------- |
+| 200    | Película creada, Modificada, alquilada, devuelva, eliminada correctamente |
+| 401    | Usuario no autorizado |
+| 403    | No tienes permisos para editar o eliminar el recurso |
+| 404    | Recurso no encontrado |
+| 500    | Error interno del servidor al procesar al petición |
+
+Además, al crear una película en la cabecera se envía el `Location` con la nueva URI. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
