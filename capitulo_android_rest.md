@@ -47,7 +47,9 @@ En `HttpStatus` están definidos como constantes todos los códigos de estado co
 
 Para obtener el resto de **cabeceras** de la respuesta del servidor usaremos también el objeto `HttpResponse`, de la forma: 
 
-```java
+```java  
+HttpResponse response = client.execute(request);
+  
 // Obtener todas las cabeceras
 Header[] headers = response.getAllHeaders();
 for (Header header : headers) {
@@ -93,6 +95,8 @@ else
 
 Como podemos ver en el ejemplo anterior, una vez configurada la petición POST la forma de ejecutar la petición es la misma que la vista anteriormente para peticiones GET. Para el resto de métodos HTTP el funcionamiento será similar, simplemente cambiando el tipo del objeto de la petición por el que corresponda (por ejemplo `HttpPut` o `HttpDelete`). Además, en las peticiones tipo POST, PUT y DELETE es importante comprobar el código que se devuelve en la cabecera, para asegurarnos de que la operación se ha realizado correctamente. 
 
+
+> Nota: todas las conexión tienen que ir dentro de un bloque `try...catch` para capturar las excepciones y además cerrar la conexión al final. Por brevedad en algunos ejemplos de los apuntes no se incluye el cógido completo. 
 
 
 
@@ -163,7 +167,7 @@ El ejemplo anterior serviría para imprimir en el LogCat el título del siguient
 <title>Universidad de Alicante*</title>
 <meta name="Description" content="Informacion Universidad Alicante.
   Estudios, masteres, diplomaturas, ingenierias, facultades, escuelas"/>
-<![CDATA[<meta http-equiv="pragma" content="no-cache" />
+<meta http-equiv="pragma" content="no-cache" />
 <meta name="Author" content="Universidad de Alicante" />
 <meta name="Copyright" content="&copy; Universidad de Alicante" />
 <meta name="robots" content="index, follow" />

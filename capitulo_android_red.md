@@ -93,6 +93,8 @@ Este es el caso general, en el que obtenemos la respuesta como un objeto `HttpRe
 
 
 
+
+
 <!-- *********************************************************************** -->
 # Conexiones asíncronas en Android
 
@@ -169,6 +171,7 @@ new Thread(new Runnable() {
 ```
 
 Con esto podemos crear conexiones asíncronas cuyo resultado se muestre en la UI. Sin embargo, podemos observar que generan un código bastante complejo. Para solucionar este problema a partir de Android 1.5 se introduce la clase `AsyncTask` que nos permite implementar tareas asíncronas de forma más elegante.
+
 
 
 
@@ -423,6 +426,17 @@ boolean hayMobile = mobile.isAvailable();
 boolean noHay = (!hayWifi && !hayMobile); // Iiinteerneer!!
 ```
 
+Por ejemplo, nos podríamos crear una función como la siguiente que nos devolviera directamente si el dispositivo tiene conexión o no: 
+
+```java
+public boolean isOnline() {
+    ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+    NetworkInfo netInfo = cm.getActiveNetworkInfo();
+    return (netInfo != null && netInfo.isConnected());
+}
+```
+
+
 El `ConnectivityManager` también puede utilizarse para controlar el estado de red, o bien estableciendo una preferencia pero permitiéndole usar el tipo de conectividad que realmente está disponible,
 
 ```java
@@ -585,7 +599,10 @@ public class ImagenAdapter extends BaseAdapter
 
         return imagen;
       } catch(IOException e) {
+      } finally {
+        client.getConnectionManager().shutdown();
       }
+
       return null;
     }
 
