@@ -15,7 +15,9 @@ try {
     tvResponse.setText(contenido);
 
 } catch (ClientProtocolException e) {
+    e.printStackTrace();
 } catch (IOException e) {
+    e.printStackTrace();
 } finally {
     client.getConnectionManager().shutdown();
 }
@@ -252,7 +254,16 @@ Authenticator.setDefault(new Authenticator() {
 });
 ```
 
-En caso de que utilicemos HttpClient de Apache, se especificará de la siguiente forma:
+En caso de que utilicemos HttpClient de Apache simplemente tendremos que añadir la siguiente cabecera:
+
+```java
+HttpClient client = new DefaultHttpClient();
+HttpPost post = new HttpPost( url );
+post.addHeader(BasicScheme.authenticate(
+        new UsernamePasswordCredentials("usuario", "password"), "UTF-8", false));
+```
+
+Otra posible opción es usando el método `setCredentials` de la clase `DefaultHttpClient`: 
 
 ```java
 DefaultHttpClient client = new DefaultHttpClient();

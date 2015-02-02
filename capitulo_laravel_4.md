@@ -2,7 +2,6 @@
 
 
 
-
 <!-- ************************************************************************-->
 # Datos de entrada
 
@@ -175,7 +174,7 @@ Para comprobar los datos de un usuario y validarlo en el sistema tenemos que uti
 ```php
 if (Auth::attempt(array('username' => $username, 'password' => $password)))
 {
-    return Redirect::intended('admin-url');
+    return Redirect::intended('url-a-redireccionar');
 }
 ```
 
@@ -183,7 +182,7 @@ Este método recibe un array de credenciales y las valida comparándolas con los
 
 El campo "_username_" en realidad no es obligatorio que tenga ese nombre, sino que podría ser cualquier otro, por ejemplo "_email_"; solamente tiene que coincidir con el campo que se utilice en la base de datos para almacenarlo. 
 
-El método utilizado en el ejemplo como respuesta `Redirect::intended` realiza una redirección a la URL que estaba intentando acceder el usuario, en caso de que hubiese accedido directamente al formulario de login se utilizará la dirección pasada por parámetro. 
+El método utilizado en el ejemplo como respuesta, `Redirect::intended`, realiza una redirección a la URL que estaba intentando acceder el usuario, en caso de que hubiese accedido directamente al formulario de login se utilizará la dirección pasada por parámetro (en este caso `url-a-redireccionar`). 
 
 A continuación se incluye un ejemplo de la validación de un usuario. El controlador `UserController` contiene dos métodos para realizar esta validación. El método `getLogin` se llamará cuando se realiza una petición tipo GET a la pantalla de _login_. Y el método `postLogin` cuando se envían los datos por POST del formulario de _login_: 
 
@@ -203,7 +202,7 @@ class UserController extends BaseController
     
         if (Auth::attempt(['username' => $username, 'password' => $password]))
         {
-            return Redirect::intended('admin-url');
+            return Redirect::intended('url-a-redireccionar');
         }
     
         return Redirect::action('UserController@getLogin')
