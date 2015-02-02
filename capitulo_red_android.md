@@ -426,7 +426,7 @@ boolean hayMobile = mobile.isAvailable();
 boolean noHay = (!hayWifi && !hayMobile); // Iiinteerneer!!
 ```
 
-Por ejemplo, nos podríamos crear una función como la siguiente que nos devolviera directamente si el dispositivo tiene conexión o no: 
+Por ejemplo, nos podríamos crear una función como la siguiente que nos devolviera directamente si el dispositivo tiene conexión o no:
 
 ```java
 public boolean isOnline() {

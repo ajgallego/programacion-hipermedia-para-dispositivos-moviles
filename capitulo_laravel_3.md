@@ -426,6 +426,7 @@ Laravel incluye su propio sistema de ORM llamado _Eloquent_, el cual nos proporc
 Los modelos se guardarán como clases PHP en la carpeta `app/models`. Para definir un modelo que use _Eloquent_ únicamente tenemos que crear una clase que herede de `Eloquent`:
 
 ```php
+<?php 
 // Todos los modelos tienen que extender la clase Eloquent
 class User extends Eloquent {} 
 ```
@@ -433,6 +434,7 @@ class User extends Eloquent {}
 En general el nombre de los modelos se pone en singular con la primera letra en mayúscula, mientras que el nombre de las tablas suele estar en plural. Gracias a esto, al definir un modelo no es necesario indicar el nombre de la tabla asociada, sino que Eloquent automáticamente buscará la tabla transformando el nombre del modelo a minúsculas y buscando su plural (en inglés). En el caso de que la tabla tuviese otro nombre lo podemos indicar definiendo la propiedad protegida `$table` del modelo: 
 
 ```php
+<?php 
 class User extends Eloquent 
 {
     protected $table = 'my_users';
@@ -446,6 +448,7 @@ Otra propiedad que en ocasiones tendremos que establecer son los _timestamps_ au
 A continuación se muestra un ejemplo de un modelo de _Eloquent_ en el que se añaden todas las especificaciones que hemos visto: 
 
 ```php
+<?php 
 class User extends Eloquent 
 {
     protected $table = 'my_users';
