@@ -835,7 +835,7 @@ navigator.compass.clearWatch(watchID);
 
 
 <!-- ********************************************************************* -->
-## Ejercicio 1 - Usando la API de PhoneGap (0.5 puntos)
+## Ejercicio 1 - Configuración de PhoneGap (0.5 puntos)
 
 Para completar el último ejercicio se pide que realicéis los siguientes pasos para todas las aplicaciones:
 

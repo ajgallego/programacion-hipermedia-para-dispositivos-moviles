@@ -281,7 +281,7 @@ $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" http
 $ curl -i -H "Accept: application/xml" -H "Content-Type: application/xml" http://localhost/resource
 ```
 
-Por ejemplo, si queremos realizar una petición tipo POST que envíe código JSON y que también espere la respuesta en JSON tendríamos que indicar ambas cabeceras y añadir el JSON que queramos en los parámetros con `i` de forma normal:
+Por ejemplo, si queremos realizar una petición tipo POST que envíe código JSON y que también espere la respuesta en JSON tendríamos que indicar ambas cabeceras y añadir el JSON que queramos en los parámetros con `-d` de forma normal:
 
 ```bash
 $ curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"title":"xyz","year":"xyz"}' http://localhost/resource
