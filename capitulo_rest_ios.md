@@ -395,11 +395,19 @@ Y puedes saber desde qué conexión se ha recibido la respuesta en el método
 }
 ```
 
-#### Modificar
+#### Editar
 
 Añade un botón `Edit` en la barra de navegación de `DetailViewController` para editar una película. Cuando el usuario lo pulse, deberá poder modificar los datos de la película usando el mismo controlador que para añadirla (`PelisTableViewController`). Ojo, tendrás que hacer una copia de la película a modificar por si el usuario cancela los cambios volviendo atrás sin guardarla.
 
 En esta opción en lugar de mostrarse en la barra de navegación _New movie_ deberá indicarse el nombre de la película, y cuando se guarde deberá actualizarse tanto en el listado local como en el servidor.
+
+Para actualizar la tabla necesitarás acceder al `MasterViewController` desde `DetailViewController`. Puedes hacerlo del siguiente modo:
+
+```objectivec
+    UINavigationController *parentController = (UINavigationController *)[self.splitViewController.viewControllers objectAtIndex:0];
+
+    MasterViewController *masterController= (MasterViewController *)[parentController.viewControllers objectAtIndex:0];
+```
 
 #### Apartados opcionales:
 
