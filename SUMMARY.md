@@ -13,7 +13,6 @@
 * [PhoneGap 1. Introducción](capitulo_phonegap.md)
 * [PhoneGap 2. Avanzado](capitulo_phonegap_avanzado.md)
 * [Laravel](capitulo_laravel_1.md)
-* [Laravel 4. Datos de entrada y control de usuarios](capitulo_laravel_4.md)
 * [Servicios Rest](capitulo_servicios_rest.md)
 * [Android. Acceso a la red](capitulo_red_android.md)
 * [Android. Servicios Rest](capitulo_rest_android.md)
