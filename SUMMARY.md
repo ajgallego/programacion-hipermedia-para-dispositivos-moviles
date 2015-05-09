@@ -11,7 +11,6 @@
 * [Sencha Touch 2. Componentes](capitulo_sencha_touch_2.md)
 * [Sencha Touch 3. Almacenamiento](capitulo_sencha_touch_3.md)
 * [PhoneGap](capitulo_phonegap.md)
-* [PhoneGap 2. Avanzado](capitulo_phonegap_avanzado.md)
 * [Laravel](capitulo_laravel_1.md)
 * [Servicios Rest](capitulo_servicios_rest.md)
 * [Android. Acceso a la red](capitulo_red_android.md)
