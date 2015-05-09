@@ -1,4 +1,5 @@
 # Summary
+
 * [Introducción](README.md)
 * [Introducción al desarrollo Web](capitulo_introduccion_web.md)
 * [Introducción a JavaScript](capitulo_introduccion_javascript.md)
@@ -11,7 +12,7 @@
 * [Sencha Touch 3. Almacenamiento](capitulo_sencha_touch_3.md)
 * [PhoneGap 1. Introducción](capitulo_phonegap.md)
 * [PhoneGap 2. Avanzado](capitulo_phonegap_avanzado.md)
-* [Laravel 1. Introducción](capitulo_laravel_1.md)
+* [Laravel](capitulo_laravel_1.md)
 * [Laravel 2. Controladores, filtros y formularios](capitulo_laravel_2.md)
 * [Laravel 3. Base de datos](capitulo_laravel_3.md)
 * [Laravel 4. Datos de entrada y control de usuarios](capitulo_laravel_4.md)
@@ -21,3 +22,4 @@
 * [Android. Servicios Rest](capitulo_rest_android.md)
 * [iOS. Acceso a la red](capitulo_red_ios.md)
 * [iOS. Servicios Rest](capitulo_rest_ios.md)
+
