@@ -1,4 +1,4 @@
-# Diseño "responsive"
+# Diseño _Responsive
 
 El contenido de este libro se puede consultar en la siguiente dirección: 
 
