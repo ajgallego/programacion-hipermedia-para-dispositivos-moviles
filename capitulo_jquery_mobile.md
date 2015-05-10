@@ -4,46 +4,6 @@
 
 
 <!-- ********************************************************************* -->
-## Estilo de los componentes jQuery Mobile
-
-jQuery Mobile dispone de un sistema muy robusto y sencillo para estilizar nuestra aplicación de varias formas. Cada componente de jQuery Mobile tiene la posibilidad de ser estilizado de una forma diferente. Para aplicar estos estilos, estos componentes pueden añadir el atributo `data-theme` y puede tomar los valores, _a, b, c, d o e_ para elegir cualquiera de los cinco temas de los que dispone actualmente jQuery Mobile. Cada uno de estos temas, utiliza una serie de combinaciones de colores y formas diferentes. Por defecto, jQuery Mobile utiliza una combinación de estos temas tal y como vemos en las siguientes imágenes.
-
-**Tema por defecto**
-
-![Tema por defecto](images/web_jqm/temapordefecto.png "Tema por defecto")
-
-**Tema A**
-
-![Tema A](images/web_jqm/temaa.png "Tema A")
-
-**Tema B**
-
-![Tema B](images/web_jqm/temab.png "Tema B")
-
-**Tema C**
-
-![Tema C](images/web_jqm/temac.png "Tema C")
-
-**Tema D**
-
-![Tema D](images/web_jqm/temad.png "Tema D")
-
-**Tema E**
-
-![Tema E](images/web_jqm/temae.png "Tema E")
-
-
-**Nota:** A partir de la versión 1.4 de JQuery Mobile solo se incluyen los temas A y B en la hoja de estilo por defecto. Para incluir el resto de temas tenemos que cargar la siguiente hoja de estilo:
-
-```css
-<link rel="stylesheet" href="http://demos.jquerymobile.com/1.4.5/theme-classic/theme-classic.css" />
-```
-
-Otra opción es generar nuestros propios temas mediante la utilidad _Theme Roller_ de JQuery Mobile: http://themeroller.jquerymobile.com/ Esta utilidad nos permite crear temas basándonos en alguno de los ya predefinidos y después personalizarlos o directamente generar nuestro propio tema. Por último nos da la opción de descargar la hoja de estilo.
-
-
-
-<!-- ********************************************************************* -->
 ### Barras de herramientas
 
 Las barras de herramientas son utilizadas habitualmente en las cabeceras y los pies de nuestras aplicaciones en cualquier aplicación web móvil. Por este motivo, jQuery Mobile nos ofrece una serie de componentes ya preparados para ser utilizados en nuestras aplicaciones.
