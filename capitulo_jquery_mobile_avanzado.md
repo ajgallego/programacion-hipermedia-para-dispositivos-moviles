@@ -1,6 +1,3 @@
-# Aspectos avanzados de jQuery Mobile
-
-Una vez vistos los aspectos más básicos de jQuery Mobile, en esta sesión vamos a profundizar en aspectos algo más avanzados y empezaremos viendo como podemos introducir listas de elementos (algo tan habitual en las aplicaciones web para móviles). Seguiremos analizando todos los elementos de formulario con las peculiaridades que se incluyen en jQuery Mobile.
 
 
 ## Listados de elementos
