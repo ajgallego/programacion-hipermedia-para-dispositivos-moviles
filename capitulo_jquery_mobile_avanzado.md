@@ -1,25 +1,5 @@
 
 
-<!-- *********************************************************************** -->
-#### Switchers
-
-En jQuery Mobile tenemos también la posibilidad de añadir un elemento de formulario nuevo que nos permitirá indicar al usuario que debe elegir entre dos valores, como pueden ser _on/off_ o _true/false_. Este elemento se mostrará de tal forma que el usuario podrá con sus dedos cambiar el estado del mismo fácilmente.
-
-Estos elementos se definen como si fuera un elemento de tipo `select` con dos opciones. Además, el `select` debe tener el atributo `data-role="slider"`. El primer elemento del `select` será tratado como el estado _off_ o _false_, mientras que el segundo será _on_ o _true_.
-
-
-```html
-<div data-role="fieldcontain">
-	<label for="casado">Casado</label>
-	<select name="casado" id="casado" data-role="slider">
-		<option value="no">No</option>
-		<option value="yes">Sí</option>
-	</select>
-</div>
-```
-
-![Switcher](images/web_jqm2/switcher.png "Switcher")
-
 
 
 
