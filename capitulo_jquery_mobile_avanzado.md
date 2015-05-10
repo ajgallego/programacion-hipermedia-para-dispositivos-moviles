@@ -1,26 +1,6 @@
 
 
 <!-- *********************************************************************** -->
-#### Deslizadores
-
-Uno de los elementos introducidos en la especificación del HTML5 ha sido la posibilidad de utilizar el elemento de formulario de tipo `range`. El usuario podrá deslizar fácilmente este elemento y al mismo irá tomando un valor diferente para cada posición.
-
-En estos elementos debemos especificar los atributos `min` y `max` que servirán para indicar un valor mínimo y un máximo y por otro lado, también podemos indicarle un valor actual con el atributo `value`.
-
-```html
-<div data-role="fieldcontain">
-   <label for="age">Edad</label>
-   <input type="range" name="age" id="age" value="25" min="0" max="100"  />
-</div>
-```
-
-![Deslizador](images/web_jqm2/slider.png "Deslizador")
-
-Como vemos en la imagen, a la izquierda del deslizador aparece una caja de texto de tal forma que el usuario podrá escribir el texto directamente, lo que se verá automáticamente reflejado en el deslizador.
-
-
-
-<!-- *********************************************************************** -->
 #### Switchers
 
 En jQuery Mobile tenemos también la posibilidad de añadir un elemento de formulario nuevo que nos permitirá indicar al usuario que debe elegir entre dos valores, como pueden ser _on/off_ o _true/false_. Este elemento se mostrará de tal forma que el usuario podrá con sus dedos cambiar el estado del mismo fácilmente.
