@@ -1,52 +1,6 @@
 
 
 
-<!-- ********************************************************************* -->
-### Diálogos
-
-jQuery Mobile permite simular la creación de cuadros de diálogo en nuestras aplicaciones.
-
-
-<!-- ********************************************************************* -->
-#### Creando cuadros de diálogos
-
-Cualquier página de nuestras aplicaciones con jQuery Mobile pueden ser mostradas como un cuadro de diálogo simplemente añadiendo el atributo `data-rel="dialog"` al enlace que muestra la página destino. Cuando se detecta este atributo, jQuery Mobile se encarga de poner unos bordes redondeados a la nueva página, crear automáticamente unos márgenes alrededor de la página y poner un fondo oscuro para que parezca que la nueva página está suspendida por encima de la página que lo carga.
-
-
-```html
-<a href="foo.html" data-rel="dialog">
-	Abrir cuadro de diálogo
-</a>
-```
-
-![Cuadro de diálogo](images/web_jqm/dialog.png "Cuadro de diálogo")
-
-
-
-<!-- ********************************************************************* -->
-#### Transiciones
-
-Por defecto, el dialogo se abre con una transición del tipo _pop_, pero como en todas las páginas, se puede especificar cualquier otra transición simplemente añadiendo el atributo `data-transition` y especificar cualquiera de los valores que veíamos anteriormente. Para que simular lo más posible los efectos de los cuadros de diálogo, se aconseja utilizar las transiciones _pop_, _slideup_ o _flip_.
-
-
-```html
-<a href="foo.html" data-rel="dialog" data-transition="pop">
-	Abrir cuadro de diálogo
-</a>
-```
-
-
-<!-- ********************************************************************* -->
-#### Cerrando cuadros de diálogos
-
-Al hacer clic en cualquier enlace dentro de un cuadro de diálogo, jQuery Mobile se encargará automáticamente de cerrarlo y mostrar la transición correcta. Sin embargo, si queremos generar el típico botón de _Cerrar_ en un cuadro de diálogo, simplemente debemos añadir el atributo `data-rel="back"`.
-
-
-<!-- ********************************************************************* -->
-### Historial y botón Atrás
-
-Habitualmente, los cuadros de diálogo se generan en el contexto de otras páginas. jQuery Mobile se encarga de no incluir estos cuadros de diálogo en el historial de navegación de nuestro navegador. Del mismo modo, cuando un usuario haga clic en el botón Atrás del navegador, no será posible llegar de nuevo a un cuadro de diálogo, con lo que no tenemos preocuparnos en absoluto por este tema.
-
 
 <!-- ********************************************************************* -->
 #### Precarga y caché de páginas
