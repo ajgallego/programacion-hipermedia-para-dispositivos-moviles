@@ -1,49 +1,6 @@
 
 
 
-<!-- ********************************************************************* -->
-### Pies de página
-
-Ahora que ya conocemos como podemos modificar el comportamiento de las cabeceras con jQuery Mobile, pasemos a ver en profundidad los pies de página, que básicamente tienen la misma estructura que las cabeceras con la salvedad, claro está, del atributo `data-role="footer"`.
-
-```html
-<div  data-role="footer">
-	<h4>Pie de página</h4>
-</div>
-```
-
-Estructuralmente, los pies de páginas son muy parecidos a las cabeceras, con la salvedad que en los pies de página, jQuery Mobile no añade automáticamente esos botones que veíamos anteriormente a ambos lados del título, con lo que si queremos mostrar botones, los vamos a tener que pintar nosotros mismos.
-
-Cualquier enlace válido añadido en el pie de página podemos convertirlo automáticamente en un botón en nuestra aplicación. Para ello debemos utilizar el atributo `data-role="button"`. Por defecto, jQuery Mobile no añade ningún tipo de espaciado entre los botones y los laterales del navegador, con lo que si queremos que no aparezcan demasiado pegados a esos laterales, podemos utilizar el atributo `class="ui-bar"`.
-
-```html
-<div data-role="footer" class="ui-bar">
-	<a href="index.html" data-role="button" data-icon="delete">Remove</a>
-	<a href="index.html" data-role="button" data-icon="plus">Add</a>
-	<a href="index.html" data-role="button" data-icon="arrow-u">Up</a>
-	<a href="index.html" data-role="button" data-icon="arrow-d">Down</a>
-</div>
-```
-
-![Pie de página](images/web_jqm/footbar1.png "Pie de página")
-
-
-Incluso podemos agrupar los botones con los atributos `data-role="controlgroup"` y `data-type="horizontal"`.
-
-
-```html
-<div data-role="footer" class="ui-bar">
-	<div data-role="controlgroup" data-type="horizontal">
-		<a href="index.html" data-role="button" data-icon="delete">Remove</a>
-		<a href="index.html" data-role="button" data-icon="plus">Add</a>
-		<a href="index.html" data-role="button" data-icon="arrow-u">Up</a>
-		<a href="index.html" data-role="button" data-icon="arrow-d">Down</a>
-	</div>
-</div>
-```
-
-![Pie de página](images/web_jqm/footbar2.png "Pie de página")
-
 
 
 
@@ -330,6 +287,14 @@ La sintaxis de estos acordeones es prácticamente la misma que veíamos anterior
 
 
 ![Grupo de elementos desplegables](images/web_jqm/collapsibleset.png "Grupo de elementos desplegables")
+
+
+
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+
 
 
 
