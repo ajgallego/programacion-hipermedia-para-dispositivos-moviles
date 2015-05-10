@@ -2,68 +2,6 @@
 
 
 
-
-<!-- *********************************************************************** -->
-#### Elementos de tipo radio
-
-Este tipo de elementos se utilizan para proporcionar al usuario una serie de elementos de los cuales éste debe seleccionar solamente uno. En las aplicaciones de escritorio este tipo de elementos no están optimizados para el uso en dispositivos móviles, pero con jQuery Mobile éstos se nos mostrarán mucho más accesibles.
-
-Para crear un conjunto de elementos de tipo radio simplemente debemos añadir la etiqueta `input` con el atributo `type="radio"` y su correspondiente `label`.
-
-Es aconsejable además que todos los elementos de tipo radio queden envueltos en las etiquetas `fieldset` y `legend`. Esta última actuará como título del elemento.
-
-Por último, la etiqueta `fieldset` debe quedar envuelta a su vez por una etiqueta `div` con el atributo `data-role="controlgroup"`, tal y como vemos en el siguiente ejemplo.
-
-```html
-<div data-role="fieldcontain">
-    <fieldset data-role="controlgroup">
-    	<legend>Marca de coche</legend>
-         	<input type="radio" name="radio-choice-1" id="radio-choice-1"
-         	    value="audi" checked="checked" />
-         	<label for="radio-choice-1">Audi</label>
-
-         	<input type="radio" name="radio-choice-1" id="radio-choice-2"
-         	    value="bmw"  />
-         	<label for="radio-choice-2">BMW</label>
-
-         	<input type="radio" name="radio-choice-1" id="radio-choice-3"
-         	    value="seat"  />
-         	<label for="radio-choice-3">Seat</label>
-
-         	<input type="radio" name="radio-choice-1" id="radio-choice-4"
-         	    value="volkswagen"  />
-         	<label for="radio-choice-4">Volkswagen</label>
-    </fieldset>
-</div>
-```
-
-![Radio vertical](images/web_jqm2/radiovertical.png "Radio vertical")
-
-
-En el ejemplo anterior, el grupo de elementos aparece de forma vertical, pero también es posible que aparezcan horizontalmente simplemente especificando el atributo `data-type="horizontal"` a la etiqueta `fieldset`.
-
-
-```html
-<div data-role="fieldcontain">
-    <fieldset data-role="controlgroup" data-type="horizontal">
-    	<legend>Modelo de Audi</legend>
-         	<input type="radio" name="radio-choice-1" id="radio-choice-1" value="a1" checked="checked" />
-         	<label for="radio-choice-1">A1</label>
-
-         	<input type="radio" name="radio-choice-1" id="radio-choice-2" value="a2"  />
-         	<label for="radio-choice-2">A2</label>
-
-         	<input type="radio" name="radio-choice-1" id="radio-choice-3" value="a3"  />
-         	<label for="radio-choice-3">A3</label>
-    </fieldset>
-</div>
-```
-
-![Radio horizontal](images/web_jqm2/radiohorizontal.png "Radio horizontal")
-
-
-
-
 <!-- *********************************************************************** -->
 #### Elementos de tipo checkbox
 
