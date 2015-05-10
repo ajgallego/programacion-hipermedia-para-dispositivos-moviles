@@ -4,7 +4,6 @@
 * [Introducción al desarrollo Web](capitulo_introduccion_web.md)
 * [Introducción a JavaScript](capitulo_introduccion_javascript.md)
 * [Diseño Responsive](capitulo_diseno_responsive.md)
-* [Diseño Responsive avanzado](capitulo_diseno_responsive_avanzado.md)
 * [JQuery Mobile](capitulo_jquery_mobile.md)
 * [JQuery Mobile avanzado](capitulo_jquery_mobile_avanzado.md)
 * [Sencha Touch 1. Introducción](capitulo_sencha_touch_1.md)
