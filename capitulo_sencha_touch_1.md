@@ -1,46 +1,6 @@
 
 
 
-<!-- ********************************* -->
-### _Docking_ o acoplamiento
-
-Todos los _layouts_ tienen la capacidad de acoplar elementos "adicionales" de forma fija en cualquiera de sus laterales. Al acoplar un elemento el resto de contenido del _layout_ será redimensionado para adaptarse. Las posiciones en las que se puede acoplar un elemento son: _top_, _right_, _bottom_, o _left_.
-
-Es importante notar que los elementos acoplados son "adicionales" al contenido del _layout_, es decir, si por ejemplo acoplamos un elemento a un contenedor con un _layout_ tipo _hbox_, el elemento acoplado no seguirá la alineación horizontal, sino que se pondrá en la posición que se especifique con `docked` de entre la lista de posiciones permitidas.
-
-![](images/web_sencha/layout_docktop.jpg)
-
-En la imagen superior tenemos un _layout_ tipo _hbox_ con dos columnas y un elemento acoplado en la parte superior. A continuación se incluye el código para crear una disposición de este tipo:
-
-```javascript
-Ext.create('Ext.Container', {
-    fullscreen: true,
-    layout: 'hbox',
-    items: [
-        {
-            docked: 'top',
-            xtype: 'panel',
-            height: 20,
-            html: 'Elemento acoplado en la parte superior.'
-        },
-        {
-            xtype: 'panel',
-            html: 'Columna izquierda.',
-            flex: 1
-        },
-        {
-            xtype: 'panel',
-            html: 'Columna derecha.',
-            flex: 2
-        }
-    ]
-});
-```
-
-En el ejemplo se ha utilizado la característica `docked` para acoplar un panel, pero es mucho más común su utilización con herramientas tipo `toolbar` o `titlebar`.
-
-Podemos acoplar tantos elementos como queramos, los cuales se irán añadiendo en el mismo orden en el que se asignen.
-
 
 
 
