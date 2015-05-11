@@ -4,50 +4,6 @@
 
 
 
-<!-- ********************************* -->
-### Eliminar componentes
-
-Para eliminar elementos de un contenedor utilizamos su método `remove` y la variable que define el item. Por ejemplo para eliminar el panel que hemos añadido en el ejemplo anterior tendríamos que hacer:
-
-```javascript
-mainPanel.remove(secondPanel);
-```
-
-> Este método elimina el componente del contenedor, no lo destruye ni libera la memoria ni los eventos asociados.
-
-
-
-<!-- ********************************* -->
-### Mostrar y ocultar componentes
-
-Los elementos también se pueden mostrar u ocultar simplemente llamando a sus métodos `hide()` o `show()`. Continuando con el ejemplo anterior, para mostrar u ocultar el panel principal haríamos:
-
-```javascript
-mainPanel.show();
-
-mainPanel.hide();
-```
-
-
-<!-- ********************************* -->
-### Eventos
-
-Todos los componentes de Sencha Touch lanzan eventos ante determinados cambios, estos eventos pueden ser escuchados y realizar una acción cuando son activados. Por ejemplo, al escribir en un campo de texto este lanza su evento `change`, por lo que podríamos escuchar a dicho evento usando un _listener_ como se muestra en el siguiente ejemplo:
-
-```javascript
-Ext.create('Ext.form.Text', {
-    label: 'Name',
-    listeners: {
-        change: function(field, newValue, oldValue) {
-            // El contenido ha cambiado
-        }
-    }
-});
-```
-
-Los componentes de Sencha Touch lanzan multitud de eventos facilitando el control de la aplicación y la programación por eventos. A estos eventos nos podemos suscribir también de forma dinámica una vez que el componente se ha creado. En la documentación de cada clase se puede encontrar un listado con los eventos que lanza y como podemos utilizarlos.
-
-
 
 
 <!-- ********************************* -->
