@@ -4,66 +4,6 @@
 
 
 <!-- ********************************************************************* -->
-## Instanciar una aplicación
-
-Para realizar nuestro primer ejemplo vamos a crear una aplicación que muestre en pantalla el mensaje "¡Hola Mundo!", para lo cual abriremos el fichero `app.js` y añadiremos el siguiente código:
-
-```javascript
-Ext.application({
-    name: 'MyApp',
-    launch: function() {
-        Ext.create("Ext.Panel", {
-            fullscreen: true,
-            html: '¡Hola Mundo!'
-        });
-    }
-});
-```
-
-A continuación analizaremos por separado cada una de las partes de este código:
-
-```javascript
-Ext.application({
-    name: 'MyApp',
-    launch: function() {
-        ...
-    }
-});
-```
-
-Con `Ext.application({ ... });` creamos una nueva instancia de Sencha Touch, es decir, este es el constructor de nuestra aplicación. Entre las llaves `{}` le pasaremos la lista de opciones de configuración para crear nuestra aplicación. En primer lugar le damos un nombre `name: 'MyApp'`, con esto automáticamente se crea una variable global llamada `MyApp` junto con los siguientes _namespaces_:
-
-* _MyApp_
-* _MyApp.views_
-* _MyApp.controllers_
-* _MyApp.models_
-* _MyApp.stores_
-
-Estos _namespaces_ (o espacios de nombres) nos permitirán acceder a atributos de nuestra aplicación de forma sencilla, los iremos viendo en detalle más adelante.
-
-> El nombre de la aplicación (`name: 'MyApp'`) no debe contener espacios y deberá estar formado únicamente por letras mayúsculas y minúsculas, números y algunos símbolos permitidos en la definición de variables en JavaScript.
-
-La función `launch: function() { ... }` solo se ejecuta una vez al cargar la aplicación, y es donde deberemos de colocar el código necesario para definir y cargar nuestra aplicación. En el ejemplo propuesto creamos un panel usando el siguiente código:
-
-```javascript
-Ext.create("Ext.Panel", {
-    fullscreen: true,
-    html: '¡Hola Mundo!'
-});
-```
-
-Con `Ext.create("Ext.Panel", { ... });` instanciamos un panel para nuestro contenido y se lo asignamos al _viewport_ de nuestra aplicación. El _viewport_ es la vista principal de la aplicación, dentro de la cual iremos añadiendo todo el contenido.
-
-Entre las llaves `{}` le pasaremos la lista de opciones de configuración que definirán el panel. Con la instrucción `fullscreen: true` le indicamos que debe ocupar toda la pantalla y con `html: 'Hola Mundo!'` el código HTML que tiene que contener.
-
-Con esto ya hemos creado nuestra primera aplicación, un panel que ocupa toda la pantalla con el texto "¡Hola Mundo!".
-
-> Si queremos podemos definir la función `launch` como una función independiente. Dentro del código del panel simplemente tendremos que poner el nombre de la función a llamar, por ejemplo: `launch: iniciarAplicacion` (sin poner los paréntesis de función). Y luego de forma independiente definiríamos la función `function iniciarAplicacion() { ... }` con el resto del código. Esta es una buena práctica para modularizar nuestro código.
-
-
-
-
-<!-- ********************************************************************* -->
 ## Comprobando los resultados
 
 Para comprobar el resultado de nuestra aplicación podemos abrirla en un navegador compatible con WebKit, como Chrome o Safari. Si abrimos el ejemplo de la sección anterior deberíamos obtener algo como:
