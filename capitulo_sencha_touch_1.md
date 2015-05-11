@@ -1,14 +1,6 @@
 
 
 
-
-<!-- ********************************************************************* -->
-## _Layouts_
-
-Los _layouts_ se utilizan para especificar las dimensiones y posicionamiento de los componentes en una aplicación. Por ejemplo, en un aplicación de correo en general se colocarán dos paneles una a continuación del otro en horizontal, el de la izquierda para lista de mensajes ocupando un tercio del ancho y el de la derecha para la previsualización ocupando el resto del espacio.
-
-
-
 <!-- ********************************* -->
 ### _Layout_ tipo _HBox_
 
