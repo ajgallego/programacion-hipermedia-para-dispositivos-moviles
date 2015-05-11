@@ -1,35 +1,6 @@
 
 
 
-
-<!-- ********************************* -->
-### _Pack_ y _Align_
-
-Las características _pack_ y _align_ del _layout_ sirven para controlar la alineación de los elementos hijos dentro de un contenedor:
-
-* _Pack_: es la alineación en el mismo eje de alineación del _layout_ utilizado. Por ejemplo, en un _layout_ tipo _hbox_ sería el horizontal y en uno tipo _vbox_ el vertical. Se pueden asignar tres posibles valores: _start_, _center_ y _end_.
-* _Align_: es la alineación en el eje perpendicular al de la alineación del _layout_ utilizado. Por ejemplo, en un _layout_ del tipo _hbox_ será la vertical y en uno del tipo _vbox_ la horizontal. Puede tener cuatro posibles valores: _start_, _center_, _end_ y _stretch_.
-
-A continuación se incluye un ejemplo de su utilización:
-
-```javascript
-Ext.create('Ext.Panel', {
-    fullscreen: true,
-    layout: {
-        type: 'hbox',
-        align: 'center',
-        pack: 'center'
-    },
-    items: {
-    	xtype: 'panel',
-    	html: 'Contenido centrado.'
-    }
-});
-```
-
-
-
-
 <!-- ********************************************************************* -->
 ## Toolbars
 
