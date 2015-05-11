@@ -4,54 +4,6 @@
 
 
 <!-- ********************************************************************* -->
-## Comprobando los resultados
-
-Para comprobar el resultado de nuestra aplicación podemos abrirla en un navegador compatible con WebKit, como Chrome o Safari. Si abrimos el ejemplo de la sección anterior deberíamos obtener algo como:
-
-![](images/web_sencha/sencha_p3.jpg)
-
-Recordad que además del acceso directo se puede acceder usando un servidor web (en general será preferible esta 2ª opción ya que en muchas ocasiones el acceso directo puede dar problemas de permisos o de _cross origin request_). Para el servidor tenemos dos alternativas:
-
-* Usar un servidor web propio instalado en nuestro sistema operativo, copiar nuestro proyecto dentro de la carpeta pública del servidor y acceder a través de la dirección: http://localhost/MyApp
-* Usar el servidor Web que proporciona Sencha Cmd. Para activarlo tenemos que ir a la carpeta de nuestra aplicación y en un terminal ejecutar `sencha web start &`. Para acceder en este caso utilizaremos la ruta: `http://localhost:1841/`
-
-Al usar un servidor también podemos comprobar el resultado utilizando un emulador de móvil, como en las imágenes inferiores:
-
-![](images/web_sencha/sencha-test1.jpg)
-
-![](images/web_sencha/sencha_p6.jpg)
-
-Estos emuladores son parte del IDE de Xcode y del SDK de Android. Para poder utilizarlos necesitaremos tener instalados los SDKs además de tener el código en un servidor Web. Para más información consultar la sección inicial "Instalación de un servidor Web" y "Emuladores".
-
-Para depurar nuestras aplicaciones, además de las herramientas para el desarrollador que incorpora el navegador podemos instalar la siguiente extensión especial para Sencha:
-
-https://chrome.google.com/webstore/detail/app-inspector-for-sencha/pbeapidedgdpniokbedbfbaacglkceae?hl=en
-
-
-
-
-<!-- ********************************************************************* -->
-## Todo en un único fichero vs. MVC (patrón Modelo, Vista, Controlador)
-
-Para facilitar la creación de aplicaciones y proporcionar a la vez una estructura de contenidos sencilla pero potente, Sencha Touch utiliza el patrón de diseño MVC (Modelo Vista Controlador).
-
-Siguiendo este patrón una aplicación se conforma por una lista de Modelos, Vistas, Controladores, Stores (o Almacenes) y Profiles (o Perfiles), además de una serie de metadatos como el icono, imágenes, etc.
-
-
-![Arquitectura MVC](images/web_sencha/sencha_arquitectura_mvc.png "Arquitectura MVC")
-
-Sin embargo para aplicaciones pequeñas y sencillas no es necesario realizar esta separación del código y se puede escribir todo en un único fichero. Por lo tanto Sencha Touch permite ambos sistemas.
-
-En este curso de introducción no vamos a tratar el modelo MVC, pero todos los conceptos y herramientas que vamos a ver sirven también para el patrón MVC.
-
-Para más información podéis consultar la siguiente dirección:
-
-http://docs.sencha.com/touch/2.4/core_concepts/about_applications.html
-
-
-
-
-<!-- ********************************************************************* -->
 ## Componentes y contenedores
 
 
