@@ -1,7 +1,7 @@
 # Summary
 
 * [Contenidos](README.md)
-* [Introducción al desarrollo Web](capitulo_introduccion_web.md)
+* [Introducción al desarrollo Web para móviles](capitulo_introduccion_web.md)
 * [Diseño Responsive](capitulo_diseno_responsive.md)
 * [JQuery Mobile](capitulo_jquery_mobile.md)
 * [Sencha Touch](capitulo_sencha_touch.md)
