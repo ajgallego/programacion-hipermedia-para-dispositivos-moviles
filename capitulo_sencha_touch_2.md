@@ -89,49 +89,6 @@ Nota: Las animaciones "_flip_", "_cube_", "_cover_", "_reveal_" y "_scroll_" no 
 
 
 
-<!-- ********************************************************************* -->
-## Carousel
-
-El Carousel es un contenedor de paneles que nos permite cambiar entre ellos simplemente arrastrando el dedo. Solo se muestra un panel en cada momento junto con un pequeño indicador con puntos que referencia el número de paneles disponibles.
-
-Es muy sencillo configurarlo, en su sección `ítems` tenemos que definir cada uno de los paneles. Si queremos que se utilicen los estilos HTML básicos tenemos que activar la opción `defaults: { styleHtmlContent: true }`, como en el siguiente ejemplo:
-
-
-```javascript
-var panelCarousel = Ext.create('Ext.Carousel', {
-    fullscreen: true,
-    defaults: {
-        styleHtmlContent: true
-    },
-    items: [
-        {
-            html : 'Item 1',
-            style: 'background-color: #5E99CC'
-        },
-        {
-            html : 'Item 2',
-            style: 'background-color: #759E60'
-        },
-        {
-            html : 'Item 3'
-        }
-    ]
-});
-```
-
-Con lo que obtendríamos un resultado como el siguiente:
-
-
-![](images/web_sencha/sencha_carousel.jpg)
-
-
-Dentro de los items de un carousel podemos añadir cualquier tipo de componente de entre los disponibles en Sencha Touch.
-
-Una opción interesante de configuración es la orientación del panel, que básicamente lo que hace es cambiar la posición de los puntos y la dirección de movimiento de los paneles. Para configurarlo usamos la propiedad `direction: 'horizontal'` (por defecto) o `direction: 'vertical'`.
-
-
-
-
 
 <!-- ********************************************************************* -->
 ## Diálogos mediante _MessageBox_
