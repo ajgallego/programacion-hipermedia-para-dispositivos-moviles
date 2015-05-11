@@ -1,31 +1,5 @@
 
 
-<!-- ********************************* -->
-### _Layout_ tipo _Fit_
-
-El _layout_ tipo _fit_ es uno de los más sencillos, simplemente hace que sus componentes hijos ocupen todo el tamaño disponible del contenedor.
-
-![](images/web_sencha/layout_fit.jpg)
-
-Por ejemplo, si tenemos un contenedor de 200px de ancho por 200px de alto y le añadimos un hijo y el _layout_ tipo _fit_, el componente añadido será expandido para ocupar el mismo tamaño que el padre:
-
-```javascript
-var panel = Ext.create('Ext.Panel', {
-    width: 200,
-    height: 200,
-    layout: 'fit',
-    items: {
-        xtype: 'panel',
-        html: 'Panel del mismo tamaño que el padre.'
-    }
-});
-Ext.Viewport.add(panel);
-```
-
-> Si añadimos varios elementos a un contenedor de este tipo solamente será visible el primero, ya que al expandirse para ocupar todo el espacio ocultará al resto. Para mostrar otros elementos en el panel podemos utilizar otros _layouts_ (hbox, vbox o card) u ocultar el elemento visible para dejar espacio.
-
-
-
 
 <!-- ********************************* -->
 ### _Docking_ o acoplamiento
