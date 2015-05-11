@@ -192,41 +192,10 @@ También existen librerías un poco más completas para detectar el cliente usan
 
 Cuando se empieza en el desarrollo de webs para dispositivos móviles es bueno buscar inspiración, ir a ver que ha hecho gente con más experiencia en el campo. A continuación se incluye una pequeña lista de ejemplos:
 
-<table>
-    <tr>
-        <td> 
-            http://m.diesel.com 
-            <br/> 
-            ![](images/web_intro/intro_ex_diesel.jpg)
-        </td>
-        <td>
-            http://m.flickr.com/ 
-            <br/> 
-            ![](images/web_intro/intro_ex_flickr.jpg)
-        </td>
-    </tr>
-    <tr>
-        <td>
-            http://mobile.walmart.com/ 
-            <br/> 
-            ![](images/web_intro/intro_ex_wallmart.jpg) 
-        </td>
-        <td>
-            http://m.marksandspencer.com/
-            <br/> 
-            ![](images/web_intro/intro_ex_mys.jpg)
-        </td>
-    </tr>
-    <tr>
-        <td>
-            http://iphonetoolbox.com/dailywallpaper
-            <br/>
-            ![](images/web_intro/intro_ex_wallpaper.jpg)
-        </td>
-        <td>
-        </td>
-   </tr>
-</table>
+| http://m.diesel.com <br/> ![](images/web_intro/intro_ex_diesel.jpg) | http://m.flickr.com/ <br/> ![](images/web_intro/intro_ex_flickr.jpg) |
+| -- | -- |
+| http://mobile.walmart.com/ <br/> ![](images/web_intro/intro_ex_wallmart.jpg) | http://m.marksandspencer.com/ <br/> ![](images/web_intro/intro_ex_mys.jpg) |
+| http://iphonetoolbox.com/dailywallpaper <br/> ![](images/web_intro/intro_ex_wallpaper.jpg) | |
 
 
 En todos de ellos debemos de considerar la adaptación que se ha hecho del contenido entre la web de escritorio y la web para dispositivos móviles. En la siguiente imagen se puede ver una comparación en la que varía la disposición. Pero como hemos dicho, los cambios no son únicamente de disposición, tenemos que recordar la regla del 20%.
