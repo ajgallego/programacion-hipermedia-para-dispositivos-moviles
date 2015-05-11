@@ -4,53 +4,6 @@
 
 
 
-<!-- ********************************************************************* -->
-## _Data Views_
-
-Los _Data Views_ nos permiten mostrar datos de forma personalizada mediante el uso de plantillas y opciones de formato. Principalmente se utilizan para mostrar datos provenientes de un _store_ y aplicarles formato utilizando las plantillas "`Ext.XTemplate`", como hemos visto en la sección anterior. Además también proporcionan mecanismos para gestionar eventos como: _click, doubleclick, mouseover, mouseout_, etc., así como para permitir seleccionar los elementos mostrados (por medio de un "_itemSelector_").
-
-En el siguiente ejemplo vamos a crear un _DataView_ para mostrar el contenido de un _store_ definido por separado y mediante la utilización de una plantilla también previamente definida usando `Ext.XTemplate`:
-
-```javascript
-var myDataView = Ext.create('Ext.DataView', {
-    fullscreen: true,
-	store: myStore,
-	tpl: myTpl
-});
-```
-
-En este otro ejemplo creamos un _DataView_ para mostrar el contenido de un _store_ que incluimos dentro de la propia clase con un array de datos interno. Además utilizamos la propiedad `itemTpl` el lugar de `tpl`, lo que nos permite indicar el _template_ de cada elemento o _item_ del array directamente.
-
-```javascript
-Ext.create('Ext.DataView', {
-    fullscreen: true,
-    store: {
-        fields: ['name','age'],
-        data: [
-        	{name:'Manuel', age:21},
-        	{name:'Pedro', age:56},
-        	{name:'Javi', age:36},
-        	{name:'Laura', age:57},
-        	{name:'Alfredo', age:11},
-        	{name:'María', age:12}
-        ]
-    },
-    itemTpl: '{name} tiene {age} años'
-});
-```
-
-
-Esta "vista de datos" podemos mostrarla en nuestra aplicación tal cual la hemos creado o también podemos añadirla a la sección `items` de un panel:
-
-```javascript
-var myPanel = Ext.create('Ext.Panel', {
-    fullscreen: true,
-    items: [ myDataView ]
-});
-```
-
-
-
 
 
 <!-- ********************************************************************* -->
