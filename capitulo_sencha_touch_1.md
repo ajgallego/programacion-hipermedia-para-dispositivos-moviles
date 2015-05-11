@@ -1,69 +1,6 @@
 
 
 
-<!-- ********************************* -->
-### _Layout_ tipo _HBox_
-
-Si queremos que los elementos en un contenedor se dispongan de forma horizontal podemos utilizar el _layout_ tipo `hbox`.
-
-Además, para especificar el espacio que han de ocupar los componentes dentro del contenedor podemos utilizar la propiedad `flex`, la cual indica la proporción de espacio que ocupará un componente. Al indicar el espaciado de una serie de componentes con `flex` no es necesario que sumen 100, sino que se sumará el total de las cantidades y ese será el 100% del espacio. Por ejemplo, para conseguir una columna que ocupe 1/3 y otra de 2/3 especificaríamos los siguientes valores para la propiedad _flex_:
-
-![](images/web_sencha/layout_hbox.jpg)
-
-Para conseguir una disposición como la de la imagen tendríamos que indicar el _layout_ tipo _hbox_ al contenedor padre y establecer el atributo _flex_ de cada hijo de la forma:
-
-```javascript
-Ext.create('Ext.Container', {
-    fullscreen: true,
-    layout: 'hbox',
-    items: [
-        {
-            xtype: 'panel',
-            html: 'Columna que ocupa 1/3 del ancho.',
-            flex: 1,
-            style: 'background-color: #5E99CC;'
-        },
-        {
-            xtype: 'panel',
-            html: 'Columna que ocupa 2/3 del ancho.',
-            flex: 2,
-            style: 'background-color: #759E60;'
-        }
-    ]
-});
-```
-
-
-
-<!-- ********************************* -->
-### _Layout_ tipo _VBox_
-
-El layout _vbox_ es similar a _hbox_ pero creando una disposición vertical en lugar de horizontal. Lo podemos visualizar como un conjunto de cajas apiladas de la siguiente forma:
-
-![](images/web_sencha/layout_vbox.jpg)
-
-El código para crear una pantalla de este tipo sería idéntico al utilizado en el ejemplo anterior pero cambiando el tipo de _layout_ _hbox_ por _vbox_:
-
-```javascript
-Ext.create('Ext.Container', {
-    fullscreen: true,
-    layout: 'vbox',
-    items: [
-        {
-            xtype: 'panel',
-            html: 'Fila que ocupa 1/3 del alto.',
-            flex: 1
-        },
-        {
-            xtype: 'panel',
-            html: 'Fila que ocupa 2/3 del alto.',
-            flex: 2
-        }
-    ]
-});
-```
-
-
 
 <!-- ********************************* -->
 ### _Layout_ tipo _Card_
