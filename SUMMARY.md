@@ -5,7 +5,7 @@
 * [Introducción a JavaScript](capitulo_introduccion_javascript.md)
 * [Diseño Responsive](capitulo_diseno_responsive.md)
 * [JQuery Mobile](capitulo_jquery_mobile.md)
-* [Sencha Touch 1. Introducción](capitulo_sencha_touch_1.md)
+* [Sencha Touch](capitulo_sencha_touch.md)
 * [Sencha Touch 2. Componentes](capitulo_sencha_touch_2.md)
 * [Sencha Touch 3. Almacenamiento](capitulo_sencha_touch_3.md)
 * [PhoneGap](capitulo_phonegap.md)
