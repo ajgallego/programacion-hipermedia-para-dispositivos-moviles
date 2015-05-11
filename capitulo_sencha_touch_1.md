@@ -1,17 +1,6 @@
 
 
 <!-- ********************************************************************* -->
-## Instalar Sencha Touch
-
-En primer lugar descargamos el SDK de Sencha Touch desde su página Web "<a href="http://www.sencha.com/products/touch/download/">http://www.sencha.com/products/touch/download/</a>". Se nos descargará un fichero comprimido con ZIP (llamado algo como "sencha-touch-VERSION.zip"), que descomprimiremos en una carpeta.
-
-A continuación tenemos que instalar el Cmd de Sencha, el cual descargamos desde <a href="http://www.sencha.com/products/sencha-cmd/download/">http://www.sencha.com/products/sencha-cmd/download/</a>, lo descomprimimos e instalamos mediante el _wizard_ que incorpora. Una vez instalado ya tendremos disponible desde la consola el ejecutable `sencha` para crear aplicaciones y gestionarlas.
-
-> Nota: si el comando `sencha` fallara por cuestiones de permisos en Linux tendremos que reinstalar como un usuario normal en vez de como _root.
-
-
-
-<!-- ********************************************************************* -->
 ## Crear nuestra primera aplicación
 
 Una vez instalado Sencha Touch y Sencha Cmd ya podemos crear nuestra primera aplicación. Para ello crearemos una nueva carpeta para la aplicación y entraremos en ella:
