@@ -2,24 +2,6 @@
 
 
 
-
-
-
-
-<!-- ********************************* -->
-### Destruir componentes
-
-Cuando no se va a necesitar más un elemento se recomienda eliminarlo completamente para ahorrar memoria. Hemos de tener en cuenta que en los dispositivos móviles la memoria es un recurso escaso y si nuestra aplicación es muy grande puede llegar a ralentizar el móvil. Por este motivo se ha introducido el método `destroy` que elimina el componente que lo llame:
-
-```javascript
-mainPanel.destroy();
-```
-
-Este comando eliminaría el _mainPanel_ del DOM y además eliminaría todos los _listeners_ que estuvieran escuchando a sus eventos. Hemos de tener cuidado ya que también se eliminará todo el contenido del elemento, por ejemplo si es un contenedor se eliminarían sus paneles hijos.
-
-
-
-
 <!-- ********************************************************************* -->
 ## _Layouts_
 
