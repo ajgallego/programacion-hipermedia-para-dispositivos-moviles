@@ -1,47 +1,5 @@
 
 
-
-
-<!-- ********************************* -->
-### _Layout_ tipo _Card_
-
-El _layout_ tipo _Card_ permite asignar muchos componentes o contenedores al mismo _layout_ pero en el que solamente se mostrará uno a la vez. Como si fuera una baraja de cartas, los componentes se apilarán y solamente se mostrará uno de ellos ocupando toda la pantalla y ocultando al resto.
-
-![](images/web_sencha/layout_card.jpg)
-
-En esta imagen el cuadro gris es el contenedor y la caja azul dentro de él es el elemento que actualmente se está mostrando. El resto de elementos que aparecen al lado están ocultos, pero se pueden intercambiar en cualquier momento para mostrarse.
-
-A continuación se incluye un ejemplo de un panel con un _layout_ tipo _card_ que contiene cuatro tarjetas:
-
-```javascript
-var panel = Ext.create('Ext.Panel', {
-    layout: 'card',
-    items: [
-        {
-            html: "Primer item"
-        },
-        {
-            html: "Segundo item"
-        },
-        {
-            html: "Tercer item"
-        },
-        {
-            html: "Cuarto item"
-        }
-    ]
-});
-
-panel.setActiveItem(1);
-```
-
-Por defecto se muestra la primera tarjeta, pero mediante la llamada a `panel.setActiveItem(1);` indicamos que se muestre la 2ª tarjeta (el número de elemento empieza en cero, por lo que el 1 se refiere a la 2ª posición).
-
-Al añadir las _cartas_ del _layout_ las podemos crear directamente en el array de _items_, como en el ejemplo, o añadirlas posteriormente con el método `add` del panel (como ya se vio en una sección anterior).
-
-
-
-
 <!-- ********************************* -->
 ### _Layout_ tipo _Fit_
 
