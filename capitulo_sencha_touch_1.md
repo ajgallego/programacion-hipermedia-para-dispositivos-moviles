@@ -1,55 +1,6 @@
 
 
 
-<!-- ********************************************************************* -->
-## Toolbars
-
-Hasta ahora hemos visto como utilizar paneles y contenedores (`Ext.Panel` y `Ext.Container`), en esta sección vamos a ver como añadir barras de herramientas dentro de estos elementos.
-
-Para añadir barras de herramientas a un panel tenemos dos opciones, igual que para otro tipo de componentes, estas son:
-
-* Crear la barra de herramientas de forma separada usando el constructor "`var toolbar = Ext.create('Ext.Toolbar', { ... });`" y posteriormente añadirla al panel en su atributo "`items`" usando su nombre de variable.
-* Crear la barra de herramientas directamente en el atributo "`items`" del panel. Para esto definiremos el tipo de componente usando el `xtype: 'toolbar'`.
-
-
-En ambos casos, dentro del constructor podemos usar los siguientes atributos:
-
-* **id: 'identificador'**: Atributo opcional para indicar el identificador de la barra.
-* **docked: 'top'** o **docked: 'bottom'**: indica que la barra se coloque en la parte superior o en la parte inferior del panel respectivamente.
-* **title: 'texto'**: indica el texto que se colocará en el centro de la barra.
-* **ui: valor**: atributo opcional que cambia la apariencia de la barra. Por defecto toma el valor "_dark_", pero también podemos usar "_light_" que aplicará unos colores más claros.
-
-
-En el siguiente ejemplo se crean dos barras de herramientas y se añaden a un panel. La primera se crea de forma separada y después se añaden al panel usando su nombre de variable. La segunda barra se crea en línea usando su _xtype_:
-
-```javascript
-var topToolbar = Ext.create('Ext.Toolbar', {
-  docked: 'top',
-  title: 'Top Toolbar'
-});
-
-var panel = Ext.create('Ext.Panel', {
-  fullscreen: true,
-  layout: 'fit',
-  html: 'Contenido central',
-  items: [
-    topToolbar,
-    {
-        xtype: 'toolbar',
-        dock: 'bottom',
-        title: 'Bottom Toolbar'
-    }
-  ]
-});
-```
-
-Con lo que obtendríamos un resultado similar a:
-
-![](images/web_sencha/sencha_toolbars.jpg)
-
-
-
-
 
 <!-- ********************************************************************* -->
 ## Botones
