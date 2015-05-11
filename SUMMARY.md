@@ -6,7 +6,6 @@
 * [Diseño Responsive](capitulo_diseno_responsive.md)
 * [JQuery Mobile](capitulo_jquery_mobile.md)
 * [Sencha Touch](capitulo_sencha_touch.md)
-* [Sencha Touch 3. Almacenamiento](capitulo_sencha_touch_3.md)
 * [PhoneGap](capitulo_phonegap.md)
 * [Laravel](capitulo_laravel_1.md)
 * [Servicios Rest](capitulo_servicios_rest.md)
