@@ -1,6 +1,6 @@
 # Summary
 
-* [Introducción](README.md)
+* [Contenidos](README.md)
 * [Introducción al desarrollo Web](capitulo_introduccion_web.md)
 * [Diseño Responsive](capitulo_diseno_responsive.md)
 * [JQuery Mobile](capitulo_jquery_mobile.md)
