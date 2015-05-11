@@ -1,38 +1,6 @@
 # Sencha Touch 2 - Componentes
 
 
-<!-- ********************************************************************* -->
-## Identificadores y referencias
-
-Como ya hemos visto, al crear un elemento lo podemos almacenar en una variable de javascript que posteriormente podemos utilizar para hacer referencia a él. Pero Sencha Touch también permite definir un identificador (`id`) mediante el cual posteriormente podremos hacer referencia a ese elemento. La forma de definirlo, por ejemplo, para un panel es la siguiente:
-
-```javascript
-var panel1 = Ext.create('Ext.Panel', {
-  id: 'idpanel1',
-  html: 'Panel 1'
-});
-```
-
-Posteriormente desde otro elemento podremos referirnos a este panel de dos formas:
-* Mediante la variable `panel1`, por ejemplo: `panel1.setHtml('Nuevo HTML');`
-* Mediante su identificador `idpanel1`. Para esto utilizaremos el método `Ext.getCmp('idpanel1')` que nos devolverá una referencia al objeto.
-
-Por ejemplo, para añadir este elemento a un panel contenedor tendríamos que hacer:
-
-```javascript
-var panelPrincipal = Ext.create('Ext.Panel', {
-  fullscreen: true,
-  layout: 'card',
-  items: [ Ext.getCmp('idpanel1') ]
-
-  // También podríamos haber usado su nombre de variable, de la forma:
-  // items: [ panel1 ]
-});
-```
-
-Este identificador podemos usarlo con todos los elementos: botones, barras, etc. Es una buena práctica definirlo para todos los elementos que creamos que vayamos a referenciar posteriormente. En este documento, por simplicidad, no lo incluiremos en todos los ejemplos, solamente cuando sea necesario.
-
-
 
 <!-- ********************************************************************* -->
 ## Transiciones de cambio de vista
