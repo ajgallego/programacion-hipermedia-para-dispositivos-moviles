@@ -1,7 +1,7 @@
 # Summary
 
 * [Contenidos](README.md)
-* [Introducción al desarrollo Web para móviles](capitulo_introduccion_web.md)
+* [Desarrollo Web para móviles](capitulo_web_para_moviles.md)
 * Introducción a la programación Web
 * [Diseño Responsive](capitulo_diseno_responsive.md)
 * [JQuery Mobile](capitulo_jquery_mobile.md)
