@@ -3,7 +3,7 @@
 
 El contenido de introducción a la programación Web se puede consultar en la siguiente dirección: 
 
-[https://www.gitbook.com/book/ajgallego/introduccion-a-la-programacion-web/dashboard](https://www.gitbook.com/book/ajgallego/introduccion-a-la-programacion-web/dashboard)
+[https://www.gitbook.com/book/ajgallego/ipw/details](https://www.gitbook.com/book/ajgallego/ipw/details)
 
 
 
