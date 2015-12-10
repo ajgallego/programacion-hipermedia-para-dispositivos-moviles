@@ -4,7 +4,7 @@
 * [Desarrollo Web para móviles](capitulo_web_para_moviles.md)
 * [Introducción a la programación Web](capitulo_introduccion_web.md)
 * [Diseño Responsive](capitulo_diseno_responsive.md)
-* [Ionic](capitulo_ionic.md/Ionic)
+* [Ionic](capitulo_ionic.md)
 * [Sencha Touch](capitulo_sencha_touch.md)
 * [PhoneGap](capitulo_phonegap.md)
 * [Laravel](capitulo_laravel_1.md)
