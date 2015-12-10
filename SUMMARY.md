@@ -4,7 +4,7 @@
 * [Desarrollo Web para móviles](capitulo_web_para_moviles.md)
 * [Introducción a la programación Web](capitulo_introduccion_web.md)
 * [Diseño Responsive](capitulo_diseno_responsive.md)
-* [JQuery Mobile](capitulo_jquery_mobile.md)
+* [Ionic](capitulo_ionic.md)
 * [Sencha Touch](capitulo_sencha_touch.md)
 * [PhoneGap](capitulo_phonegap.md)
 * [Laravel](capitulo_laravel_1.md)
@@ -13,5 +13,4 @@
 * [Android. Servicios Rest](capitulo_rest_android.md)
 * [iOS. Acceso a la red](capitulo_red_ios.md)
 * [iOS. Servicios Rest](capitulo_rest_ios.md)
-
 
