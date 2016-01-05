@@ -1,4 +1,4 @@
-# Introducción
+# Contenidos
 
 El desarrollo web para móviles se ha convertido en una alternativa al desarrollo de aplicaciones nativas para dispositivos móviles por su simplicidad y la ventaja de poder usar un solo código para todas las plataformas. Además permite a los desarrolladores de aplicaciones web de escritorio utilizar sus conocimientos y la experiencia adquirida con solo unas pequeñas diferencias para su adaptación.
 

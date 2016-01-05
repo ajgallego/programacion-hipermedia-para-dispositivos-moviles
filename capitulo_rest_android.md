@@ -73,10 +73,10 @@ Hemos visto cómo realizar una petición GET, tal como se vio en sesiones anteri
 
 ```java
 HttpClient client = new DefaultHttpClient();
+HttpPost post = new HttpPost("http://<dominio>/recurso");
 
-HttpPost post = new HttpPost("http://<dominio>/peliculas");
-
-StringEntity se = new StringEntity(" [contenido xml] ");
+String XMLcontent = "[contenido xml]";
+StringEntity se = new StringEntity( XMLcontent, HTTP.UTF_8); // Es importante indicar la codificación
 se.setContentType("application/xml");    // O "application/json"
 
 post.setEntity(se);
@@ -212,7 +212,15 @@ El objeto `JSONArray` nos permite conocer el número de elementos que contiene (
 
 Los objetos (`JSONObject`) tienen una serie de campos, a los que también se accede mediante una serie de métodos `get-` que pueden ser de los mismos tipos que en el caso de las listas. En el ejemplo anterior son cadenas (_texto_, y _usuario_), pero podrían ser listas u otros objetos anidados.
 
-Esta librería no sólo nos permite analizar JSON, sino que también podemos componer mensajes con este formato. Los objetos `JSONObject` y `JSONArray` tienen para cada método `get-`, un método `put-` asociado que nos permite añadir campos o elementos. Una vez añadida la información necesaria, podemos obtener el texto JSON mediante el método `toString()` de los objetos anteriores.
+Esta librería no sólo nos permite analizar JSON, sino que también podemos componer mensajes con este formato. Los objetos `JSONObject` y `JSONArray` tienen para cada método `get-`, un método `put-` asociado que nos permite añadir campos o elementos. Una vez añadida la información necesaria, podemos obtener el texto JSON mediante el método `toString()` de los objetos anteriores. A continuación se incluye un ejemplo:
+
+```java
+JSONObject jobj = new JSONObject();
+jobj.put("texto", "Texto de prueba");
+jobj.put("usuario", "Juan" );
+
+String json = jobj.toString();
+``` 
 
 Además es importante que capturemos las excepciones al procesar cadenas en JSON ya que en caso de intentar obtener un tipo de elemento que no estuviera presente se lanzaría una excepción del tipo `JSONException`.
 
