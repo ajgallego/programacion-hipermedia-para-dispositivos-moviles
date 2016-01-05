@@ -202,7 +202,7 @@ Con HttpClient podemos activar o desactivar la autentificaciÛn preventiva con e
 
 ### Autentificación no preventiva
 
-En iOS, la autentificación la puede hacer el delegado de la conexión. Cuando enviamos una petición sin credenciales, el sevidor nos responderá que necesita autentificación invocando al método delegado `didReceiveChallenge`. En este método, que puede ser a nivel de sesión o de tarea, podremos especificar los datos de la acreditación.
+En iOS, la autentificación la puede hacer el delegado de la conexión. Cuando enviamos una petición sin credenciales, el sevidor nos responderá que necesita autentificación invocando al método delegado `didReceiveChallenge` del protocolo `NSURLSessionDelegate`. En este método, que puede ser a nivel de sesión o de tarea, podremos especificar los datos de la acreditación.
 
 * A nivel de sesión, se invoca ``URLSession:didReceiveChallenge:completionHandler`` cuando el servidor requiere autentificación. Este método debe usarse para servidores con SSL/TLS, o cuando todas las peticiones que hagamos para una sesión necesiten la misma acreditación.
 
@@ -231,7 +231,7 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
 }
 ```
 
-Y a nivel de tarea sería exactamente igual, pero usando el siguiente prototipo:
+Y a nivel de tarea sería exactamente igual, pero usando el siguiente prototipo, esta vez del protocolo `NSURLSessionTaskDelegate`:
 
 ```objectivec
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
