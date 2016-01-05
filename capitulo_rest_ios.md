@@ -142,12 +142,23 @@ Tras inicializar el _parser_, lo ejecutamos llamando el método `parse`, que rea
 
 ## Acceso a servicios REST desde iOS
 
-En iOS podemos acceder a servicios REST utilizando las clases para conectar con URLs vistas en anteriores sesiones. Por ejemplo, para hacer una consulta al servidor de OpenWeatherMap podríamos utilizar un código como el siguiente para iniciar la conexión (recordemos que este método de conexión es asíncrono, y los datos los recibirá posteriormente el objeto delegado especificado):
+En iOS podemos acceder a servicios REST utilizando las clases para conectar con URLs vistas en anteriores sesiones. Por ejemplo, para hacer una consulta al servidor de OpenWeatherMap podríamos utilizar un código como el siguiente para iniciar la conexión (recordemos que este método de conexión es asíncrono:
 
 ```objectivec
 NSURL *url = [NSURL URLWithString:@"http://api.openweathermap.org/data/2.5/weather?q=Alicante"];
+// A partir de aquí es una conexión normal como la que hemos visto en la sesión anterior
 NSURLRequest *theRequest = [NSURLRequest requestWithURL: url];
-NSURLConnection *theConnection = [NSURLConnection connectionWithRequest: theRequest delegate: self];
+
+NSURLSessionConfiguration *config=[NSURLSessionConfiguration defaultSessionConfiguration];
+NSURLSession session = [NSURLSession sessionWithConfiguration:config];
+
+[[session dataTaskWithRequest:request
+ completionHandler:^(NSData *data,
+                NSURLResponse *response,
+                NSError *error)
+                {
+                    // La respuesta del servidor se recibe en este punto
+                }] resume];
 ```
 
 En el caso de Objective-C, si queremos realizar peticiones con métodos distintos a GET, deberemos utilizar la clase `NSMutableURLRequest`, en lugar de `NSURLRequest`, ya que esta última no nos permite modificar los datos de la petición, incluyendo el método HTTP. Podremos de esta forma establecer todos los datos necesarios para la petición al servicio: método HTTP, mensaje a enviar (por ejemplo XML o JSON), y cabeceras (para indicar el tipo de contenido enviado, o los tipos de representaciones que aceptamos). Por ejemplo:
@@ -162,37 +173,13 @@ NSMutableURLRequest *theRequest = [NSMutableURLRequest requestWithURL: url];
 [theRequest setHTTPBody: datosPelicula];
 [theRequest setValue:@"application/json" forHTTPHeaderField:@"Accept"];
 [theRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-
-NSURLConnection *theConnection = [NSURLConnection connectionWithRequest: theRequest delegate: self];
 ```
 
 Podemos ver que en la petición POST hemos establecido todos los datos necesarios. Por un lado su bloque de contenido, con los datos del recurso que queremos añadir en la representación que consideremos adecuada. En este caso suponemos que utilizamos XML como representación. En tal caso hay que avisar de que el contenido lo enviamos con este formato, mediante la cabecera `Content-Type`, y de que la respuesta también queremos obtenerla en XML, mediante la cabecera `Accept`.
 
-## Seguridad HTTP básica
+## Seguridad HTTP
 
 Vamos a ver en primer lugar cómo acceder a servicios protegidos con seguridad HTTP estándar. En estos casos, deberemos proporcionar en la llamada al servicio las cabeceras de autentificación al servidor, con las credenciales que nos den acceso a las operaciones solicitadas.
-
-<!--
-Por ejemplo, desde un cliente Android en el que utilicemos la API de red est·ndar de Java SE deberemos definir
-un <code>Authenticator</code> que proporcione estos datos:</p>
-
-<source lang="java">Authenticator.setDefault(new Authenticator() {
-    protected PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication (
-              "usuario", "password".toCharArray());
-    }
-});</source>
-
-<p>En caso de que utilicemos HttpClient de Apache, se especificar· de la siguiente forma:</p>
-
-<source lang="java">DefaultHttpClient client = new DefaultHttpClient();
-client.getCredentialsProvider().setCredentials(
-    new AuthScope("jtech.ua.es", 80),
-    new UsernamePasswordCredentials("usuario", "password")
-);</source>
-
-<p>AquÌ adem·s de las credenciales, hay que indicar el ·mbito al que se aplican (host y puerto).</p>
--->
 
 Para quienes no estén muy familiarizados con la seguridad en HTTP, conviene mencionar el funcionamiento del protocolo a grandes rasgos. Cuando realizamos una petición HTTP a un recurso protegido con seguridad
 básica, HTTP nos devuelve una respuesta indicándonos que necesitamos autentificarnos para acceder. Es entonces cuando el cliente solicita al usuario las credenciales (usuario y password), y entonces se
@@ -203,7 +190,9 @@ realiza una nueva petición con dichas credenciales incluidas en una cabecera _A
 la librerÌa lanzar· una nueva peticiÛn con las credenciales especificadas en el proveedor de credenciales.</p>
 -->
 
+
 Sin embargo, si sabemos de antemano que un recurso va a necesitar autentificación, podemos tambiçen autentificarnos de forma preventiva. La autentificación preventiva consiste en mandar las credenciales en la primera petición, antes de que el servidor nos las solicite. Con esto ahorramos una petición, pero podríamos estar mandando las credenciales en casos en los que no resulta necesario.
+
 
 <!--
 Con HttpClient podemos activar o desactivar la autentificaciÛn preventiva con el siguiente mÈtodo:
@@ -211,78 +200,89 @@ Con HttpClient podemos activar o desactivar la autentificaciÛn preventiva con e
 <source lang="java">client.getParams().setAuthenticationPreemptive(true);</source>
 -->
 
-En iOS, la autentificación la deberá hacer el delegado de la conexión. Para ello deberemos implementar el método `connection:didReceiveAuthenticationChallenge:`. Este método será invocado cuando el servidor nos pida autentificarnos. En ese caso deberemos crear un objeto `NSURLCredential`
-a partir de nuestras credenciales (usuario y password).
+### Autentificación no preventiva
 
-A continuación vemos un ejemplo típico de implementación:
+En iOS, la autentificación la puede hacer el delegado de la conexión. Cuando enviamos una petición sin credenciales, el sevidor nos responderá que necesita autentificación invocando al método delegado `didReceiveChallenge`. En este método, que puede ser a nivel de sesión o de tarea, podremos especificar los datos de la acreditación.
+
+* A nivel de sesión, se invoca ``URLSession:didReceiveChallenge:completionHandler`` cuando el servidor requiere autentificación. Este método debe usarse para servidores con SSL/TLS, o cuando todas las peticiones que hagamos para una sesión necesiten la misma acreditación.
+
+* A nivel de petición, podemos usar el método ``URLSession:task:didReceiveChallenge:completionHandler:`` si el servidor requiere autentificación para una tarea en concreto. Esto es necesario si las peticiones de una misma sesión requieren acreditaciones distintas.
+
+Para usar estos métodos con autentificación Basic debemos crear un objeto `NSURLCredential` a partir de nuestras credenciales (usuario y password). A continuación vemos un ejemplo típico de implementación de una autenticación a nivel de sesión:
 
 ```objectivec
-- (void)connection:(NSURLConnection *)connection
-    didReceiveAuthenticationChallenge:
-        (NSURLAuthenticationChallenge *)challenge
+- (void)URLSession:(NSURLSession *)session
+didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
 {
     if(challenge.previousFailureCount == 0)
     {
-        NSURLCredential *cred = [NSURLCredential credentialWithUser:@"mi_login"
+        NSURLCredential *credential = [NSURLCredential credentialWithUser:@"mi_login"
                                                            password:@"mi_password"
-                                    persistence:NSURLCredentialPersistenceNone];
-        [[challenge sender] useCredential: cred forAuthenticationChallenge:challenge];
+                                    persistence:NSURLCredentialPersistenceForSession];
+
+        completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
     }
     else
     {
-        [[challenge sender] cancelAuthenticationChallenge: challenge];
+        NSLog(@"%s: challenge.error = %@", __FUNCTION__, challenge.error);
+        completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
     }
 }
 ```
 
-Podemos observar que comprobamos los fallos previos de autentificación que hemos tenido. Es decir, si con los credenciales que tenemos en el código ha fallado la autentificación, será mejor que cancelemos el acceso, ya que si volvemos a intentar acceder con los mismos credenciales vamos a tener el mismo error. En caso de que sea el primer intento, creamos los credenciales (podemos ver que se puede indicar que se guarden de forma persistente para los próximos accesos), y los utilizamos para responder al reto de autentificación (`NSURLAuthenticationChallenge`).
-
-Este método nos permite autentificarnos siempre que realicemos una conexión asíncrona. Sin embargo, si queremos conectar de forma síncrona, o queremos autentificarnos de forma preventiva, esto resultará
-bastante más complejo, ya que deberemos añadir las cabeceras de autentificación manualmente a la petición.
-
-La cabecera que necesitamos es `Authorization`, a la que le proporcionaremos el tipo de autentificación y los credenciales (login y password). Por ejemplo, para utilizar seguridad de tipo BASIC
-como en los casos anteriores, esta cabecera tendrá la siguiente forma:
-
-```bash
-Authorization: Basic login_base64:password_base64
-```
-
-La mayor dificultad radica en que el login y el password no se incluyen directamente, sino que deben estar codificados en base64. Necesitaremos por lo tanto una función que se encargue de realizar esta codificación, y no hay ninguna implementada en el SDK de iOS. Esto no es demasiado complejo de implementar, pero si no estamos familiarizados con este formato podemos encontrar diferentes implementaciones. Una de ellas es la implementación de Matt Gallagher: <a href="
-http://cocoawithlove.com/2009/06/base64-encoding-options-on-mac-and.html">http://cocoawithlove.com/2009/06/base64-encoding-options-on-mac-and.html</a>
-
-Esta implementación es bastante elegante, ya que se introduce como una categoría de `NSData`, lo cual añade a esta clase la capacidad de realizar la codificación y descodificación. Con ella podemos implementar la codificación de la siguiente forma:
+Y a nivel de tarea sería exactamente igual, pero usando el siguiente prototipo:
 
 ```objectivec
-NSString *cred = [NSString stringWithFormat:@"%@:%@", login, password];
-NSString *credBase64 = [[cred dataUsingEncoding:NSUTF8StringEncoding]
-                                                   base64EncodedString];
-NSString *authHeader = [NSString stringWithFormat:@"Basic %@",
-                                                  credBase64];
-
-NSMutableURLRequest *theRequest = [NSMutableURLRequest requestWithURL: url];
-[theRequest addValue:authHeader forHTTPHeaderField:@"Authorization"];
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
 ```
 
-Donde `login` y `password` son variables de tipo `NSString` donde tenemos almacenados nuestros credenciales, y `url` es de tipo `NSURL` y contiene la URL a la que conectar.
+Si es necesaria la autentificación y no implementamos el método a nivel de sesión, entonces iOS llama automáticamente al método a nivel de tarea.
 
-En el código podemos ver que primero se genera la cadena de credenciales, concatenando `login:password`. A continuación esta cadena se codifica en base64, y con esto ya podemos añadir una cabecera `Authorization` cuyo valor sea la cadena `Basic <credenciales_base64>`
+El tipo de persistencia puede ser:
+* ``NSURLCredentialPersistenceNone``: Las credenciales no se guardan
+* ``NSURLCredentialPersistenceForSession``: Las credenciales se guardan para esta sesión
+* ``NSURLCredentialPersistencePermanent``: Las credenciales se guardan en el _keychain_
+* ``NSURLCredentialPersistenceSynchronizable``: Las credenciales se guardan en el _keychain_, y además se comparten entre dispositivos iOS.
 
-Si en lugar de acceder a estos servicios desde una aplicación nativa, lo hacemos desde Javascript, deberemos asegurarnos de que el usuario se ha autentificado
-previamente en el sitio web que esté haciendo la llamada AJAX al servicio REST seguro.
+Podemos observar que comprobamos los fallos previos de autentificación que hemos tenido. Es decir, si con los credenciales que tenemos en el código ha fallado la autentificación, será mejor que cancelemos el acceso, ya que si volvemos a intentar acceder con los mismos credenciales vamos a tener el mismo error. En caso de que sea el primer intento, creamos los credenciales (podemos ver que se puede indicar que se guarden de forma persistente para los próximos accesos), y los utilizamos para responder al reto de autentificación (`NSURLAuthenticationChallenge`).
 
+### Autentificación preventiva
 
+Este tipo de autentificación se suele usar para servicios REST, y consiste en enviar las credenciales antes de que las pida el servidor. De este modo nos ahorramos un mensaje de petición y de respuesta, por lo que es más eficiente y ahorramos ancho de banda. Este esquema es recomendable cuando sabemos de antemano que nuestra petición va a necesitar autentificación.
 
+Esto también lo podemos hacer a nivel de sesión o de tarea. En cualquier caso, deberemos codificar en Base64 la cadena para autentificación. En el caso de autentificación Basic, dados un usuario y una contraseña podemos generar la cadena del siguiente modo:
 
+```objectivec
+NSString *login=@"my_user";
+NSString *password=@"my_password";
 
+NSString *authStr = [NSString stringWithFormat:@"%@:%@", login, password];
+NSData *authData = [authStr dataUsingEncoding:NSUTF8StringEncoding];
+NSString *authValue = [NSString stringWithFormat: @"Basic %@",[authData base64EncodedStringWithOptions:0]];
+```
 
+En el código podemos ver que primero se genera la cadena de credenciales, concatenando `login:password`. A continuación esta cadena se codifica en base64, y con esto ya podemos añadir una cabecera `Authorization` cuyo valor es la cadena `Basic <credenciales_base64>`.
 
+Una vez tengamos la cadnea de las credenciales, si queremos añadir la autentificación preventiva a la sesión podemos especificarla en la configuración:
 
+```objectivec
+NSURLSessionConfiguration *config=[NSURLSessionConfiguration defaultSessionConfiguration];
 
+config.HTTPAdditionalHeaders = @{@"Accept": @"application/json",
+                                 @"Authorization": authString};
 
+ NSURLSession *session=[NSURLSession sessionWithConfiguration:config];
+```
 
+Si en lugar de hacerlo a nivel de sesión lo que queremos es añadir esta autentificación a una petición, tenemos que modificar su request:
 
+```objectivec
+NSMutableURLRequest *req=[request mutableCopy]; // Porque no podemos modificar un NSURLRequest
+[req setValue:authValue forHTTPHeaderField:@"Authorization"];
 
-
+// En req tenemos el request actualizado
+```
 
 # Ejercicios de servicios rest en iOS
 
@@ -298,7 +298,7 @@ Hay que completar los métodos `parseXML` y `parseJSON` para mostrar la informac
 
 De forma opcional, puedes implementar lo siguiente:
 
-* Descargar la imagen del icono que se encuentra en el campo `icon` de la respuesta para mostrarlo en el `UIImageView` correspondiente. Ejemplo de una URL de acceso: http://openweathermap.org/img/w/10d.png
+* Descargar la imagen del icono que se encuentra en el campo `icon` de la respuesta para mostrarlo en el `UIImageView` correspondiente. Para esto puedes descargar la imagen con ``dataTaskWithURL``. Ejemplo de la URL correspondiente al icono `10d`: http://openweathermap.org/img/w/10d.png
 
 ## Proyecto de iOS (7 puntos)
 
@@ -308,48 +308,32 @@ El proyecto consistirá en hacer una aplicación para iOS que gestione el videoc
 
 Vamos a cambiar en el `MasterViewController` la carga de películas, de manera que esta vez se haga una petición GET al servidor. Puedes usar localhost si ya lo tienes implementado, o gbrain si no es así.
 
-Para empezar, descarga la clase `Connection` de los materiales. Esta clase realiza una conexión asíncrona como la que hemos visto anteriormente, evitando gestionarlo en las clases principales.
-
-Prepara  `MasterViewController` para usar la clase `Connection`, añadiendo el protocolo `ConnectionDelegate` e implementando los métodos siguientes:
+Para empezar, añade al proyecto la clase `Connection` que hemos implementado en eel ejercicio anterior. Prepara `MasterViewController` para usar esta clase, añadiendo el protocolo `ConnectionDelegate` e implementando los métodos siguientes:
 
 ```objectivec
 -(void)connectionSucceed:(Connection *)connection withData:(NSData *)data;
--(void)connectionFailed:(Connection *)connection withError:(NSError *)error;
+-(void)connectionFailed:(Connection *)connection withError:(NSString *)errorMessage;
 ```
 
-Para establecer la conexión usando la nueva clase, añade lo siguiente:
-
-```objectivec
-    self.theConnection=[[Connection alloc] initWithURLRequest:theRequest];
-    self.theConnection.delegate=self;
-```
-
-Si tras guardar los datos no se muestra nada en la tabla, probablemente debas añadir la siguiente instrucción:
+Implementa el código para hacer la petición del listado de películas desde el método ``createPelis``. Si tras recibir los datos no se muestra nada en la tabla, probablemente debas añadir la siguiente instrucción:
 
 ```objectivec
 [self.tableView reloadData];
 ```
 
-Los datos JSON de las películas están almacenados en un array. Añade el campo `identif` de tipo _NSString_ a la clase `Peli` y guárdalo cuando leas del JSON el valor del id. Te hará falta para implementar el resto de opciones.
+Los datos JSON de las películas están almacenados en un array. Añade el campo `identif` de tipo _NSString_ a la clase `Peli` y guárdalo cuando leas del JSON el valor del _id_. Esto te hará falta para implementar el resto de opciones.
 
 #### Alquilar / devolver
 
 En la vista `detailViewController`, implementa la opción de alquiler mostrando un botón (en cualquier parte visible) que indique el estado actual con el texto _Alquilada_ o _Libre_, y que pueda pulsarse para cambiar su estado.
 
-
 Si la conexión ha sido válida y se ha alquilado o devuelto la película, se debe actualizar el campo `rented` y el título del botón en el interfaz.
 
-Como esta petición requiere autentificación, también necesitarás añadir el siguiente método a la clase `Connection`:
-
-```objectivec
-- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge: (NSURLAuthenticationChallenge *)challenge
-```
-
-Y especificar el usuario y contraseña cuando se crea la conexión.
+Esta petición requiere autentificación. Puedes hacerla de tipo preventivo y a nivel de tarea, añadiendo por ejemplo un método adicional a la clase `Connection` que acepte usuario y contraseña para hacer la petición.
 
 #### Añadir
 
-Vamos a poner la opción de añadir una película. Para esto, puedes descomentar el código de `addButton` en `viewDidLoad`.
+Vamos a implementar la opción para añadir una película. Para esto, puedes descomentar el código de `addButton` en `viewDidLoad`.
 
 En el método `insertNewObject` tendremos que mostrar una vista  para pedir los datos de la película a añadir. Para ello se proporciona como material la clase `PelisTableViewController`. El método quedaría así:
 
@@ -368,13 +352,13 @@ En el método `insertNewObject` tendremos que mostrar una vista  para pedir los 
 
 En `PelisTableViewController` deberás implementar el método `save` que se llama cuando el usuario pulsa el botón para guardar la película. También debes modificar `connectionSucceed` para actualizar el identificador de la película que se ha recibido, antes de devolverla al delegado mediante el método `saved`.
 
-Hay que implementar dicho método `saved` en `MasterViewController` para actualizar el array local de películas sin tener que volver a hacer una llamada al servidor. Es conveniente crear un nuevo método `init` en la clase `Pelis` para inicializar los datos de una película vacía. Las nuevas películas estarán libres por defecto.
+También que implementar dicho método `saved` en `MasterViewController` para actualizar el array local de películas sin tener que volver a hacer una llamada al servidor. Es conveniente crear un nuevo método `init` en la clase `Pelis` para inicializar los datos de una película vacía. Las nuevas películas estarán libres por defecto.
 
 #### Eliminar
 
 Descomenta el código de edición de las tablas en `MasterViewController`, tanto en el método `viewDidLoad` como `commitEditingStyle`, y devolviendo `YES` en `canEditRowAtIndexPath`.
 
-Haz los cambios correspondientes para que cuando se elimine una película en la tabla también se haga en el servidor, y que si falla en el servidor no se llegue a borrar en la tabla.
+Haz los cambios correspondientes para que cuando se elimine una película en la tabla también se haga en el servidor, de modo que si falla en el servidor no se llegue a borrar en la tabla.
 
 Al tener dos tipos de conexiones en el mismo controlador, necesitarás identificar cuál de ellas es la que ha hecho la petición. Para ello, créate una nueva propiedad, por ejemplo:
 
@@ -399,7 +383,7 @@ Y puedes saber desde qué conexión se ha recibido la respuesta en el método
 
 Añade un botón `Edit` en la barra de navegación de `DetailViewController` para editar una película. Cuando el usuario lo pulse, deberá poder modificar los datos de la película usando el mismo controlador que para añadirla (`PelisTableViewController`). Ojo, tendrás que hacer una copia de la película a modificar por si el usuario cancela los cambios volviendo atrás sin guardarla.
 
-En esta opción en lugar de mostrarse en la barra de navegación _New movie_ deberá indicarse el nombre de la película, y cuando se guarde deberá actualizarse tanto en el listado local como en el servidor.
+En esta opción, en lugar de mostrar en la barra de navegación _New movie_ deberá indicarse el nombre de la película, y cuando se guarde deberá actualizarse tanto en el listado local como en el servidor.
 
 Para actualizar la tabla necesitarás acceder al `MasterViewController` desde `DetailViewController`. Puedes hacerlo del siguiente modo:
 
@@ -411,6 +395,6 @@ Para actualizar la tabla necesitarás acceder al `MasterViewController` desde `D
 
 #### Apartados opcionales:
 
-* Usar un formulario para pedir usuario y contraseña la primera vez que se necesite. Se puede usar un `UIAlertView`, con el estilo `UIAlertViewStyleLoginAndPasswordInput`, y guardar el usuario y la contraseña en `[NSUserDefaults standardUserDefaults]`. En realidad, la información sensible como las contraseñas debe guardarse en el KeyChain, pero esto se verá más adelante en la asignatura de persistencia.
+* Usar un formulario para pedir usuario y contraseña la primera vez que se necesite. Se puede usar un `UIAlertController`, y guardar el usuario y la contraseña en `[NSUserDefaults standardUserDefaults]`. En realidad, la información sensible como las contraseñas debe guardarse en el KeyChain, pero esto se verá más adelante en la asignatura de persistencia.
 
-* Añadir opción de búsqueda de películas con servicios REST. Para esto se debe implementar la búsqueda en el servidor mediante querystring. En la app se puede mostrar esta opción en la escena `MasterViewController`, reemplazando el botón _Edit_, ya que en realidad el borrado se puede hacer sin él.
+* Añadir opción de búsqueda de películas con servicios REST. Para esto se debe implementar la búsqueda en el servidor mediante querystring. En la app se puede mostrar esta opción en la escena `MasterViewController`, reemplazando el botón _Edit_, ya que en realidad el borrado se puede hacer sin él (mediante un gesto hacia la izquierda en la fila a eliminar).
