@@ -119,10 +119,59 @@ private static String getResponse (HttpURLConnection connection) throws Exceptio
 } 
 ```
 
+
+
+```
+public static Bitmap getImage(URL url) {
+    HttpURLConnection connection = null;
+    try {
+      connection = (HttpURLConnection) url.openConnection();
+      connection.connect();
+      int responseCode = connection.getResponseCode();
+      if (responseCode == 200) {
+        return BitmapFactory.decodeStream(connection.getInputStream());
+      } else
+        return null;
+    } catch (Exception e) {
+      return null;
+    } finally {
+      if (connection != null) {
+        connection.disconnect();
+      }
+    }
+}
+public static Bitmap getImage(String urlString) {
+    try {
+      URL url = new URL(urlString);
+      return getImage(url);
+    } catch (MalformedURLException e) {
+      return null;
+    }
+}
+```
+
 ----------------
 ----------------
 ----------------
 ----------------
+
+
+<!--
+
+Avoiding Bugs In Earlier Releases
+Prior to Android 2.2 (Froyo), this class had some frustrating bugs. In particular, calling close() on a readable InputStream could poison the connection pool. Work around this by disabling connection pooling:
+
+   private void disableConnectionReuseIfNecessary() {
+   // Work around pre-Froyo bugs in HTTP connection reuse.
+   if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+     System.setProperty("http.keepAlive", "false");
+   
+ }}
+
+Each instance of HttpURLConnection may be used for one request/response pair. Instances of this class are not thread safe. 
+
+-->
+
 
 
 Sin embargo, en Android resulta más común utilizar la libería _Apache Http Client_.
