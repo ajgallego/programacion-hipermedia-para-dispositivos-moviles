@@ -51,27 +51,21 @@ if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
 }
 ```
 
-La forma de descargar dicho contenido será utilizar un `InputStream` para leer o descargar los datos. 
+La forma de descargar dicho contenido será utilizar un `InputStream` para leer o descargar los datos. Por lo que en primer lugar tendremos que crear el objeto `URL`, a continuación conectar usando la clase `HttpURLConnection`, después comprobaríamos si la URL es accesible o hay algún error, y por último descargaríamos el contenido. A continuación se incluye una función que podríamos usar para descargar el contenido de una página Web: 
 
-
-----------------
-----------------
-----------------
-----------------
 
 ```java
 // url = "http://www.ua.es";
-public String descargarContendio( String strUrl ) 
+public String descargarContendio( String strUrl )
 {
     HttpURLConnection http = null;
-    BufferedReader reader = null;
     String content = null;
 
     try {
         URL url = new URL( strUrl );
         http = (HttpURLConnection)url.openConnection();
-      
-        if( mResponseCode == HttpURLConnection.HTTP_OK ) {
+
+        if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
             StringBuilder sb = new StringBuilder();
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader( http.getInputStream() ));
@@ -95,38 +89,22 @@ public String descargarContendio( String strUrl )
 ```
 
 
+Además podemos configurar algunos parámetros de la conexión, como el tiempo máximo de conexión o de descarga. En caso de que se supere alguno de estos umbrales se lanzará una excepción: 
+
+```java
+http.setReadTimeout( 10000 /*milliseconds*/ );
+http.setConnectTimeout( 15000 /* milliseconds */ );
 ```
-private static String getResponse (HttpURLConnection connection) throws Exception
-{
-   String responseString = null;
-   int responseCode = connection.getResponseCode();
-   
-   String line = null;
-   if (responseCode == HttpURLConnection.HTTP_OK) {
-       BufferedReader bufferedReader = null;
-       try {
-           InputStream inputStream = connection.getInputStream();
-           if (inputStream != null) {
-               bufferedReader = Util.bufferedReader(
-                   inputStream, Util.Encod.UTF8);
-               StringBuilder response = new StringBuilder();
-               while ((line = bufferedReader.readLine()) != null) {
-                   response.append(line);
-                   response.append(Util.getNewLine());
-               }
-               responseString = response.toString();
-           }
-       }
-       finally {
-           if (bufferedReader != null) {
-               bufferedReader.close();
-           }
-       }
-   }
-   return responseString;
-} 
+  
+También podemos configurar otros valores de la cabecera de la petición, como la codificación o el _user-agent_: 
+  
+```java
+http.setRequestProperty("User-Agent", "...");
+http.setRequestProperty("Accept-Charset", "UTF-8");
+http.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
 ```
 
+A continuación se incluye otra función de ejemplo para ilustrar como descargar una imagen. 
 
 
 ```
