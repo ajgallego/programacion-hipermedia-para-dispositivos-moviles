@@ -205,7 +205,7 @@ ImageView imageView = (ImageView)findViewById(R.id.ImageView01);
 new Thread(new Runnable() {
   public void run() {
     Drawable imagen = descargarImagen("http://...");
-    //Desde aquí NO debo acceder a imageView
+    // Desde aquí NO debo acceder a imageView
   }
 }).start();
 ```
@@ -302,7 +302,7 @@ El primer tipo es el que se recibe como datos de entrada. Realmente se recibe un
 Por lo tando, el único método que se ejecuta en el segundo hilo de ejecución es el bucle del método `doInBackground(ENTRADA...)`. El resto de métodos se ejecutan en el mismo hilo que la interfaz gráfica y son los que tendremos que utilizar para actualizar los datos.
 
 
-> La notación `(String ... values)` indica que hay un número indeterminado de parámetros del tipo indicado, se accede a ellos con `values[0], values[1],` ..., y también podemos obtener el número de elementos con `values.length`. Esta notación forma parte de la sintaxis estándar de Java.
+> La notación `(String... values)` indica que hay un número indeterminado de parámetros del tipo indicado, se accede a ellos con `values[0], values[1],` ..., y también podemos obtener el número de elementos con `values.length`. Esta notación forma parte de la sintaxis estándar de Java.
 
 El segundo tipo de datos que se especifica en la declaración de la tarea es el tipo del progreso. Conforme avanza la tarea en segundo plano podemos publicar actualizaciones _visuales_ del progreso realizado. Hemos dicho que desde el método `doInBackground` no podemos modificar la interfaz, pero si que podemos llamar a `publishProgress` para solicitar que se actualice la información de progreso de la tarea, indicando como información de progreso una lista de elementos del tipo indicado como tipo de progreso. Tras hacer esto se ejecutará el método `onProgressUpdate` de la tarea, que recibirá la información que pasamos como parámetro. Este método si que se ejecuta dentro del hilo de la interfaz, por lo que podremos actualizar la visualización del progreso dentro de él, en función de la información recibida. Es importante entender que la ejecución de `onProgressUpdate(...)` no tiene por qué ocurrir inmediatamente después de la petición `publishProgress(...)`, o puede incluso no llegar a ocurrir.
 
@@ -399,7 +399,7 @@ private class BajarImagenesTask extends
 
      @Override
      protected void onProgressUpdate(Integer... values) {
-       textView.setText(values[0] + " imagenes cargadas...");
+       textView.setText(values[0] + " imágenes descargadas...");
      }
 
      @Override
