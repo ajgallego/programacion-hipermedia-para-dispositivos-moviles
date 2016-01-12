@@ -147,29 +147,17 @@ http.setRequestProperty("Accept-Charset", "UTF-8");
 http.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
 ```
 
+Además para evitar algunos problemas existentes al cerrar el flujo de datos de entrada en versiones de Android anteriores a la 2.2 (Froyo) podemos ejecutar el siguiente código: 
 
-----------------
-----------------
-----------------
-----------------
-
-
-<!--
-
-Avoiding Bugs In Earlier Releases
-Prior to Android 2.2 (Froyo), this class had some frustrating bugs. In particular, calling close() on a readable InputStream could poison the connection pool. Work around this by disabling connection pooling:
-
-   private void disableConnectionReuseIfNecessary() {
+```java
+private void disableConnectionReuseIfNecessary() {
    // Work around pre-Froyo bugs in HTTP connection reuse.
-   if (Integer.parseInt(Build.VERSION.SDK) < Build.VERSION_CODES.FROYO) {
+   if(Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) 
      System.setProperty("http.keepAlive", "false");
-   
- }}
+}
+```
 
-Each instance of HttpURLConnection may be used for one request/response pair. Instances of this class are not thread safe. 
-
--->
-
+Además se recomienda usar cada instancia de la clase `HttpURLConnection` para realizar una sola petición, ya que no es seguro crear varios hilos usando la misma instancia. 
 
 
 
