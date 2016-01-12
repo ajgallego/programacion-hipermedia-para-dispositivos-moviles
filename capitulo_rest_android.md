@@ -6,20 +6,22 @@ Como ya hemos visto antes, en Android para descargar el contenido desde una URL 
 Por ejemplo para realizar una petición tipo GET a una URI y obtener su contenido tendríamos que hacer:
 
 ```java
-HttpClient client = new DefaultHttpClient();
-HttpGet request = new HttpGet("http://<domain>/resource");
-try {
-    ResponseHandler<String> handler = new BasicResponseHandler();
-    String contenido = client.execute(request, handler);
-
-    tvResponse.setText(contenido);
-
-} catch (ClientProtocolException e) {
-    e.printStackTrace();
-} catch (IOException e) {
-    e.printStackTrace();
-} finally {
-    client.getConnectionManager().shutdown();
+public String descargarContenido( String url )
+{
+    String contenido = null;
+    HttpClient client = new DefaultHttpClient();
+    HttpGet request = new HttpGet("http://<domain>/resource");
+    try {
+        ResponseHandler<String> handler = new BasicResponseHandler();
+        contenido = client.execute(request, handler);
+    } catch (ClientProtocolException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        client.getConnectionManager().shutdown();
+    }
+    return contenido;
 }
 ```
 
