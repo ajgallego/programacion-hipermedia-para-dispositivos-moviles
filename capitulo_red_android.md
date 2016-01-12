@@ -12,71 +12,85 @@ Una consideración que debemos tener en cuenta es que las operaciones de red son
 
 Vamos a comenzar viendo cómo conectar con URLs desde aplicaciones Android. Lo habitual será realizar una petición GET a una URL y obtener el documento que nos devuelve el servidor, por lo que las APIs de acceso a URLs nos facilitarán fundamentalmente esta operación. Sin embargo, como veremos más adelante también será posible realizar otras operaciones HTTP, como POST, PUT o DELETE, entre otras.
 
-Como paso previo, para todas las conexiones por Internet en Android necesitaremos declarar los permisos en el `AndroidManifest.xml`, fuera del `application` tag:
+Como paso previo, para todas las conexiones a Internet en Android necesitaremos declarar los permisos en el `AndroidManifest.xml`, fuera de la etiqueta `application` tenemos que poner:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
 
-Las conexiones por HTTP son las más comunes en las comunicaciones de red. En Android podemos utilizar la clase `HttpURLConnnection` en combinación con `Url`. Estas clases son las mismas que están presentes en Java SE, por lo que el acceso a URLs desde Android se puede hacer de la misma forma que en cualquier aplicación Java. Podemos ver información de las cabeceras de HTTP como se muestra a continuación (la información se añade a un `TextView`):
+Las conexiones por HTTP son las más comunes en las comunicaciones de red. En Android podemos utilizar la clase `HttpURLConnnection` en combinación con `URL`. Estas clases son las mismas que están presentes en Java SE, por lo que el acceso a URLs desde Android se puede hacer de la misma forma que en cualquier aplicación Java. Podemos ver información de las cabeceras de HTTP como se muestra a continuación (la información se añade a un `TextView` en el ejemplo):
 
 ```java
-TextView textView = (TextView)findViewById(R.id.tvVisor);
-textView.setText("Conexión http.\n\n");
+TextView tv = (TextView)findViewById(R.id.tvVisor);
+tv.setText("Conexión http.\n\n");
+
 try {
-  textView.setText("Cabeceras www.ua.es:\n");
   URL url = new URL("http://www.ua.es");
   HttpURLConnection http = (HttpURLConnection)url.openConnection();
 
-  textView.append(" longitud = "+http.getContentLength()+"\n");
-  textView.append(" encoding = "+http.getContentEncoding()+"\n");
-  textView.append(" tipo = "+http.getContentType()+"\n");
-  textView.append(" response code = "+http.getResponseCode()+"\n");
-  textView.append(" response message = "+http.getResponseMessage()+"\n");
-  textView.append(" content = "+http.getContent().toString()+"\n");
+  tv.append("Cabeceras de http://www.ua.es:\n");
+  tv.append(" longitud = "+http.getContentLength()+"\n");
+  tv.append(" encoding = "+http.getContentEncoding()+"\n");
+  tv.append(" tipo = "+http.getContentType()+"\n");
+  tv.append(" response code = "+http.getResponseCode()+"\n");
+  tv.append(" response message = "+http.getResponseMessage()+"\n");
+  tv.append(" content = "+http.getContent().toString()+"\n");
 } catch (MalformedURLException e) {
 } catch (IOException e) {
 }
 ```
 
+Como se puede ver, podemos obtener desde la codificación del contenido hasta el código de respuesta. El método `getContent` no devuelve el contenido sino el método deconexión adecuado dependiendo del tipo de contenido. 
+
+Es importante comprobar el código de respuesta con `getResponseCode`, el cual devolverá un entero que será igual a 200 si se puede acceder y descargar el contendio. En caso de que haya algún error devolverá un valor distinto a 200 correspondiente al código del error (https://en.wikipedia.org/wiki/List_of_HTTP_status_codes). Podemos comprobar esto haciendo simplemente: 
+
+```java
+if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+    // Correcto! Ya podemos descargar el cotenido!
+}
+```
+
+La forma de descargar dicho contenido será utilizar un `InputStream` para leer o descargar los datos. 
+
+
 ----------------
 ----------------
 ----------------
 ----------------
 
 ```java
-private static String getUrlContents(String theUrl)
+// url = "http://www.ua.es";
+public String descargarContendio( String url ) 
 {
-StringBuilder content = new StringBuilder();
+    HttpURLConnection http = null;
+    BufferedReader reader = null;
+    String content = null;
 
-// many of these calls can throw exceptions, so i've just
-// wrapped them all in one try/catch statement.
-try
-{
-  // create a url object
-  URL url = new URL(theUrl);
-
-  // create a urlconnection object
-  URLConnection urlConnection = url.openConnection();
-
-  // wrap the urlconnection in a bufferedreader
-  BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-
-  String line;
-
-  // read from the urlconnection via the bufferedreader
-  while ((line = bufferedReader.readLine()) != null)
-  {
-    content.append(line + "\n");
-  }
-  bufferedReader.close();
-}
-catch(Exception e)
-{
-  e.printStackTrace();
-}
-return content.toString();
+    try {
+        URL url = new URL("http://www.ua.es");
+        HttpURLConnection http = (HttpURLConnection)url.openConnection();
+      
+        if( mResponseCode == HttpURLConnection.HTTP_OK ) {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader( http.getInputStream() ));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            content = sb.toString();
+            reader.close();
+        }
+    }
+    catch(Exception e) {
+        e.printStackTrace();
+    }
+    finally {
+        if( http != null )
+            http.disconnect();
+    }
+    return content;
 }
 ```
 
@@ -86,9 +100,7 @@ private static String getResponse (HttpURLConnection connection) throws Exceptio
 {
    String responseString = null;
    int responseCode = connection.getResponseCode();
-   String responseMessage = connection.getResponseMessage();
-   Log.debug("%s - Response code is \"%s\" with message \"%s\"",
-          methodName, responseCode, responseMessage);
+   
    String line = null;
    if (responseCode == HttpURLConnection.HTTP_OK) {
        BufferedReader bufferedReader = null;
@@ -110,10 +122,6 @@ private static String getResponse (HttpURLConnection connection) throws Exceptio
                bufferedReader.close();
            }
        }
-       Log.signature.debug(
-           "%s - Received following JSON response : %s",
-           methodName,
-           responseString);
    }
    return responseString;
 } 
