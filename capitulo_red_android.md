@@ -61,15 +61,15 @@ La forma de descargar dicho contenido será utilizar un `InputStream` para leer 
 
 ```java
 // url = "http://www.ua.es";
-public String descargarContendio( String url ) 
+public String descargarContendio( String strUrl ) 
 {
     HttpURLConnection http = null;
     BufferedReader reader = null;
     String content = null;
 
     try {
-        URL url = new URL("http://www.ua.es");
-        HttpURLConnection http = (HttpURLConnection)url.openConnection();
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection)url.openConnection();
       
         if( mResponseCode == HttpURLConnection.HTTP_OK ) {
             StringBuilder sb = new StringBuilder();
