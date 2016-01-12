@@ -34,7 +34,7 @@ try {
   textView.append(" tipo = "+http.getContentType()+"\n");
   textView.append(" response code = "+http.getResponseCode()+"\n");
   textView.append(" response message = "+http.getResponseMessage()+"\n");
-  textView.append(" content = "+http.getContent()+"\n");
+  textView.append(" content = "+http.getContent().toString()+"\n");
 } catch (MalformedURLException e) {
 } catch (IOException e) {
 }
@@ -131,15 +131,22 @@ La librería de Java SE está diseñada de forma genérica, para soportar cualqu
 La forma más sencilla de acceso con esta librería es la siguiente:
 
 ```java
-HttpClient client = new DefaultHttpClient();
-HttpGet request = new HttpGet("http://www.ua.es");
-try {
-    ResponseHandler<String> handler = new BasicResponseHandler();
-    String contenido = client.execute(request, handler);
-} catch (ClientProtocolException e) {
-} catch (IOException e) {
-} finally {
-    client.getConnectionManager().shutdown();
+// url = "http://www.ua.es";
+public String descargarImagen( String url ) 
+{
+    String contenido = null;
+    HttpClient client = new DefaultHttpClient();
+    HttpGet request = new HttpGet( url );
+    
+    try {
+        ResponseHandler<String> handler = new BasicResponseHandler();
+        contenido = client.execute(request, handler);
+    } catch (ClientProtocolException e) {
+    } catch (IOException e) {
+    } finally {
+        client.getConnectionManager().shutdown();
+    }
+    return contenido;
 }
 ```
 
@@ -160,17 +167,23 @@ En el ejemplo anterior hemos visto el caso en el que nos interesaba obtener la r
 
 
 ```java
-HttpClient client = new DefaultHttpClient();
-HttpGet request = new HttpGet("http://www.ua.es/imagenes/logoua.png");
-try {
-    HttpResponse response = client.execute(request);
-    InputStream in = response.getEntity().getContent();
-
-    Bitmap imagen = BitmapFactory.decodeStream(in);
-} catch (ClientProtocolException e) {
-} catch (IOException e) {
-} finally {
-    client.getConnectionManager().shutdown();
+// url = "http://www.ua.es/imagenes/logoua.png";
+public Bitmap descargarImagen( String url ) 
+{
+    Bitmap imagen = null;
+    HttpClient client = new DefaultHttpClient();
+    HttpGet request = new HttpGet( url );
+    
+    try {
+        HttpResponse response = client.execute(request);
+        InputStream in = response.getEntity().getContent();
+        imagen = BitmapFactory.decodeStream(in);
+    } catch (ClientProtocolException e) {
+    } catch (IOException e) {
+    } finally {
+        client.getConnectionManager().shutdown();
+    }
+    return imagen;
 }
 ```
 
@@ -215,7 +228,7 @@ En Android, una forma sencilla de realizar una conexión de forma asíncrona es 
 ImageView imageView = (ImageView)findViewById(R.id.ImageView01);
 new Thread(new Runnable() {
   public void run() {
-    Drawable imagen = cargarLaImagen("http://...");
+    Drawable imagen = descargarImagen("http://...");
     //Desde aquí NO debo acceder a imageView
   }
 }).start();
@@ -227,7 +240,7 @@ Pero hay un problema: tras cargar la imagen no puedo acceder a la interfaz gráf
 ImageView imageView = (ImageView)findViewById(R.id.ImageView01);
 new Thread(new Runnable() {
   public void run() {
-    Drawable imagen = cargarLaImagen("http://...");
+    Drawable imagen = descargarImagen("http://...");
     imageView.post(new Runnable() {
       public void run() {
         imageView.setDrawable(imagen);
@@ -245,7 +258,7 @@ Como alternativa, contamos también con el método `Activity.runOnUiThread(Runna
 ImageView imageView = (ImageView)findViewById(R.id.ImageView01);
 new Thread(new Runnable() {
   public void run() {
-    Drawable imagen = cargarLaImagen("http://...");
+    Drawable imagen = descargarImagen("http://...");
     runOnUiThread(new Runnable() {
       public void run() {
         imageView.setDrawable(imagen);
@@ -341,7 +354,7 @@ private class DownloadTask extends AsyncTask<String, Void, String>
     {
         // Llamada al método de descarga de contenido que
         // se ejecutará en segundo plano
-        return prv_downloadContent( urls[0] );
+        return descargarContenido( urls[0] );
     }
 
     @Override
@@ -396,7 +409,7 @@ private class BajarImagenesTask extends
      protected List<Drawable> doInBackground(String... urls) {
          ArrayList<Drawable> imagenes = new ArrayList<Drawable>();
          for(int i=0;i<urls.length; i++) {
-           imagenes.add( cargarLaImagen(urls[i]) );
+           imagenes.add( descargarImagen(urls[i]) );
            publishProgress(i);
          }
          return imagenes;
