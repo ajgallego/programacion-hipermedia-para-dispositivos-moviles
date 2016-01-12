@@ -487,10 +487,27 @@ Cuando desarrollemos una aplicación que acceda a la red deberemos tener en cuen
 
 En ciertas ocasiones esto puede implicar limitar ciertas funcionalidades de la aplicación a las zonas en las que contemos con conexión Wi-Fi, o por lo menos avisar al usuario en caso de que solicite una de estas operaciones mediante 3G, y darle la oportunidad de cancelarla.
 
+En primer lugar para comprobar el estado de la red tenemos que solicitar los permisos en el Manifest, fuera de la sección `application`: 
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+```
 
 A continuación se muestra cómo usar el `ConnectivityManager` para comprobar el estado de red en dispositivos Android.
 
 ```java
+boolean checkStatus(Context ctx) {
+    ConnectivityManager cm = (ConnectivityManager)
+        ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+    NetworkInfo i = cm.getActiveNetworkInfo();
+
+    if (i == null || !i.isConnected() || !i.isAvailable())
+        return false;  // Iiinteerneer!!
+        
+    return true;
+}
+
 ConnectivityManager cm = (ConnectivityManager)
     getSystemService(Context.CONNECTIVITY_SERVICE);
 NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
