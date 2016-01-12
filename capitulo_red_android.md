@@ -80,6 +80,45 @@ return content.toString();
 }
 ```
 
+
+```
+private static String getResponse (HttpURLConnection connection) throws Exception
+{
+   String responseString = null;
+   int responseCode = connection.getResponseCode();
+   String responseMessage = connection.getResponseMessage();
+   Log.debug("%s - Response code is \"%s\" with message \"%s\"",
+          methodName, responseCode, responseMessage);
+   String line = null;
+   if (responseCode == HttpURLConnection.HTTP_OK) {
+       BufferedReader bufferedReader = null;
+       try {
+           InputStream inputStream = connection.getInputStream();
+           if (inputStream != null) {
+               bufferedReader = Util.bufferedReader(
+                   inputStream, Util.Encod.UTF8);
+               StringBuilder response = new StringBuilder();
+               while ((line = bufferedReader.readLine()) != null) {
+                   response.append(line);
+                   response.append(Util.getNewLine());
+               }
+               responseString = response.toString();
+           }
+       }
+       finally {
+           if (bufferedReader != null) {
+               bufferedReader.close();
+           }
+       }
+       Log.signature.debug(
+           "%s - Received following JSON response : %s",
+           methodName,
+           responseString);
+   }
+   return responseString;
+} 
+```
+
 ----------------
 ----------------
 ----------------
