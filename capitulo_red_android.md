@@ -8,7 +8,7 @@ Una consideración que debemos tener en cuenta es que las operaciones de red son
 
 
 <!-- *********************************************************************** -->
-# Conexión a URLs en Android
+## Conexión a URLs en Android
 
 Vamos a comenzar viendo cómo conectar con URLs desde aplicaciones Android. Lo habitual será realizar una petición GET a una URL y obtener el documento que nos devuelve el servidor, por lo que las APIs de acceso a URLs nos facilitarán fundamentalmente esta operación. Sin embargo, como veremos más adelante también será posible realizar otras operaciones HTTP, como POST, PUT o DELETE, entre otras.
 
@@ -41,7 +41,7 @@ try {
 }
 ```
 
-Como se puede ver, podemos obtener desde la codificación del contenido hasta el código de respuesta. El método `getContent` no devuelve el contenido sino el método deconexión adecuado dependiendo del tipo de contenido. 
+Como se puede ver, podemos obtener desde la codificación del contenido hasta el código de respuesta de la petición. El método `getContent` no devuelve el contenido sino el método deconexión adecuado dependiendo del tipo de contenido. 
 
 Es importante comprobar el código de respuesta con `getResponseCode`, el cual devolverá un entero que será igual a 200 si se puede acceder y descargar el contendio. En caso de que haya algún error devolverá un valor distinto a 200 correspondiente al código del error (https://en.wikipedia.org/wiki/List_of_HTTP_status_codes). Podemos comprobar esto haciendo simplemente: 
 
@@ -51,7 +51,13 @@ if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
 }
 ```
 
-La forma de descargar dicho contenido será utilizar un `InputStream` para leer o descargar los datos. Por lo que en primer lugar tendremos que crear el objeto `URL`, a continuación conectar usando la clase `HttpURLConnection`, después comprobaríamos si la URL es accesible o hay algún error, y por último descargaríamos el contenido. A continuación se incluye una función que podríamos usar para descargar el contenido de una página Web: 
+
+
+### Descargar contenido
+
+La forma de descargar contenido es mediante un `InputStream` para leer o descargar los datos. Por lo que en primer lugar tendremos que crear el objeto `URL`, a continuación conectar usando la clase `HttpURLConnection` que hemos visto, después comprobaríamos si la URL es accesible o hay algún error, y por último descargaríamos el contenido usando el _stream_. 
+
+A continuación se incluye una función de ejemplo que podríamos usar para descargar el contenido de una página Web: 
 
 
 ```java
@@ -88,8 +94,45 @@ public String descargarContendio( String strUrl )
 }
 ```
 
+Esta función recibe una cadena con la direccion URL de descarga y devuelve también una cadena con el contenido de la Web indicada. En caso de error se devolverá _null_. Además, como se puede ver, en el `finally` se cierra siempre la conexión HTTP.
 
-Además podemos configurar algunos parámetros de la conexión, como el tiempo máximo de conexión o de descarga. En caso de que se supere alguno de estos umbrales se lanzará una excepción: 
+
+
+### Descargar una imagen
+
+En el ejemplo anterior descargabamos el contenido de una URL en formato de texto plano. Sin embargo, puede que queramos obtener otros formatos como por ejemplo una imagen. A continuación se incluye otra función de ejemplo para ilustrar como descargar una imagen desde una dirección URL: 
+
+```
+// url = "http://www.ua.es/imagenes/logoua.png";
+public Bitmap descargarImagen(String strUrl) {
+    HttpURLConnection http = null;
+    Bitmap bitmap = null;
+
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection)url.openConnection();
+
+        if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) 
+            bitmap = BitmapFactory.decodeStream(http.getInputStream());
+    }
+    catch(Exception e) {
+        e.printStackTrace();
+    }
+    finally {
+        if( http != null )
+            http.disconnect();
+    }
+    return bitmap;
+}
+```
+
+En el caso general podemos leer sus propiedades de la cabecera, como su tipo MIME, codificación, longitud, etc., y por último descargarlo y asignarlo al tipo de fichero o dato adecuado. 
+
+
+
+### Configuración
+
+Podemos configurar algunos parámetros de la conexión, como el tiempo máximo de conexión o de descarga. En caso de que se supere alguno de estos umbrales se lanzará una excepción: 
 
 ```java
 http.setReadTimeout( 10000 /*milliseconds*/ );
@@ -104,37 +147,6 @@ http.setRequestProperty("Accept-Charset", "UTF-8");
 http.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
 ```
 
-A continuación se incluye otra función de ejemplo para ilustrar como descargar una imagen. 
-
-
-```
-public static Bitmap getImage(URL url) {
-    HttpURLConnection connection = null;
-    try {
-      connection = (HttpURLConnection) url.openConnection();
-      connection.connect();
-      int responseCode = connection.getResponseCode();
-      if (responseCode == 200) {
-        return BitmapFactory.decodeStream(connection.getInputStream());
-      } else
-        return null;
-    } catch (Exception e) {
-      return null;
-    } finally {
-      if (connection != null) {
-        connection.disconnect();
-      }
-    }
-}
-public static Bitmap getImage(String urlString) {
-    try {
-      URL url = new URL(urlString);
-      return getImage(url);
-    } catch (MalformedURLException e) {
-      return null;
-    }
-}
-```
 
 ----------------
 ----------------
@@ -160,69 +172,10 @@ Each instance of HttpURLConnection may be used for one request/response pair. In
 
 
 
-Sin embargo, en Android resulta más común utilizar la libería _Apache Http Client_.
-La librería de Java SE está diseñada de forma genérica, para soportar cualquier tipo de protocolo, mientras que _HttpClient_ se centra en HTTP y con ella resulta más sencillo utilizar este protocolo.
-
-La forma más sencilla de acceso con esta librería es la siguiente:
-
-```java
-// url = "http://www.ua.es";
-public String descargarImagen( String url ) 
-{
-    String contenido = null;
-    HttpClient client = new DefaultHttpClient();
-    HttpGet request = new HttpGet( url );
-    
-    try {
-        ResponseHandler<String> handler = new BasicResponseHandler();
-        contenido = client.execute(request, handler);
-    } catch (ClientProtocolException e) {
-    } catch (IOException e) {
-    } finally {
-        client.getConnectionManager().shutdown();
-    }
-    return contenido;
-}
-```
-
-Con esta librería tenemos un objeto cliente, y sobre él podemos ejecutar peticiones.
-Cada petición se representa en un objeto, cuya clase corresponde con el tipo de petición
-a realizar. Por ejemplo, lo más común será realizar una petición GET, por lo que utilizaremos una instancia de `HttpGet` que construiremos a partir de la URL a la que debe
-realizar dicha petición.
-
-Para obtener la respuesta, en caso de que queramos obtenerla como una cadena, lo cual
-también es lo más habitual, podemos utilizar un `BasicResponseHandler`, que se encarga de obtener el contenido en forma de `String`.
-
-Por último, en el `finally` deberemos cerrar todas las conexiones del cliente HTTP
-si no lo vamos a utilizar más. Hay que destacar que el cliente (`HttpClient`) puede
-utilizarse para realizar varias peticiones. Lo cerraremos cuando no vayamos a realizar
-más peticiones con él.
-
-En el ejemplo anterior hemos visto el caso en el que nos interesaba obtener la respuesta como cadena. Sin embargo, puede interesarnos obtener otros formatos, o tener más información sobre la respuesta HTTP (no sólo el contenido):
 
 
-```java
-// url = "http://www.ua.es/imagenes/logoua.png";
-public Bitmap descargarImagen( String url ) 
-{
-    Bitmap imagen = null;
-    HttpClient client = new DefaultHttpClient();
-    HttpGet request = new HttpGet( url );
-    
-    try {
-        HttpResponse response = client.execute(request);
-        InputStream in = response.getEntity().getContent();
-        imagen = BitmapFactory.decodeStream(in);
-    } catch (ClientProtocolException e) {
-    } catch (IOException e) {
-    } finally {
-        client.getConnectionManager().shutdown();
-    }
-    return imagen;
-}
-```
 
-Este es el caso general, en el que obtenemos la respuesta como un objeto `HttpResponse` del que podemos leer todas las propiedades de la respuesta HTTP. La parte más destacada de la respuesta es el bloque de contenido (`HttpEntity`). De la entidad podemos obtener sus propiedades, como su tipo MIME, longitud, y un flujo de entrada para leer el contenido devuelto. En caso de que dicho contenido sea texto, será más sencillo leerlo como en el ejemplo previo.
+
 
 
 
