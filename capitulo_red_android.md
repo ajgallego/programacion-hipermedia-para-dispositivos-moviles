@@ -509,7 +509,8 @@ boolean checkStatus(Context ctx) {
 }
 ```
 
-Por ejemplo, nos podríamos crear una función como la siguiente que nos devolviera directamente si el dispositivo tiene conexión o no:
+
+Con la función anterior podremos comprobar si el dispositivo tiene conexión o no, pero además podemos saber el tipo de conexión que está usando mediante la función `getType`, por ejemplo:
 
 ```java
 ConnectivityManager cm = (ConnectivityManager)
@@ -522,6 +523,7 @@ if( i.getType() == ConnectivityManager.TYPE_MOBILE )
 else if( i.getType() == ConnectivityManager.TYPE_WIFI )
     // Conectado a una red wifi
 ```
+
 
 <!--
 DEPRECATED
