@@ -661,7 +661,7 @@ public class ImagenAdapter extends BaseAdapter
       // Ponemos esta imagen de momento
       ivIcono.setImageResource(R.drawable.icon);
 
-      // Si la imagen no está cargada, comienza una tarea de carga
+      // Si la imagen no está descargando...
       if(mImagenesCargando.get(elemento)==null) {
           CargarImagenTask task = new CargarImagenTask();
           mImagenesCargando.put(elemento, task);
@@ -682,6 +682,8 @@ public class ImagenAdapter extends BaseAdapter
       this.elemento = (Elemento)params[0];
       this.view = (ImageView)params[1];
 
+
+
       HttpClient client = new DefaultHttpClient();
       HttpGet request = new HttpGet(this.elemento.getUrlImagen());
       try {
@@ -694,6 +696,8 @@ public class ImagenAdapter extends BaseAdapter
       } finally {
         client.getConnectionManager().shutdown();
       }
+      
+      
 
       return null;
     }
