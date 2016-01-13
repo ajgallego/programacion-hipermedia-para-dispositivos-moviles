@@ -718,14 +718,14 @@ public class ImagenAdapter extends BaseAdapter
 <!-- *********************************** -->
 ## Mejora: Carga _lazy_ solo cuando no se hace _scroll_
 
-Como mejora, se puede hacer que las imágenes sólo carguen si no se está haciendo _scroll_ en la lista. Para ello podemos hacer que el adaptador implemente un `AbsListView.OnScrollListener`, y registrarlo como oyente de la lista (esto lo tendremos que hacer desde la actividad que contiene a la lista):
+Como mejora se puede hacer que las imágenes solo se descarguen si no se está haciendo _scroll_ en la lista. Para ello podemos hacer que el adaptador implemente un `AbsListView.OnScrollListener`, y registrarlo como oyente de la lista (esto lo tendremos que hacer desde la actividad que contiene a la lista):
 
 ```java
-// En el constructor
+// En el constructor de la actividad
 miListView.setOnScrollListener(adaptador)
 ```
 
-En el adaptador podemos crear una variable que indique si está ocupado o no haciendo _scroll_, y que sólo descargue imágenes cuando no esté ocupado. Cuando pare el _scroll_, recargaremos los datos de la lista (`notifyDataSetChanged()`) para que carguen todas las imágenes que haya actualmente en pantalla:
+En el adaptador podemos crear una variable que indique si está ocupado o no haciendo _scroll_, y que sólo descargue imágenes cuando no esté ocupado. Cuando pare el _scroll_ recargaremos los datos de la lista (`notifyDataSetChanged()`) para que carguen todas las imágenes que haya actualmente en pantalla:
 
 ```java
 public class ImagenAdapter extends BaseAdapter
@@ -745,7 +745,7 @@ public class ImagenAdapter extends BaseAdapter
       ivIcono.setImageResource(R.drawable.icon);
 
       // Si la imagen no está cargada y no se está haciendo SCROLL...
-      if(mImagenesCargando.get(elemento)==null  && !mBusy) {
+      if(mImagenesCargando.get(elemento)==null && !mBusy) {
           CargarImagenTask task = new CargarImagenTask();
           mImagenesCargando.put(elemento, task);
           task.execute(elemento, ivIcono);
