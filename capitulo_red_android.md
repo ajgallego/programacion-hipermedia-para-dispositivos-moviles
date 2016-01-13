@@ -502,19 +502,11 @@ boolean checkStatus(Context ctx) {
 
     NetworkInfo i = cm.getActiveNetworkInfo();
 
-    if (i == null || !i.isConnected() || !i.isAvailable())
-        return false;  // Iiinteerneer!!
+    if (i == null || !i.isAvailable() || !i.isConnected())
+        return false;  // Inteerneer!!
         
     return true;
 }
-
-ConnectivityManager cm = (ConnectivityManager)
-    getSystemService(Context.CONNECTIVITY_SERVICE);
-NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-NetworkInfo mobile = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-boolean hayWifi = wifi.isAvailable();
-boolean hayMobile = mobile.isAvailable();
-boolean noHay = (!hayWifi && !hayMobile); // Iiinteerneer!!
 ```
 
 Por ejemplo, nos podríamos crear una función como la siguiente que nos devolviera directamente si el dispositivo tiene conexión o no:
@@ -527,6 +519,8 @@ public boolean isOnline() {
 }
 ```
 
+<!--
+DEPRECATED
 
 El `ConnectivityManager` también puede utilizarse para controlar el estado de red, o bien estableciendo una preferencia pero permitiéndole usar el tipo de conectividad que realmente está disponible,
 
@@ -541,6 +535,7 @@ cm.setRadio(NetworkType.MOBILE,false);
 cm.setRadio(NetworkType.WIFI,true);
 ```
 
+-->
 
 
 
