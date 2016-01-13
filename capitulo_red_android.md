@@ -815,7 +815,7 @@ protected void onPostExecute(Bitmap result) {
 }
 ```
 
-Cuando el dispositivo se esté quedando sin memoria, podrá liberar automáticamente el contenido de todos los objetos `SoftReference`, y sus referencias se pondrán a `null`.
+Cuando el dispositivo se esté quedando sin memoria podrá liberar automáticamente el contenido de todos los objetos `SoftReference` y sus referencias se pondrán a `null`.
 
 
 
