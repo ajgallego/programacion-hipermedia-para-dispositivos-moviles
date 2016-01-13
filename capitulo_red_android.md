@@ -638,7 +638,7 @@ Sin embargo, si queremos implementar carga _lazy_ deberemos hacer que al rellena
 ```java
 public class ImagenAdapter extends BaseAdapter
 {
-  private List<Pasta> mList;
+  private List<Elemento> mList;
   private Context mContext;
   // Mapa de tareas de carga en proceso
   private Map<Elemento, CargarImagenTask> mImagenesCargando;
