@@ -512,11 +512,15 @@ boolean checkStatus(Context ctx) {
 Por ejemplo, nos podríamos crear una función como la siguiente que nos devolviera directamente si el dispositivo tiene conexión o no:
 
 ```java
-public boolean isOnline() {
-    ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo netInfo = cm.getActiveNetworkInfo();
-    return (netInfo != null && netInfo.isConnected());
-}
+ConnectivityManager cm = (ConnectivityManager)
+        ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+NetworkInfo i = cm.getActiveNetworkInfo();
+
+if( i.getType() == ConnectivityManager.TYPE_MOBILE )
+    // Conectado por datos
+else if( i.getType() == ConnectivityManager.TYPE_WIFI )
+    // Conectado a una red wifi
 ```
 
 <!--
