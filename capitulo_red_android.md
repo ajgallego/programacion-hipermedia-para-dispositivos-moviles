@@ -809,7 +809,7 @@ Para crear una nueva referencia débil a una imagen deberemos utilizar el constr
 ```java
 protected void onPostExecute(Bitmap result) {
   if(result!=null) {
-    this.elemento.setImagen(new SoftReference<ImagenCache>(result));
+    this.elemento.setImagen(new SoftReference<Bitmap>(result));
     this.view.setImageBitmap(result);
   }
 }
