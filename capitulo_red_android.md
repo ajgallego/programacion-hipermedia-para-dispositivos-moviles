@@ -679,27 +679,27 @@ public class ImagenAdapter extends BaseAdapter
 
     @Override
     protected Bitmap doInBackground(Object... params) {
+      HttpURLConnection http = null;
+      Bitmap bitmap = null;
+      
       this.elemento = (Elemento)params[0];
       this.view = (ImageView)params[1];
 
-
-
-      HttpClient client = new DefaultHttpClient();
-      HttpGet request = new HttpGet(this.elemento.getUrlImagen());
       try {
-        HttpResponse response = client.execute(request);
-        Bitmap imagen = BitmapFactory
-                         .decodeStream(response.getEntity().getContent());
+        URL url = new URL( this.elemento.getUrlImagen() );
+        http = (HttpURLConnection)url.openConnection();
 
-        return imagen;
-      } catch(IOException e) {
-      } finally {
-        client.getConnectionManager().shutdown();
+        if( http.getResponseCode() == HttpURLConnection.HTTP_OK )
+           bitmap = BitmapFactory.decodeStream(http.getInputStream());
       }
-      
-      
-
-      return null;
+      catch(Exception e) {
+        e.printStackTrace();
+      }
+      finally {
+        if( http != null )
+            http.disconnect();
+      }
+      return bitmap;
     }
 
     @Override
