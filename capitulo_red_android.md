@@ -893,7 +893,10 @@ Vamos a empezar por la vista detalle:
   * `ivImageView` es el campo _ImageView_ del _layout_ donde se ha de colocar la imagen.
 * Por último, completa el método `prv_imageLoader` de `PastaLoader` para que descargue la imagen que se le pasa por parámetro y la devuelva como un Bitmap.
 
-Si lo probamos nos tendría que mostrar la imagen de la vista detalle.
+Si lo probamos nos tendría que mostrar la imagen de la vista detalle. 
+
+> Pista: ¿No descarga la imagen y te salta una excepción? ¿Te falta solicitar algún permiso en el Manifest?
+
 
 Ahora vamos a completar la descarga _lazy_ de la lista principal, para esto tenéis que editar la clase `PastaAdapter` para completar la descarga de imágenes añadiendo un mapa de las descargas activas y realizando la llamada a _PastaLoader_ solamente para las imágenes que no estén ya cargadas.
 
