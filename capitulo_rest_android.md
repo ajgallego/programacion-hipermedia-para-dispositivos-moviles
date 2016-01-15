@@ -126,7 +126,7 @@ Este método recibe como entrada una cadena con la dirección URL a la cual se q
 
 ### Petición POST
 
-Para realizar una petición por `POST` tenemos que llamar al método `setDoOutput(true)` y además es recomendable también usar el metodo `setRequestMethod` para indicar el tipo de petición: 
+Para realizar una petición por `POST` tenemos que llamar al método `setDoOutput(true)` y además indicar el tipo de petición POST mediante el metodo `setRequestMethod`: 
 
 
 ```java
@@ -185,7 +185,34 @@ En la función de ejemplo simplemente se lee el código de la respuesta y con es
 
 ### Petición PUT
 
+Las peticiones PUT son muy similares a las POST, también tenemos que usar los métodos `setDoOutput(true)` e indicar el tipo de petición PUT mediante el metodo `setRequestMethod`: 
+
 ```java
+public int peticionPUT( String strUrl, String data )
+{
+    HttpURLConnection http = null;
+    int responseCode = -1;
+
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("PUT");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "application/json");
+        http.setDoOutput(true);
+
+        PrintWriter writer = new PrintWriter(http.getOutputStream());
+        writer.print(data);
+        writer.flush();
+
+        responseCode = http.getResponseCode();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (http != null) http.disconnect();
+    }
+    return responseCode;
+}
 ```
 
 
