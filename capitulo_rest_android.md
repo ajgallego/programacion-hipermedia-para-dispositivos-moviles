@@ -126,8 +126,12 @@ Este método recibe como entrada una cadena con la dirección URL a la cual se q
 
 ### Petición POST
 
+Para realizar una petición por `POST` tenemos que llamar al método `setDoOutput(true)`. 
+
+
 ```java
 ```
+
 
 
 ### Petición PUT
@@ -136,11 +140,13 @@ Este método recibe como entrada una cadena con la dirección URL a la cual se q
 ```
 
 
+
 ### Petición DELETE
 
+Y por último para realizar una petición tipo DELETE simplemente tendríamos que indicarlo con el método `setRequestMethod` y por último llamar a `getResponseCode` para lanzar la petición y comprobar el código de respuesta. 
 
 ```java
-public String peticionGET( String strUrl )
+public int peticionDELETE( String strUrl )
 {
     HttpURLConnection http = null;
     int responseCode = -1;
@@ -153,7 +159,7 @@ public String peticionGET( String strUrl )
         
         // Conectar y obtener el codigo de respuesta
         responseCode = http.getResponseCode();
-    } catch (IOException e) {
+    } catch (Exception e) {
         e.printStackTrace();
     } finally {
         if (http != null) http.disconnect();
@@ -161,6 +167,8 @@ public String peticionGET( String strUrl )
     return responseCode;
 }
 ```
+
+Como respuesta de esta función se devolverá el código de la petición, de esta forma podremos comprobar desde fuera si se ha eliminado correctamente o si ha habido algún error. 
 
 
 
@@ -175,34 +183,6 @@ public String peticionGET( String strUrl )
 
 
 Hemos visto cómo realizar una petición GET, tal como se vio en sesiones anteriores, para acceder a servicios REST. Sin embargo, para determinadas operaciones REST utiliza métodos HTTP distintos, como POST, PUT o DELETE. Para cambiar el método simplemente tendremos que cambiar el objeto `HttpGet` por el del método que corresponda (`HttpPost`, `HttpPut` o `HttpDelete`). Cada tipo incorpora los métodos necesarios para el tipo de petición HTTP que realice. Por ejemplo, a continuación vemos un ejemplo de petición POST. Creamos un objeto `HttpPost` al que le deberemos pasar una entidad que represente el bloque de contenido a enviar (en una petición POST ya no sólo tenemos un bloque de contenido en la respuesta, sino que también lo tenemos en la petición). Podemos crear diferentes tipos de entidades, que serán clases que hereden de `HttpEntity`. La más habitual para los servicios que estamos utilizando será `StringEntity`, que nos facilitará incluir en la petición contenido XML o JSON como una cadena de texto. Además, deberemos especificar el tipo MIME de la entidad de la petición mediante `setContentType` (en el siguiente ejemplo consideramos que es XML). Por otro lado, también debemos especificar el tipo de representación que queremos obtener como respuesta, y como hemos visto anteriormente, esto debe hacerse mediante la cabecera `Accept`. Esta cabecera la deberemos establecer en el objeto que representa la petición POST (`HttpPost`).
-
-```java
-HttpClient client = new DefaultHttpClient();
-HttpPost post = new HttpPost("http://<dominio>/recurso");
-
-String XMLcontent = "[contenido xml]";
-StringEntity se = new StringEntity( XMLcontent, HTTP.UTF_8); // Es importante indicar la codificación
-se.setContentType("application/xml");    // O "application/json"
-
-post.setEntity(se);
-post.setHeader("Accept", "application/xml");
-post.setHeader("Content-type", "application/xml");
-
-HttpResponse response = client.execute(post);
-StatusLine statusLine = response.getStatusLine();
-
-if (statusLine.getStatusCode() == 200 )
-    String contenido = EntityUtils.toString( response.getEntity() );
-else
-    // error...
-```
-
-
-Como podemos ver en el ejemplo anterior, una vez configurada la petición POST la forma de ejecutar la petición es la misma que la vista anteriormente para peticiones GET. Para el resto de métodos HTTP el funcionamiento será similar, simplemente cambiando el tipo del objeto de la petición por el que corresponda (por ejemplo `HttpPut` o `HttpDelete`). Además, en las peticiones tipo POST, PUT y DELETE es importante comprobar el código que se devuelve en la cabecera, para asegurarnos de que la operación se ha realizado correctamente.
-
-
-> Nota: todas las conexión tienen que ir dentro de un bloque `try...catch` para capturar las excepciones y además cerrar la conexión al final. Por brevedad en algunos ejemplos de los apuntes no se incluye el cógido completo.
-
 
 
 
