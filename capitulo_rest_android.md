@@ -126,11 +126,60 @@ Este método recibe como entrada una cadena con la dirección URL a la cual se q
 
 ### Petición POST
 
-Para realizar una petición por `POST` tenemos que llamar al método `setDoOutput(true)`. 
+Para realizar una petición por `POST` tenemos que llamar al método `setDoOutput(true)` y además es recomendable también usar el metodo `setRequestMethod` para indicar el tipo de petición: 
 
 
 ```java
+public int peticionPOST( String strUrl, String data )
+{
+    HttpURLConnection http = null;
+    int responseCode = -1;
+
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("POST");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "application/json");
+        http.setDoOutput(true);
+
+        PrintWriter writer = new PrintWriter(http.getOutputStream());
+        writer.print(data);
+        writer.flush();
+
+        responseCode = http.getResponseCode();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (http != null) http.disconnect();
+    }
+    return responseCode;
+}
 ```
+
+En este caso la función, además de la URL, recibe un segundo parámetro con los datos a enviar. En este ejemplo se reciben los datos como una cadena (que ya tendrá los datos almacenados) y se envían a servidor usando un _output stream_. A la clase `PrinterWriter` se le puede pasar todo tipo de datos que queramos enviar, como por ejemplo un objecto JSON, o incluso podríamos establecer distintos parámetros a enviar de la forma: 
+
+
+```java
+Uri.Builder builder = new Uri.Builder()
+        .appendQueryParameter("firstParam", paramValue1)
+        .appendQueryParameter("secondParam", paramValue2)
+        .appendQueryParameter("thirdParam", paramValue3);
+String query = builder.build().getEncodedQuery();
+
+OutputStream os = http.getOutputStream();
+BufferedWriter writer = new BufferedWriter(
+            new OutputStreamWriter(os, "UTF-8"));
+writer.write(query);
+writer.flush();
+writer.close();
+os.close();
+```
+
+En la función de ejemplo simplemente se lee el código de la respuesta y con eso ya podemos saber si el servidor ha procesado bien o no la petición. En caso de que queramos leer el cuerpo de la respuesta lo podemos hacer de la misma forma que en la petición tipo `GET`. A veces, según la API usada, también nos interesará leer la cabecera `Location` de respuesta, ya que en ella se suele devolver la URI del nuevo recurso generado. 
+
+
+
 
 
 
