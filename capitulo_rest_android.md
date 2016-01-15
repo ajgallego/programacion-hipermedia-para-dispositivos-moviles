@@ -6,31 +6,20 @@
 
 Como ya hemos visto antes, en Android para descargar el contenido desde una URL podemos utilizar la clase `HttpURLConnection`. Por defecto al realizar una conexión, si no indicamos nada más, se realizará por `GET`. Si llamamos al método `setDoOutput(true)` la petición se realizará por `POST`. Y para realizar una petición de otro tipo, como `PUT` o `DELETE`, tenemos que indicarlo mediante el método `setRequestMethod`. 
 
+A continuación se repasa la gestión de los códigos de estado, del uso de cabeceras y por ultimo se incluyen ejemplos de todos los tipos de peticiones. 
+
 
 
 ### Códigos de estado
 
-A partir del objeto `HttpResponse` podemos tener acceso a los **códigos de estado** que se envían en la cabecera, por ejemplo:
-
+Como ya vimos en la sesión anterior, a partir del método `getResponseCode` de la clase `HttpURLConnection` podemos obtener el **códigos de estado** que se envía en la cabecera de la respuesta. Si el codigo es igual a 200 indicará que la petición es correcta y que se puede descargar el contendio. En caso de que haya algún error devolverá un valor distinto a 200 correspondiente al código del error (Podéis consultar la lista completa de códigos en  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes). Los códigos de error usados dependerán de la API, no es obligatorio usarlos todos, y algunas usarán solo algunos de ellos para indicar un error genérico. Lo que sí que es estándar es devolver el código 200 si la petición es correcta. Para comprobar esto podemos hacer:  
 
 ```java
-HttpResponse response = client.execute(request);
-StatusLine statusLine = response.getStatusLine();
-int statusCode = statusLine.getStatusCode();
-
-if (statusCode == 200 )
-    // ...
-
-// O también:
-if (statusCode == HttpStatus.SC_OK)
-    // ...
+if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+    // Correcto! Ya podemos descargar el cotenido!
+}
 ```
 
-En `HttpStatus` están definidos como constantes todos los códigos de estado con los cuales podemos comparar. Para más información podéis consultar: http://developer.android.com/reference/org/apache/http/HttpStatus.html
-
-
-
-A continuación se incluyen ejemplos de todos los tipos de peticiones. 
 
 
 
