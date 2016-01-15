@@ -4,20 +4,72 @@
 
 ## Servicios Rest
 
-Como ya hemos visto antes, en Android para descargar el contenido desde una URL podemos utilizar la clase `HttpURLConnection`. Por defecto al realizar una conexión, si no indicamos nada más, se realizará por `GET`. Si llamamos al método `setDoOutput(true)` la petición se realizará por `POST`. Y para realizar una petición de otro tipo, como `PUT` o `DELETE`, tenemos que indicarlo mediante el método `setRequestMethod`. A continuación se incluyen ejemplos de todos los tipos de peticiones. 
+Como ya hemos visto antes, en Android para descargar el contenido desde una URL podemos utilizar la clase `HttpURLConnection`. Por defecto al realizar una conexión, si no indicamos nada más, se realizará por `GET`. Si llamamos al método `setDoOutput(true)` la petición se realizará por `POST`. Y para realizar una petición de otro tipo, como `PUT` o `DELETE`, tenemos que indicarlo mediante el método `setRequestMethod`. 
+
+
+
+### Códigos de estado
+
+A partir del objeto `HttpResponse` podemos tener acceso a los **códigos de estado** que se envían en la cabecera, por ejemplo:
+
+
+```java
+HttpResponse response = client.execute(request);
+StatusLine statusLine = response.getStatusLine();
+int statusCode = statusLine.getStatusCode();
+
+if (statusCode == 200 )
+    // ...
+
+// O también:
+if (statusCode == HttpStatus.SC_OK)
+    // ...
+```
+
+En `HttpStatus` están definidos como constantes todos los códigos de estado con los cuales podemos comparar. Para más información podéis consultar: http://developer.android.com/reference/org/apache/http/HttpStatus.html
+
+
+
+A continuación se incluyen ejemplos de todos los tipos de peticiones. 
+
+
+
+### Cabeceras
+
+Para obtener el resto de **cabeceras** de la respuesta del servidor usaremos también el objeto `HttpResponse`, de la forma:
+
+```java
+HttpResponse response = client.execute(request);
+
+// Obtener todas las cabeceras
+Header[] headers = response.getAllHeaders();
+for (Header header : headers) {
+	Log.d("Headers", "Key : " + header.getName()
+         	       + " ,Value : " + header.getValue());
+}
+
+// Obtener una cabecera por su clave
+String server = response.getFirstHeader("Server").getValue();
+```
+
+
+
 
 
 ### Petición GET
+
+Por ejemplo para realizar una petición tipo GET a una URI y obtener su contenido tendríamos que hacer:
 
 ```java
 public String peticionGET( String strUrl )
 {
     HttpURLConnection http = null;
     String content = null;
-
     try {
         URL url = new URL( strUrl );
         http = (HttpURLConnection)url.openConnection();
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "application/json");
 
         if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
             StringBuilder sb = new StringBuilder();
@@ -42,6 +94,19 @@ public String peticionGET( String strUrl )
 ```
 
 
+
+Observamos que primero instanciamos el cliente HTTP y procedemos a crear un objeto que representa el método HTTP GET. Con el cliente y el método instanciado, necesitamos ejecutar la petición con el método `execute`. Si queremos tener un mayor control sobre la respuesta, en lugar de utilizar un `BasicResponseHandler` podríamos ejecutar directamente la petición sobre el cliente (`HttpResponse response = client.execute(request);`), y obtener así la respuesta completa, tal como vimos en la sesión anterior.
+
+
+Para obtener el contenido de la respuesta a partir del objeto `HttpResponse` la forma más sencilla es utilizar `EntityUtils` (dado que sino tendríamos que crear un bucle para leer linea a línea del _stream_ de entrada ):
+
+```java
+String contenido = EntityUtils.toString( response.getEntity() );
+```
+
+
+
+
 ### Petición POST
 
 ```java
@@ -58,26 +123,26 @@ public String peticionGET( String strUrl )
 
 
 ```java
-try {
-    URL url = new URL(CATALOG_URL_STRING + "/" + movie.getId());
-    http = (HttpURLConnection) url.openConnection();
-    http.setRequestMethod("DELETE");
-    http.setRequestProperty("Content-Type", "application/json");
-    http.setRequestProperty("Accept", "application/json");
-    // Basic auth header
-    SharedPreferences mPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-    String user = mPreferences.getString("user", "");
-    String pass = mPreferences.getString("pass", "");
-    http.setRequestProperty("Authorization", "Basic " + Base64.encodeToString((user + ":" + pass).getBytes(), 0));
-    // Do the connection and retrieve response code
-    responseCode = http.getResponseCode();
-} catch (IOException e) {
-    e.printStackTrace();
-} finally {
-    if (http != null) http.disconnect();
+public String peticionGET( String strUrl )
+{
+    HttpURLConnection http = null;
+    int responseCode = -1;
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("DELETE");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "application/json");
+        
+        // Conectar y obtener el codigo de respuesta
+        responseCode = http.getResponseCode();
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        if (http != null) http.disconnect();
+    }
+    return responseCode;
 }
-
-return responseCode;
 ```
 
 
@@ -87,72 +152,9 @@ return responseCode;
 
 
 
-Por ejemplo para realizar una petición tipo GET a una URI y obtener su contenido tendríamos que hacer:
-
-```java
-public String descargarContenido( String url )
-{
-    String contenido = null;
-    HttpClient client = new DefaultHttpClient();
-    HttpGet request = new HttpGet("http://<domain>/resource");
-    try {
-        ResponseHandler<String> handler = new BasicResponseHandler();
-        contenido = client.execute(request, handler);
-    } catch (ClientProtocolException e) {
-        e.printStackTrace();
-    } catch (IOException e) {
-        e.printStackTrace();
-    } finally {
-        client.getConnectionManager().shutdown();
-    }
-    return contenido;
-}
-```
 
 
-Observamos que primero instanciamos el cliente HTTP y procedemos a crear un objeto que representa el método HTTP GET. Con el cliente y el método instanciado, necesitamos ejecutar la petición con el método `execute`. Si queremos tener un mayor control sobre la respuesta, en lugar de utilizar un `BasicResponseHandler` podríamos ejecutar directamente la petición sobre el cliente (`HttpResponse response = client.execute(request);`), y obtener así la respuesta completa, tal como vimos en la sesión anterior.
 
-A partir del objeto `HttpResponse` podemos tener acceso a los **códigos de estado** que se envían en la cabecera, por ejemplo:
-
-
-```java
-HttpResponse response = client.execute(request);
-StatusLine statusLine = response.getStatusLine();
-int statusCode = statusLine.getStatusCode();
-
-if (statusCode == 200 )
-    // ...
-
-// O también:
-if (statusCode == HttpStatus.SC_OK)
-    // ...
-```
-
-En `HttpStatus` están definidos como constantes todos los códigos de estado con los cuales podemos comparar. Para más información podéis consultar: http://developer.android.com/reference/org/apache/http/HttpStatus.html
-
-
-Para obtener el resto de **cabeceras** de la respuesta del servidor usaremos también el objeto `HttpResponse`, de la forma:
-
-```java
-HttpResponse response = client.execute(request);
-
-// Obtener todas las cabeceras
-Header[] headers = response.getAllHeaders();
-for (Header header : headers) {
-	Log.d("Headers", "Key : " + header.getName()
-         	       + " ,Value : " + header.getValue());
-}
-
-// Obtener una cabecera por su clave
-String server = response.getFirstHeader("Server").getValue();
-```
-
-
-Para obtener el contenido de la respuesta a partir del objeto `HttpResponse` la forma más sencilla es utilizar `EntityUtils` (dado que sino tendríamos que crear un bucle para leer linea a línea del _stream_ de entrada ):
-
-```java
-String contenido = EntityUtils.toString( response.getEntity() );
-```
 
 
 Hemos visto cómo realizar una petición GET, tal como se vio en sesiones anteriores, para acceder a servicios REST. Sin embargo, para determinadas operaciones REST utiliza métodos HTTP distintos, como POST, PUT o DELETE. Para cambiar el método simplemente tendremos que cambiar el objeto `HttpGet` por el del método que corresponda (`HttpPost`, `HttpPut` o `HttpDelete`). Cada tipo incorpora los métodos necesarios para el tipo de petición HTTP que realice. Por ejemplo, a continuación vemos un ejemplo de petición POST. Creamos un objeto `HttpPost` al que le deberemos pasar una entidad que represente el bloque de contenido a enviar (en una petición POST ya no sólo tenemos un bloque de contenido en la respuesta, sino que también lo tenemos en la petición). Podemos crear diferentes tipos de entidades, que serán clases que hereden de `HttpEntity`. La más habitual para los servicios que estamos utilizando será `StringEntity`, que nos facilitará incluir en la petición contenido XML o JSON como una cadena de texto. Además, deberemos especificar el tipo MIME de la entidad de la petición mediante `setContentType` (en el siguiente ejemplo consideramos que es XML). Por otro lado, también debemos especificar el tipo de representación que queremos obtener como respuesta, y como hemos visto anteriormente, esto debe hacerse mediante la cabecera `Accept`. Esta cabecera la deberemos establecer en el objeto que representa la petición POST (`HttpPost`).
