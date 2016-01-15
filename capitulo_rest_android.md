@@ -166,13 +166,9 @@ Uri.Builder builder = new Uri.Builder()
         .appendQueryParameter("thirdParam", paramValue3);
 String query = builder.build().getEncodedQuery();
 
-OutputStream os = http.getOutputStream();
-BufferedWriter writer = new BufferedWriter(
-            new OutputStreamWriter(os, "UTF-8"));
-writer.write(query);
+PrintWriter writer = new PrintWriter(http.getOutputStream());
+writer.print( query );
 writer.flush();
-writer.close();
-os.close();
 ```
 
 En la función de ejemplo simplemente se lee el código de la respuesta y con eso ya podemos saber si el servidor ha procesado bien o no la petición. En caso de que queramos leer el cuerpo de la respuesta lo podemos hacer de la misma forma que en la petición tipo `GET`. A veces, según la API usada, también nos interesará leer la cabecera `Location` de respuesta, ya que en ella se suele devolver la URI del nuevo recurso generado. 
