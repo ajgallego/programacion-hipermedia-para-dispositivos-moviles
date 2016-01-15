@@ -1,7 +1,91 @@
 <!-- *********************************************************************** -->
 # Parsing y servicios REST en Android
 
-Como ya hemos visto antes, en Android para descargar el contenido desde una URL podemos utilizar la librería _Http Client_. Dicha librería ofrece una mayor facilidad para controlar y utilizar objetos de conexión HTTP, nos permitirá realizar peticiones tipo GET, POST, PUT, DELETE y además acceder a las cabeceras.
+
+## Servicios Rest
+
+Como ya hemos visto antes, en Android para descargar el contenido desde una URL podemos utilizar la clase `HttpURLConnection`. Por defecto al realizar una conexión, si no indicamos nada más, se realizará por `GET`. Si llamamos al método `setDoOutput(true)` la petición se realizará por `POST`. Y para realizar una petición de otro tipo, como `PUT` o `DELETE`, tenemos que indicarlo mediante el método `setRequestMethod`. A continuación se incluyen ejemplos de todos los tipos de peticiones. 
+
+
+### Petición GET
+
+```java
+public String peticionGET( String strUrl )
+{
+    HttpURLConnection http = null;
+    String content = null;
+
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection)url.openConnection();
+
+        if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader( http.getInputStream() ));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            content = sb.toString();
+            reader.close();
+        }
+    }
+    catch(Exception e) {
+        e.printStackTrace();
+    }
+    finally {
+        if( http != null ) http.disconnect();
+    }
+    return content;
+}
+```
+
+
+### Petición POST
+
+```java
+```
+
+
+### Petición PUT
+
+```java
+```
+
+
+### Petición DELETE
+
+
+```java
+try {
+    URL url = new URL(CATALOG_URL_STRING + "/" + movie.getId());
+    http = (HttpURLConnection) url.openConnection();
+    http.setRequestMethod("DELETE");
+    http.setRequestProperty("Content-Type", "application/json");
+    http.setRequestProperty("Accept", "application/json");
+    // Basic auth header
+    SharedPreferences mPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+    String user = mPreferences.getString("user", "");
+    String pass = mPreferences.getString("pass", "");
+    http.setRequestProperty("Authorization", "Basic " + Base64.encodeToString((user + ":" + pass).getBytes(), 0));
+    // Do the connection and retrieve response code
+    responseCode = http.getResponseCode();
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    if (http != null) http.disconnect();
+}
+
+return responseCode;
+```
+
+
+
+
+-------------
+
+
 
 Por ejemplo para realizar una petición tipo GET a una URI y obtener su contenido tendríamos que hacer:
 
@@ -104,8 +188,89 @@ Como podemos ver en el ejemplo anterior, una vez configurada la petición POST l
 
 
 
+
 <!-- *********************************************************************** -->
-# Parsing de estructuras XML
+## Autentificación en servicios remotos
+
+Los servicios REST estan fuertemente vinculados al protocolo HTTP, por lo que los mecanismos de seguridad
+utilizados también deberían ser los que define dicho protocolo. Pueden utilizar los diferentes tipos de
+autentificación definidos en HTTP: _Basic_, _Digest_ y _X.509_. Sin embargo, cuando se
+trata de servicios que se dejan disponibles para que cualquier desarrollador externo pueda acceder a ellos, utilizar
+directamente estos mecanismos básicos de seguridad puede resultar peligroso. En estos casos la autentificación suele
+realizarse mediante el protocolo OAuth. Este último se sale de los contenidos del curso, en la siguiente sección
+nos centraremos en la seguridad HTTP básica.
+
+
+
+<!-- ************************************* -->
+### Seguridad HTTP básica
+
+Para acceder a servicios protegidos con seguridad HTTP estándar deberemos
+proporcionar en la llamada al servicio las cabeceras de autentificación con los credenciales que
+nos den acceso a las operaciones solicitadas.
+
+Por ejemplo, desde un cliente Android en el que utilicemos la API de red estándar de Java SE deberemos definir
+un `Authenticator` que proporcione estos datos:
+
+```java
+Authenticator.setDefault(new Authenticator() {
+    protected PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication (
+              "usuario", "password".toCharArray());
+    }
+});
+```
+
+En caso de que utilicemos HttpClient de Apache simplemente tendremos que añadir la siguiente cabecera:
+
+```java
+HttpClient client = new DefaultHttpClient();
+HttpPost post = new HttpPost( url );
+post.addHeader(BasicScheme.authenticate(
+        new UsernamePasswordCredentials("usuario", "password"), "UTF-8", false));
+```
+
+Otra posible opción es usando el método `setCredentials` de la clase `DefaultHttpClient`: 
+
+```java
+DefaultHttpClient client = new DefaultHttpClient();
+client.getCredentialsProvider().setCredentials(
+    new AuthScope("jtech.ua.es", 80),
+    new UsernamePasswordCredentials("usuario", "password")
+);
+```
+
+Aquí además de las credenciales, hay que indicar el ámbito al que se aplican (host y puerto).
+
+Para quienes no estén muy familiarizados con la seguridad en HTTP, conviene mencionar el funcionamiento
+del protocolo a grandes rasgos. Cuando realizamos una petición HTTP a un recurso protegido con seguridad
+básica, HTTP nos devuelve una respuesta indicándonos que necesitamos autentificarnos para acceder. Es
+entonces cuando el cliente solicita al usuario las credenciales (usuario y password), y entonces se
+realiza una nueva petición con dichas credenciales incluidas en una cabecera _Authorization_.
+Si las credenciales son válidas, el servidor nos dará acceso al contenido solicitado.
+
+Este es el funcionamiento habitual de la autentificación. En el caso del acceso mediante HttpClient
+que hemos visto anteriormente, el funcionamiento es el mismo, cuando el servidor nos pida autentificarnos
+la librería lanzará una nueva petición con las credenciales especificadas en el proveedor de credenciales.
+
+Sin embargo, si sabemos de antemano que un recurso va a necesitar autentificación, podemos también autentificarnos
+de forma preventiva. La autentificación preventiva consiste en mandar las credenciales en la primera petición,
+antes de que el servidor nos las solicite. Con esto ahorramos una petición, pero podríamos estar mandando
+las credenciales en casos en los que no resulta necesario.
+
+Con HttpClient podemos activar o desactivar la autentificación preventiva con el siguiente método:
+
+```java
+client.getParams().setAuthenticationPreemptive(true);
+```
+
+
+
+
+
+
+<!-- *********************************************************************** -->
+## Parsing de estructuras XML
 
 En las comunicaciones por red es muy común transmitir información en formato XML, el ejemplo más conocido depués del HTML, son las noticias RSS. En este último caso, al delimitar cada campo de la noticia por tags de XML se permite a los diferentes clientes lectores de RSS obtener sólo aquellos campos que les interese mostrar.
 
@@ -178,7 +343,7 @@ El ejemplo anterior serviría para imprimir en el LogCat el título del siguient
 
 
 <!-- *********************************************************************** -->
-# Parsing de estructuras JSON
+## Parsing de estructuras JSON
 
 JSON es una representación muy utilizada para formatear los recursos solicitados a un servicio web RESTful. El formato sigue la misma notación de objetos de JavaScript, por lo tanto ocupa muy poco, es texto plano y puede ser manipulado muy fácilmente utilizando JavaScript, PHP u otros lenguajes.
 
@@ -229,83 +394,6 @@ Además es importante que capturemos las excepciones al procesar cadenas en JSON
 Esta librería es sencilla y fácil de utilizar, pero puede generar demasiado código para parsear estructuras de complejidad media. Existen otras librerías que podemos utilizar como *GSON* (<a href="http://sites.google.com/site/gson/gson-user-guide">`http://sites.google.com/site/gson/gson-user-guide`</a>) o *Jackson* (<a href="http://wiki.fasterxml.com/JacksonInFiveMinutes">`http://wiki.fasterxml.com/JacksonInFiveMinutes`</a>) que nos facilitarán notablemente el trabajo, ya que nos permiten mapear el JSON directamente con nuestros objetos Java, con lo que podremos acceder al contenido JSON de forma similar a como se hace en Javascript.
 
 
-
-
-
-<!-- *********************************************************************** -->
-# Autentificación en servicios remotos
-
-Los servicios REST estan fuertemente vinculados al protocolo HTTP, por lo que los mecanismos de seguridad
-utilizados también deberían ser los que define dicho protocolo. Pueden utilizar los diferentes tipos de
-autentificación definidos en HTTP: _Basic_, _Digest_ y _X.509_. Sin embargo, cuando se
-trata de servicios que se dejan disponibles para que cualquier desarrollador externo pueda acceder a ellos, utilizar
-directamente estos mecanismos básicos de seguridad puede resultar peligroso. En estos casos la autentificación suele
-realizarse mediante el protocolo OAuth. Este último se sale de los contenidos del curso, en la siguiente sección
-nos centraremos en la seguridad HTTP básica.
-
-
-
-<!-- ************************************* -->
-## Seguridad HTTP básica
-
-Para acceder a servicios protegidos con seguridad HTTP estándar deberemos
-proporcionar en la llamada al servicio las cabeceras de autentificación con los credenciales que
-nos den acceso a las operaciones solicitadas.
-
-Por ejemplo, desde un cliente Android en el que utilicemos la API de red estándar de Java SE deberemos definir
-un `Authenticator` que proporcione estos datos:
-
-```java
-Authenticator.setDefault(new Authenticator() {
-    protected PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication (
-              "usuario", "password".toCharArray());
-    }
-});
-```
-
-En caso de que utilicemos HttpClient de Apache simplemente tendremos que añadir la siguiente cabecera:
-
-```java
-HttpClient client = new DefaultHttpClient();
-HttpPost post = new HttpPost( url );
-post.addHeader(BasicScheme.authenticate(
-        new UsernamePasswordCredentials("usuario", "password"), "UTF-8", false));
-```
-
-Otra posible opción es usando el método `setCredentials` de la clase `DefaultHttpClient`: 
-
-```java
-DefaultHttpClient client = new DefaultHttpClient();
-client.getCredentialsProvider().setCredentials(
-    new AuthScope("jtech.ua.es", 80),
-    new UsernamePasswordCredentials("usuario", "password")
-);
-```
-
-Aquí además de las credenciales, hay que indicar el ámbito al que se aplican (host y puerto).
-
-Para quienes no estén muy familiarizados con la seguridad en HTTP, conviene mencionar el funcionamiento
-del protocolo a grandes rasgos. Cuando realizamos una petición HTTP a un recurso protegido con seguridad
-básica, HTTP nos devuelve una respuesta indicándonos que necesitamos autentificarnos para acceder. Es
-entonces cuando el cliente solicita al usuario las credenciales (usuario y password), y entonces se
-realiza una nueva petición con dichas credenciales incluidas en una cabecera _Authorization_.
-Si las credenciales son válidas, el servidor nos dará acceso al contenido solicitado.
-
-Este es el funcionamiento habitual de la autentificación. En el caso del acceso mediante HttpClient
-que hemos visto anteriormente, el funcionamiento es el mismo, cuando el servidor nos pida autentificarnos
-la librería lanzará una nueva petición con las credenciales especificadas en el proveedor de credenciales.
-
-Sin embargo, si sabemos de antemano que un recurso va a necesitar autentificación, podemos también autentificarnos
-de forma preventiva. La autentificación preventiva consiste en mandar las credenciales en la primera petición,
-antes de que el servidor nos las solicite. Con esto ahorramos una petición, pero podríamos estar mandando
-las credenciales en casos en los que no resulta necesario.
-
-Con HttpClient podemos activar o desactivar la autentificación preventiva con el siguiente método:
-
-```java
-client.getParams().setAuthenticationPreemptive(true);
-```
 
 
 
