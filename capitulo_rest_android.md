@@ -10,6 +10,7 @@ A continuación se repasa la gestión de los códigos de estado, del uso de cabe
 
 
 
+
 ### Códigos de estado
 
 Como ya vimos en la sesión anterior, a partir del método `getResponseCode` de la clase `HttpURLConnection` podemos obtener el **códigos de estado** que se envía en la cabecera de la respuesta. Si el codigo es igual a 200 indicará que la petición es correcta y que se puede descargar el contendio. En caso de que haya algún error devolverá un valor distinto a 200 correspondiente al código del error (Podéis consultar la lista completa de códigos en  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes). Los códigos de error usados dependerán de la API, no es obligatorio usarlos todos, y algunas usarán solo algunos de ellos para indicar un error genérico. Lo que sí que es estándar es devolver el código 200 si la petición es correcta. Para comprobar esto podemos hacer:  
@@ -25,21 +26,55 @@ if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
 
 ### Cabeceras
 
-Para obtener el resto de **cabeceras** de la respuesta del servidor usaremos también el objeto `HttpResponse`, de la forma:
+Para añadir cabeceras a una petición usamos el método `setRequestProperty`. 
+
+Por ejemplo para indicar el _user-agent_, el formato de la codificación esperada y el formato en texto plano de los datos enviados usaríamos: 
 
 ```java
-HttpResponse response = client.execute(request);
-
-// Obtener todas las cabeceras
-Header[] headers = response.getAllHeaders();
-for (Header header : headers) {
-	Log.d("Headers", "Key : " + header.getName()
-         	       + " ,Value : " + header.getValue());
-}
-
-// Obtener una cabecera por su clave
-String server = response.getFirstHeader("Server").getValue();
+http.setRequestProperty("User-Agent", "...");
+http.setRequestProperty("Accept-Charset", "UTF-8");
+http.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
 ```
+
+Para indicar que el formato de los datos enviados y de la respuesta esperada es JSON tenemos que añadir: 
+
+```java
+http.setRequestProperty("Content-Type", "application/json");
+http.setRequestProperty("Accept", "application/json");
+```
+
+Para indicar que vamos a usar XML pondríamos: 
+
+```java
+http.setRequestProperty("Content-type", "application/xml");
+http.setRequestProperty("Accept", "application/xml");
+```
+
+
+O para desactivar la compresión Gzip de la comunicación: 
+
+```java
+http.setRequestProperty("Accept-Encoding", "identity");
+```
+
+
+Y para consultar las cabeceras de la respuesta podemos usar el método `getHeaderFields` que devolverá toda la lista de cabeceras: 
+
+```java
+for (Map.Entry<String, List<String>> k : http.getHeaderFields().entrySet()) {
+    for (String v : k.getValue()){
+        Log.d("Headers", k.getKey() + ":" + v);
+    }
+}
+```
+
+O para consultar una cabecera específica podemos usar: 
+
+```java
+String type = http.getHeaderField("Content-type");
+```
+
+
 
 
 
@@ -83,15 +118,8 @@ public String peticionGET( String strUrl )
 ```
 
 
+Este método recibe como entrada una cadena con la dirección URL a la cual se quiere realizar la peticion GET y devuelve como respuesta el contenido de la misma. En caso de que hubiera algún error devolvería _null_.
 
-Observamos que primero instanciamos el cliente HTTP y procedemos a crear un objeto que representa el método HTTP GET. Con el cliente y el método instanciado, necesitamos ejecutar la petición con el método `execute`. Si queremos tener un mayor control sobre la respuesta, en lugar de utilizar un `BasicResponseHandler` podríamos ejecutar directamente la petición sobre el cliente (`HttpResponse response = client.execute(request);`), y obtener así la respuesta completa, tal como vimos en la sesión anterior.
-
-
-Para obtener el contenido de la respuesta a partir del objeto `HttpResponse` la forma más sencilla es utilizar `EntityUtils` (dado que sino tendríamos que crear un bucle para leer linea a línea del _stream_ de entrada ):
-
-```java
-String contenido = EntityUtils.toString( response.getEntity() );
-```
 
 
 
