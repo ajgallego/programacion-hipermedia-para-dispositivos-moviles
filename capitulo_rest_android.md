@@ -293,8 +293,8 @@ Con `HttpURLConnection` podemos activar la autentificación preventiva añadiend
 ```java
 URL url = new URL(strUrl);
 http = (HttpURLConnection) url.openConnection();
-            
-String encoded = Base64.encode(username+":"+password);
+
+String encoded = Base64.encodeToString((user + ":" + pass).getBytes(), 0);
 http.setRequestProperty("Authorization", "Basic "+encoded);
 ```
 
