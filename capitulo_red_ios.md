@@ -1,4 +1,4 @@
-# Acceso a la red con iOS
+
 
 Al igual que hemos visto para Android, en esta sesión veremos cómo acceder a la red desde las aplicaciones iOS.
 
@@ -299,7 +299,7 @@ En caso de no contar todavía con la imagen, podemos poner una imagen temporal e
 ```
 
 Cada descarga es gestionada por un objeto de la clase `UAImageDownloader`, que se encargará de gestionar la descarga asíncrona de la imagen cuya URL se le pasa en el inicializador, y estos objetos se introducen en el diccionario de descargas en progreso. Utilizamos el patrón delegado para que, una vez se haya finalizado la descarga, se nos proporcione la imagen obtenida. Definimos el protocolo para el delegado junto a la clase
-`UAImagenDownloader`:
+`UAImageDownloader`:
 
 ```objectivec
 @class UAImageDownloader;
@@ -475,7 +475,7 @@ Como podemos observar, impedimos la carga tanto si el usuario está arrastrando 
 
 Si queremos evitar que las imágenes de una tabla puedan acabar con la memoria disponible (aunque esto es poco probable) tenemos implementar el método `didReceiveMemoryWarning`. En él deberíamos detener las descargas pendientes, y liberar de memoria las imágenes que no sean necesarias. En este caso la liberación de los objetos la deberemos implementar manualmente nosotros.
 
-Hemos visto que en ambos casos utilizamos un mapa o diccionario para almacenar todas las descargas que ya se han iniciado, y así evitar que se repita una descarga para la misma entrada de la tabla. Hemos utilizado la entrada de la tabla para indexar este mapa o diccionario. Sin embargo, en algunos casos podría ocurrir que múltiples entradas con la misma imagen (por ejemplo varios _tweets_ de una misma persona). Si es probable que distintas entradas tengan la misma imagen, sería recomendable utilizar la propia URL de la imagen para indexar el mapa o diccionario de descargas.
+Hemos visto que en ambos casos utilizamos un mapa o diccionario para almacenar todas las descargas que ya se han iniciado, y así evitar que se repita una descarga para la misma entrada de la tabla. Hemos utilizado la entrada de la tabla para indexar este mapa o diccionario. Sin embargo, en algunos casos podría ocurrir que existan múltiples entradas con la misma imagen (por ejemplo varios _tweets_ de una misma persona). Si es probable que distintas entradas tengan la misma imagen, sería recomendable utilizar la propia URL de la imagen para indexar el mapa o diccionario de descargas.
 
 # Ejercicios de acceso a la red en iOS
 
@@ -495,7 +495,7 @@ _c)_ Mostrar en la barra de estado un indicador de actividad de red mientras se 
 
 Vamos a implementar una aplicación que nos permita visualizar una lista de imágenes de carátulas de películas, y que al pulsar sobre cada una de ellas nos aparezca la información de la película.
 
-Se proporciona una plantilla `Pelis` que utilizaremos como base. En esta sesión no usaremos servicios REST (esto lo haremos en la siguiente). Todos los datos de las películas estarán almacenados en nuestro programa, y sólo accederemos a la red para descargar las imágenes del servidor.
+Se proporciona una plantilla `Pelis` que utilizaremos como base. En esta sesión no usaremos servicios REST, ya que esto lo haremos en la siguiente. Todos los datos de las películas estarán almacenados en nuestro programa, y sólo accederemos a la red para descargar las imágenes del servidor.
 
 <!-- Primero debemos implementar la carga (**no lazy**) de las imágenes en la vista detalle, y en la parte final haremos la carga lazy en la vista maestra. Cuando se abra una vista detalle, tendremos que cargar la imagen correspondiente, mostrando la carátula en el `ImageView` destinado a tal fin. Puedes usar la clase UAImageDownloader con `indexPath:nil`. No olvides mostrar y ocultar el indicador de actividad de red.
 
@@ -514,7 +514,7 @@ Una vez implementada la carga lazy, puedes asignar la imagen correspondiente en 
 
 <!-- Puedes comentar el código para hacer la conexión en el método `configureView` de `DetailViewController`, y en su lugar asignar la imagen correspondiente.-->
 
-Implementa la funcionalidad de no descargar las imágenes mientras se hace _scroll_.
+Implementa la funcionalidad para no descargar las imágenes mientras se hace _scroll_.
 
 <!--También debes permitir que se eliminen todas las imágenes en condiciones de baja memoria.-->
 
