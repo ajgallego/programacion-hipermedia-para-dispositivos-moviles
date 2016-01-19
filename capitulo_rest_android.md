@@ -1,109 +1,312 @@
 <!-- *********************************************************************** -->
 # Parsing y servicios REST en Android
 
-Como ya hemos visto antes, en Android para descargar el contenido desde una URL podemos utilizar la librería _Http Client_. Dicha librería ofrece una mayor facilidad para controlar y utilizar objetos de conexión HTTP, nos permitirá realizar peticiones tipo GET, POST, PUT, DELETE y además acceder a las cabeceras.
+
+## Servicios Rest
+
+Como ya hemos visto antes, en Android para descargar el contenido desde una URL podemos utilizar la clase `HttpURLConnection`. Por defecto al realizar una conexión, si no indicamos nada más, se realizará por `GET`. Si llamamos al método `setDoOutput(true)` la petición se realizará por `POST`. Y para realizar una petición de otro tipo, como `PUT` o `DELETE`, tenemos que indicarlo mediante el método `setRequestMethod`. 
+
+A continuación se repasa la gestión de los códigos de estado, del uso de cabeceras y por ultimo se incluyen ejemplos de todos los tipos de peticiones. 
+
+
+
+
+### Códigos de estado
+
+Como ya vimos en la sesión anterior, a partir del método `getResponseCode` de la clase `HttpURLConnection` podemos obtener el **códigos de estado** que se envía en la cabecera de la respuesta. Si el codigo es igual a 200 indicará que la petición es correcta y que se puede descargar el contendio. En caso de que haya algún error devolverá un valor distinto a 200 correspondiente al código del error (Podéis consultar la lista completa de códigos en  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes). Los códigos de error usados dependerán de la API, no es obligatorio usarlos todos, y algunas usarán solo algunos de ellos para indicar un error genérico. Lo que sí que es estándar es devolver el código 200 si la petición es correcta. Para comprobar esto podemos hacer:  
+
+```java
+if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+    // Correcto! Ya podemos descargar el cotenido!
+}
+```
+
+
+
+### Cabeceras
+
+Para añadir cabeceras a una petición usamos el método `setRequestProperty`. 
+
+Por ejemplo para indicar el _user-agent_, el formato de la codificación esperada y el formato en texto plano de los datos enviados usaríamos: 
+
+```java
+http.setRequestProperty("User-Agent", "...");
+http.setRequestProperty("Accept-Charset", "UTF-8");
+http.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
+```
+
+Para indicar que el formato de los datos enviados y de la respuesta esperada es JSON tenemos que añadir: 
+
+```java
+http.setRequestProperty("Content-Type", "application/json");
+http.setRequestProperty("Accept", "application/json");
+```
+
+Para indicar que vamos a usar XML pondríamos: 
+
+```java
+http.setRequestProperty("Content-type", "application/xml");
+http.setRequestProperty("Accept", "application/xml");
+```
+
+
+O para desactivar la compresión Gzip de la comunicación: 
+
+```java
+http.setRequestProperty("Accept-Encoding", "identity");
+```
+
+
+Y para consultar las cabeceras de la respuesta podemos usar el método `getHeaderFields` que devolverá toda la lista de cabeceras: 
+
+```java
+for (Map.Entry<String, List<String>> k : http.getHeaderFields().entrySet()) {
+    for (String v : k.getValue()){
+        Log.d("Headers", k.getKey() + ":" + v);
+    }
+}
+```
+
+O para consultar una cabecera específica podemos usar: 
+
+```java
+String type = http.getHeaderField("Content-type");
+```
+
+
+
+
+
+### Petición GET
 
 Por ejemplo para realizar una petición tipo GET a una URI y obtener su contenido tendríamos que hacer:
 
 ```java
-HttpClient client = new DefaultHttpClient();
-HttpGet request = new HttpGet("http://<domain>/resource");
-try {
-    ResponseHandler<String> handler = new BasicResponseHandler();
-    String contenido = client.execute(request, handler);
+public String peticionGET( String strUrl )
+{
+    HttpURLConnection http = null;
+    String content = null;
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection)url.openConnection();
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "application/json");
 
-    tvResponse.setText(contenido);
-
-} catch (ClientProtocolException e) {
-    e.printStackTrace();
-} catch (IOException e) {
-    e.printStackTrace();
-} finally {
-    client.getConnectionManager().shutdown();
+        if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader( http.getInputStream() ));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            content = sb.toString();
+            reader.close();
+        }
+    }
+    catch(Exception e) {
+        e.printStackTrace();
+    }
+    finally {
+        if( http != null ) http.disconnect();
+    }
+    return content;
 }
 ```
 
 
-Observamos que primero instanciamos el cliente HTTP y procedemos a crear un objeto que representa el método HTTP GET. Con el cliente y el método instanciado, necesitamos ejecutar la petición con el método `execute`. Si queremos tener un mayor control sobre la respuesta, en lugar de utilizar un `BasicResponseHandler` podríamos ejecutar directamente la petición sobre el cliente (`HttpResponse response = client.execute(request);`), y obtener así la respuesta completa, tal como vimos en la sesión anterior.
+Este método recibe como entrada una cadena con la dirección URL a la cual se quiere realizar la peticion GET y devuelve como respuesta el contenido de la misma. En caso de que hubiera algún error devolvería _null_.
 
-A partir del objeto `HttpResponse` podemos tener acceso a los **códigos de estado** que se envían en la cabecera, por ejemplo:
+
+En esta función también hemos especificado el tipo MIME de los datos de la peticion (`Content-Type`) y el tipo de representación que queremos obtener como respuesta (mediante la cabecera `Accept`).
+
+
+
+
+### Petición POST
+
+Para realizar una petición por `POST` tenemos que llamar al método `setDoOutput(true)` y además indicar el tipo de petición POST mediante el metodo `setRequestMethod`: 
 
 
 ```java
-HttpResponse response = client.execute(request);
-StatusLine statusLine = response.getStatusLine();
-int statusCode = statusLine.getStatusCode();
+public int peticionPOST( String strUrl, String data )
+{
+    HttpURLConnection http = null;
+    int responseCode = -1;
 
-if (statusCode == 200 )
-    // ...
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("POST");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "application/json");
+        http.setDoOutput(true);
 
-// O también:
-if (statusCode == HttpStatus.SC_OK)
-    // ...
-```
+        PrintWriter writer = new PrintWriter(http.getOutputStream());
+        writer.print(data);
+        writer.flush();
 
-En `HttpStatus` están definidos como constantes todos los códigos de estado con los cuales podemos comparar. Para más información podéis consultar: http://developer.android.com/reference/org/apache/http/HttpStatus.html
-
-
-Para obtener el resto de **cabeceras** de la respuesta del servidor usaremos también el objeto `HttpResponse`, de la forma:
-
-```java
-HttpResponse response = client.execute(request);
-
-// Obtener todas las cabeceras
-Header[] headers = response.getAllHeaders();
-for (Header header : headers) {
-	Log.d("Headers", "Key : " + header.getName()
-         	       + " ,Value : " + header.getValue());
+        responseCode = http.getResponseCode();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (http != null) http.disconnect();
+    }
+    return responseCode;
 }
-
-// Obtener una cabecera por su clave
-String server = response.getFirstHeader("Server").getValue();
 ```
 
+En este caso la función, además de la URL, recibe un segundo parámetro con los datos a enviar. En este ejemplo se reciben los datos como una cadena (que ya tendrá los datos almacenados) y se envían a servidor usando un _output stream_. A la clase `PrinterWriter` se le puede pasar todo tipo de datos que queramos enviar, como por ejemplo un objecto JSON, o incluso podríamos establecer distintos parámetros a enviar de la forma: 
 
-Para obtener el contenido de la respuesta a partir del objeto `HttpResponse` la forma más sencilla es utilizar `EntityUtils` (dado que sino tendríamos que crear un bucle para leer linea a línea del _stream_ de entrada ):
 
 ```java
-String contenido = EntityUtils.toString( response.getEntity() );
+Uri.Builder builder = new Uri.Builder()
+        .appendQueryParameter("firstParam", paramValue1)
+        .appendQueryParameter("secondParam", paramValue2)
+        .appendQueryParameter("thirdParam", paramValue3);
+String query = builder.build().getEncodedQuery();
+
+PrintWriter writer = new PrintWriter(http.getOutputStream());
+writer.print( query );
+writer.flush();
 ```
 
+En la función de ejemplo simplemente se lee el código de la respuesta y con eso ya podemos saber si el servidor ha procesado bien o no la petición. En caso de que queramos leer el cuerpo de la respuesta lo podemos hacer de la misma forma que en la petición tipo `GET`. A veces, según la API usada, también nos interesará leer la cabecera `Location` de respuesta, ya que en ella se suele devolver la URI del nuevo recurso generado. 
 
-Hemos visto cómo realizar una petición GET, tal como se vio en sesiones anteriores, para acceder a servicios REST. Sin embargo, para determinadas operaciones REST utiliza métodos HTTP distintos, como POST, PUT o DELETE. Para cambiar el método simplemente tendremos que cambiar el objeto `HttpGet` por el del método que corresponda (`HttpPost`, `HttpPut` o `HttpDelete`). Cada tipo incorpora los métodos necesarios para el tipo de petición HTTP que realice. Por ejemplo, a continuación vemos un ejemplo de petición POST. Creamos un objeto `HttpPost` al que le deberemos pasar una entidad que represente el bloque de contenido a enviar (en una petición POST ya no sólo tenemos un bloque de contenido en la respuesta, sino que también lo tenemos en la petición). Podemos crear diferentes tipos de entidades, que serán clases que hereden de `HttpEntity`. La más habitual para los servicios que estamos utilizando será `StringEntity`, que nos facilitará incluir en la petición contenido XML o JSON como una cadena de texto. Además, deberemos especificar el tipo MIME de la entidad de la petición mediante `setContentType` (en el siguiente ejemplo consideramos que es XML). Por otro lado, también debemos especificar el tipo de representación que queremos obtener como respuesta, y como hemos visto anteriormente, esto debe hacerse mediante la cabecera `Accept`. Esta cabecera la deberemos establecer en el objeto que representa la petición POST (`HttpPost`).
+
+
+
+
+### Petición PUT
+
+Las peticiones PUT son muy similares a las POST, también tenemos que usar los métodos `setDoOutput(true)` e indicar el tipo de petición PUT mediante el metodo `setRequestMethod`: 
 
 ```java
-HttpClient client = new DefaultHttpClient();
-HttpPost post = new HttpPost("http://<dominio>/recurso");
+public int peticionPUT( String strUrl, String data )
+{
+    HttpURLConnection http = null;
+    int responseCode = -1;
 
-String XMLcontent = "[contenido xml]";
-StringEntity se = new StringEntity( XMLcontent, HTTP.UTF_8); // Es importante indicar la codificación
-se.setContentType("application/xml");    // O "application/json"
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("PUT");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "application/json");
+        http.setDoOutput(true);
 
-post.setEntity(se);
-post.setHeader("Accept", "application/xml");
-post.setHeader("Content-type", "application/xml");
+        PrintWriter writer = new PrintWriter(http.getOutputStream());
+        writer.print(data);
+        writer.flush();
 
-HttpResponse response = client.execute(post);
-StatusLine statusLine = response.getStatusLine();
+        responseCode = http.getResponseCode();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (http != null) http.disconnect();
+    }
+    return responseCode;
+}
+```
 
-if (statusLine.getStatusCode() == 200 )
-    String contenido = EntityUtils.toString( response.getEntity() );
-else
-    // error...
+Como se puede ver recibe como parámetros la URL y los datos a enviar, y devuelve el código de respuesta para que podamos comprobar si todo ha funcionado correctamente. Al igual que en las peticiones tipo POST también podemos enviar otro tipo de datos y leer el cuerpo de la respuesta si fuese necesario. 
+
+
+
+
+### Petición DELETE
+
+Y por último para realizar una petición tipo DELETE simplemente tendríamos que indicarlo con el método `setRequestMethod` y por último llamar a `getResponseCode` para lanzar la petición y comprobar el código de respuesta. 
+
+```java
+public int peticionDELETE( String strUrl )
+{
+    HttpURLConnection http = null;
+    int responseCode = -1;
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("DELETE");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "application/json");
+        
+        // Conectar y obtener el codigo de respuesta
+        responseCode = http.getResponseCode();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (http != null) http.disconnect();
+    }
+    return responseCode;
+}
+```
+
+Como respuesta de esta función se devolverá el código de la petición, de esta forma podremos comprobar desde fuera si se ha eliminado correctamente o si ha habido algún error. 
+
+
+
+
+
+
+### Autentificación en servicios remotos
+
+Los servicios REST estan fuertemente vinculados al protocolo HTTP, por lo que los mecanismos de seguridad
+utilizados también deberían ser los que define dicho protocolo. Pueden utilizar los diferentes tipos de
+autentificación definidos en HTTP: _Basic_, _Digest_ y _X.509_. Sin embargo, cuando se trata de métodos que se dejan disponibles para que servicios externos puedan acceder a ellos, utilizar directamente estos mecanismos básicos de seguridad puede resultar peligroso. En estos casos la autentificación suele realizarse mediante el protocolo _OAuth_. Este último se sale de los contenidos del curso, en la siguiente sección nos centraremos en la seguridad HTTP básica.
+
+
+
+#### Seguridad HTTP básica
+
+Para acceder a servicios protegidos con seguridad HTTP estándar deberemos proporcionar en la llamada al servicio las cabeceras de autentificación con los credenciales que nos den acceso a las operaciones solicitadas.
+
+Por ejemplo, desde un cliente Android en el que utilicemos la API de red estándar de Java SE deberemos definir
+un `Authenticator` que proporcione estos datos:
+
+```java
+Authenticator.setDefault(new Authenticator() {
+    protected PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication (
+              "usuario", "password".toCharArray());
+    }
+});
+```
+
+Para quienes no estén muy familiarizados con la seguridad en HTTP, conviene mencionar el funcionamiento
+del protocolo a grandes rasgos. Cuando realizamos una petición HTTP a un recurso protegido con seguridad
+básica, HTTP nos devuelve una respuesta indicándonos que necesitamos autentificarnos para acceder. Es
+entonces cuando el cliente solicita al usuario las credenciales (usuario y password), y entonces se
+realiza una nueva petición con dichas credenciales incluidas en una cabecera _Authorization_.
+Si las credenciales son válidas, el servidor nos dará acceso al contenido solicitado.
+
+Este es el funcionamiento habitual de la autentificación. En el caso del acceso mediante `HttpURLConnection`
+que hemos visto anteriormente, el funcionamiento es el mismo, cuando el servidor nos pida autentificarnos
+la librería lanzará una nueva petición con las credenciales especificadas en el proveedor de credenciales.
+
+Sin embargo, si sabemos de antemano que un recurso va a necesitar autentificación, podemos también autentificarnos
+de forma **preventiva**. La autentificación preventiva consiste en mandar las credenciales en la primera petición,
+antes de que el servidor nos las solicite. Con esto ahorramos una petición, pero podríamos estar mandando
+las credenciales en casos en los que no resulta necesario.
+
+Con `HttpURLConnection` podemos activar la autentificación preventiva añadiendo nosotros mismos la cabecera:
+
+```java
+URL url = new URL(strUrl);
+http = (HttpURLConnection) url.openConnection();
+
+String encoded = Base64.encodeToString((user + ":" + pass).getBytes(), 0);
+http.setRequestProperty("Authorization", "Basic "+encoded);
 ```
 
 
-Como podemos ver en el ejemplo anterior, una vez configurada la petición POST la forma de ejecutar la petición es la misma que la vista anteriormente para peticiones GET. Para el resto de métodos HTTP el funcionamiento será similar, simplemente cambiando el tipo del objeto de la petición por el que corresponda (por ejemplo `HttpPut` o `HttpDelete`). Además, en las peticiones tipo POST, PUT y DELETE es importante comprobar el código que se devuelve en la cabecera, para asegurarnos de que la operación se ha realizado correctamente.
-
-
-> Nota: todas las conexión tienen que ir dentro de un bloque `try...catch` para capturar las excepciones y además cerrar la conexión al final. Por brevedad en algunos ejemplos de los apuntes no se incluye el cógido completo.
+Es importante destacar que para que todos estos métodos sean seguros las conexiones se tendrían que realizar con HTTPS ya que en otro caso la conexion no sería segura. 
 
 
 
 
 
 <!-- *********************************************************************** -->
-# Parsing de estructuras XML
+## Parsing de estructuras XML
 
 En las comunicaciones por red es muy común transmitir información en formato XML, el ejemplo más conocido depués del HTML, son las noticias RSS. En este último caso, al delimitar cada campo de la noticia por tags de XML se permite a los diferentes clientes lectores de RSS obtener sólo aquellos campos que les interese mostrar.
 
@@ -176,7 +379,7 @@ El ejemplo anterior serviría para imprimir en el LogCat el título del siguient
 
 
 <!-- *********************************************************************** -->
-# Parsing de estructuras JSON
+## Parsing de estructuras JSON
 
 JSON es una representación muy utilizada para formatear los recursos solicitados a un servicio web RESTful. El formato sigue la misma notación de objetos de JavaScript, por lo tanto ocupa muy poco, es texto plano y puede ser manipulado muy fácilmente utilizando JavaScript, PHP u otros lenguajes.
 
@@ -227,83 +430,6 @@ Además es importante que capturemos las excepciones al procesar cadenas en JSON
 Esta librería es sencilla y fácil de utilizar, pero puede generar demasiado código para parsear estructuras de complejidad media. Existen otras librerías que podemos utilizar como *GSON* (<a href="http://sites.google.com/site/gson/gson-user-guide">`http://sites.google.com/site/gson/gson-user-guide`</a>) o *Jackson* (<a href="http://wiki.fasterxml.com/JacksonInFiveMinutes">`http://wiki.fasterxml.com/JacksonInFiveMinutes`</a>) que nos facilitarán notablemente el trabajo, ya que nos permiten mapear el JSON directamente con nuestros objetos Java, con lo que podremos acceder al contenido JSON de forma similar a como se hace en Javascript.
 
 
-
-
-
-<!-- *********************************************************************** -->
-# Autentificación en servicios remotos
-
-Los servicios REST estan fuertemente vinculados al protocolo HTTP, por lo que los mecanismos de seguridad
-utilizados también deberían ser los que define dicho protocolo. Pueden utilizar los diferentes tipos de
-autentificación definidos en HTTP: _Basic_, _Digest_ y _X.509_. Sin embargo, cuando se
-trata de servicios que se dejan disponibles para que cualquier desarrollador externo pueda acceder a ellos, utilizar
-directamente estos mecanismos básicos de seguridad puede resultar peligroso. En estos casos la autentificación suele
-realizarse mediante el protocolo OAuth. Este último se sale de los contenidos del curso, en la siguiente sección
-nos centraremos en la seguridad HTTP básica.
-
-
-
-<!-- ************************************* -->
-## Seguridad HTTP básica
-
-Para acceder a servicios protegidos con seguridad HTTP estándar deberemos
-proporcionar en la llamada al servicio las cabeceras de autentificación con los credenciales que
-nos den acceso a las operaciones solicitadas.
-
-Por ejemplo, desde un cliente Android en el que utilicemos la API de red estándar de Java SE deberemos definir
-un `Authenticator` que proporcione estos datos:
-
-```java
-Authenticator.setDefault(new Authenticator() {
-    protected PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication (
-              "usuario", "password".toCharArray());
-    }
-});
-```
-
-En caso de que utilicemos HttpClient de Apache simplemente tendremos que añadir la siguiente cabecera:
-
-```java
-HttpClient client = new DefaultHttpClient();
-HttpPost post = new HttpPost( url );
-post.addHeader(BasicScheme.authenticate(
-        new UsernamePasswordCredentials("usuario", "password"), "UTF-8", false));
-```
-
-Otra posible opción es usando el método `setCredentials` de la clase `DefaultHttpClient`: 
-
-```java
-DefaultHttpClient client = new DefaultHttpClient();
-client.getCredentialsProvider().setCredentials(
-    new AuthScope("jtech.ua.es", 80),
-    new UsernamePasswordCredentials("usuario", "password")
-);
-```
-
-Aquí además de las credenciales, hay que indicar el ámbito al que se aplican (host y puerto).
-
-Para quienes no estén muy familiarizados con la seguridad en HTTP, conviene mencionar el funcionamiento
-del protocolo a grandes rasgos. Cuando realizamos una petición HTTP a un recurso protegido con seguridad
-básica, HTTP nos devuelve una respuesta indicándonos que necesitamos autentificarnos para acceder. Es
-entonces cuando el cliente solicita al usuario las credenciales (usuario y password), y entonces se
-realiza una nueva petición con dichas credenciales incluidas en una cabecera _Authorization_.
-Si las credenciales son válidas, el servidor nos dará acceso al contenido solicitado.
-
-Este es el funcionamiento habitual de la autentificación. En el caso del acceso mediante HttpClient
-que hemos visto anteriormente, el funcionamiento es el mismo, cuando el servidor nos pida autentificarnos
-la librería lanzará una nueva petición con las credenciales especificadas en el proveedor de credenciales.
-
-Sin embargo, si sabemos de antemano que un recurso va a necesitar autentificación, podemos también autentificarnos
-de forma preventiva. La autentificación preventiva consiste en mandar las credenciales en la primera petición,
-antes de que el servidor nos las solicite. Con esto ahorramos una petición, pero podríamos estar mandando
-las credenciales en casos en los que no resulta necesario.
-
-Con HttpClient podemos activar o desactivar la autentificación preventiva con el siguiente método:
-
-```java
-client.getParams().setAuthenticationPreemptive(true);
-```
 
 
 

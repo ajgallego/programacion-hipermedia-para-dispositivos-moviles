@@ -8,88 +8,162 @@ Una consideración que debemos tener en cuenta es que las operaciones de red son
 
 
 <!-- *********************************************************************** -->
-# Conexión a URLs en Android
+## Conexión a URLs en Android
 
 Vamos a comenzar viendo cómo conectar con URLs desde aplicaciones Android. Lo habitual será realizar una petición GET a una URL y obtener el documento que nos devuelve el servidor, por lo que las APIs de acceso a URLs nos facilitarán fundamentalmente esta operación. Sin embargo, como veremos más adelante también será posible realizar otras operaciones HTTP, como POST, PUT o DELETE, entre otras.
 
-Como paso previo, para todas las conexiones por Internet en Android necesitaremos declarar los permisos en el `AndroidManifest.xml`, fuera del `application` tag:
+Como paso previo, para todas las conexiones a Internet en Android necesitaremos declarar los permisos en el `AndroidManifest.xml`, fuera de la etiqueta `application` tenemos que poner:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
 
-Las conexiones por HTTP son las más comunes en las comunicaciones de red. En Android podemos utilizar la clase `HttpURLConnnection` en combinación con `Url`. Estas clases son las mismas que están presentes en Java SE, por lo que el acceso a URLs desde Android se puede hacer de la misma forma que en cualquier aplicación Java. Podemos ver información de las cabeceras de HTTP como se muestra a continuación (la información se añade a un `TextView`):
+Las conexiones por HTTP son las más comunes en las comunicaciones de red. En Android podemos utilizar la clase `HttpURLConnnection` en combinación con `URL`. Estas clases son las mismas que están presentes en Java SE, por lo que el acceso a URLs desde Android se puede hacer de la misma forma que en cualquier aplicación Java. Podemos ver información de las cabeceras de HTTP como se muestra a continuación (la información se añade a un `TextView` en el ejemplo):
 
 ```java
-TextView textView = (TextView)findViewById(R.id.tvVisor);
-textView.setText("Conexión http.\n\n");
+TextView tv = (TextView)findViewById(R.id.tvVisor);
+tv.setText("Conexión http.\n\n");
+
 try {
-  textView.setText("Cabeceras www.ua.es:\n");
   URL url = new URL("http://www.ua.es");
   HttpURLConnection http = (HttpURLConnection)url.openConnection();
 
-  textView.append(" longitud = "+http.getContentLength()+"\n");
-  textView.append(" encoding = "+http.getContentEncoding()+"\n");
-  textView.append(" tipo = "+http.getContentType()+"\n");
-  textView.append(" response code = "+http.getResponseCode()+"\n");
-  textView.append(" response message = "+http.getResponseMessage()+"\n");
-  textView.append(" content = "+http.getContent()+"\n");
+  tv.append("Cabeceras de http://www.ua.es:\n");
+  tv.append(" longitud = "+http.getContentLength()+"\n");
+  tv.append(" encoding = "+http.getContentEncoding()+"\n");
+  tv.append(" tipo = "+http.getContentType()+"\n");
+  tv.append(" response code = "+http.getResponseCode()+"\n");
+  tv.append(" response message = "+http.getResponseMessage()+"\n");
+  tv.append(" content = "+http.getContent().toString()+"\n");
 } catch (MalformedURLException e) {
 } catch (IOException e) {
 }
 ```
 
-Sin embargo, en Android resulta más común utilizar la libería _Apache Http Client_.
-La librería de Java SE está diseñada de forma genérica, para soportar cualquier tipo de protocolo, mientras que _HttpClient_ se centra en HTTP y con ella resulta más sencillo utilizar este protocolo.
+Como se puede ver, podemos obtener desde la codificación del contenido hasta el código de respuesta de la petición. El método `getContent` no devuelve el contenido sino el método deconexión adecuado dependiendo del tipo de contenido. 
 
-La forma más sencilla de acceso con esta librería es la siguiente:
+Es importante comprobar el código de respuesta con `getResponseCode`, el cual devolverá un entero que será igual a 200 si se puede acceder y descargar el contendio. En caso de que haya algún error devolverá un valor distinto a 200 correspondiente al código del error (https://en.wikipedia.org/wiki/List_of_HTTP_status_codes). Podemos comprobar esto haciendo simplemente: 
 
 ```java
-HttpClient client = new DefaultHttpClient();
-HttpGet request = new HttpGet("http://www.ua.es");
-try {
-    ResponseHandler<String> handler = new BasicResponseHandler();
-    String contenido = client.execute(request, handler);
-} catch (ClientProtocolException e) {
-} catch (IOException e) {
-} finally {
-    client.getConnectionManager().shutdown();
+if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+    // Correcto! Ya podemos descargar el cotenido!
 }
 ```
 
-Con esta librería tenemos un objeto cliente, y sobre él podemos ejecutar peticiones.
-Cada petición se representa en un objeto, cuya clase corresponde con el tipo de petición
-a realizar. Por ejemplo, lo más común será realizar una petición GET, por lo que utilizaremos una instancia de `HttpGet` que construiremos a partir de la URL a la que debe
-realizar dicha petición.
 
-Para obtener la respuesta, en caso de que queramos obtenerla como una cadena, lo cual
-también es lo más habitual, podemos utilizar un `BasicResponseHandler`, que se encarga de obtener el contenido en forma de `String`.
 
-Por último, en el `finally` deberemos cerrar todas las conexiones del cliente HTTP
-si no lo vamos a utilizar más. Hay que destacar que el cliente (`HttpClient`) puede
-utilizarse para realizar varias peticiones. Lo cerraremos cuando no vayamos a realizar
-más peticiones con él.
+### Descargar contenido
 
-En el ejemplo anterior hemos visto el caso en el que nos interesaba obtener la respuesta como cadena. Sin embargo, puede interesarnos obtener otros formatos, o tener más información sobre la respuesta HTTP (no sólo el contenido):
+La forma de descargar contenido es mediante un `InputStream` para leer o descargar los datos. Por lo que en primer lugar tendremos que crear el objeto `URL`, a continuación conectar usando la clase `HttpURLConnection` que hemos visto, después comprobaríamos si la URL es accesible o hay algún error, y por último descargaríamos el contenido usando el _stream_. 
+
+A continuación se incluye una función de ejemplo que podríamos usar para descargar el contenido de una página Web: 
 
 
 ```java
-HttpClient client = new DefaultHttpClient();
-HttpGet request = new HttpGet("http://www.ua.es/imagenes/logoua.png");
-try {
-    HttpResponse response = client.execute(request);
-    InputStream in = response.getEntity().getContent();
+// url = "http://www.ua.es";
+public String descargarContendio( String strUrl )
+{
+    HttpURLConnection http = null;
+    String content = null;
 
-    Bitmap imagen = BitmapFactory.decodeStream(in);
-} catch (ClientProtocolException e) {
-} catch (IOException e) {
-} finally {
-    client.getConnectionManager().shutdown();
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection)url.openConnection();
+
+        if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader( http.getInputStream() ));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            content = sb.toString();
+            reader.close();
+        }
+    }
+    catch(Exception e) {
+        e.printStackTrace();
+    }
+    finally {
+        if( http != null )
+            http.disconnect();
+    }
+    return content;
 }
 ```
 
-Este es el caso general, en el que obtenemos la respuesta como un objeto `HttpResponse` del que podemos leer todas las propiedades de la respuesta HTTP. La parte más destacada de la respuesta es el bloque de contenido (`HttpEntity`). De la entidad podemos obtener sus propiedades, como su tipo MIME, longitud, y un flujo de entrada para leer el contenido devuelto. En caso de que dicho contenido sea texto, será más sencillo leerlo como en el ejemplo previo.
+Esta función recibe una cadena con la direccion URL de descarga y devuelve también una cadena con el contenido de la Web indicada. En caso de error se devolverá _null_. Además, como se puede ver, en el `finally` se cierra siempre la conexión HTTP.
+
+
+
+### Descargar una imagen
+
+En el ejemplo anterior descargabamos el contenido de una URL en formato de texto plano. Sin embargo, puede que queramos obtener otros formatos como por ejemplo una imagen. A continuación se incluye otra función de ejemplo para ilustrar como descargar una imagen desde una dirección URL: 
+
+```
+// url = "http://www.ua.es/imagenes/logoua.png";
+public Bitmap descargarImagen(String strUrl) {
+    HttpURLConnection http = null;
+    Bitmap bitmap = null;
+
+    try {
+        URL url = new URL( strUrl );
+        http = (HttpURLConnection)url.openConnection();
+
+        if( http.getResponseCode() == HttpURLConnection.HTTP_OK ) 
+            bitmap = BitmapFactory.decodeStream(http.getInputStream());
+    }
+    catch(Exception e) {
+        e.printStackTrace();
+    }
+    finally {
+        if( http != null )
+            http.disconnect();
+    }
+    return bitmap;
+}
+```
+
+En el caso general podemos leer sus propiedades de la cabecera, como su tipo MIME, codificación, longitud, etc., y por último descargarlo y asignarlo al tipo de fichero o dato adecuado. 
+
+
+
+### Configuración
+
+Podemos configurar algunos parámetros de la conexión, como el tiempo máximo de conexión o de descarga. En caso de que se supere alguno de estos umbrales se lanzará una excepción: 
+
+```java
+http.setReadTimeout( 10000 /*milliseconds*/ );
+http.setConnectTimeout( 15000 /* milliseconds */ );
+```
+  
+También podemos configurar otros valores de la cabecera de la petición, como la codificación o el _user-agent_: 
+  
+```java
+http.setRequestProperty("User-Agent", "...");
+http.setRequestProperty("Accept-Charset", "UTF-8");
+http.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
+```
+
+Además para evitar algunos problemas existentes al cerrar el flujo de datos de entrada en versiones de Android anteriores a la 2.2 (Froyo) podemos ejecutar el siguiente código: 
+
+```java
+private void disableConnectionReuseIfNecessary() {
+   // Work around pre-Froyo bugs in HTTP connection reuse.
+   if(Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) 
+     System.setProperty("http.keepAlive", "false");
+}
+```
+
+Además se recomienda usar cada instancia de la clase `HttpURLConnection` para realizar una sola petición, ya que no es seguro crear varios hilos usando la misma instancia. 
+
+
+
+
+
+
 
 
 
@@ -130,8 +204,8 @@ En Android, una forma sencilla de realizar una conexión de forma asíncrona es 
 ImageView imageView = (ImageView)findViewById(R.id.ImageView01);
 new Thread(new Runnable() {
   public void run() {
-    Drawable imagen = cargarLaImagen("http://...");
-    //Desde aquí NO debo acceder a imageView
+    Drawable imagen = descargarImagen("http://...");
+    // Desde aquí NO debo acceder a imageView
   }
 }).start();
 ```
@@ -142,7 +216,7 @@ Pero hay un problema: tras cargar la imagen no puedo acceder a la interfaz gráf
 ImageView imageView = (ImageView)findViewById(R.id.ImageView01);
 new Thread(new Runnable() {
   public void run() {
-    Drawable imagen = cargarLaImagen("http://...");
+    Drawable imagen = descargarImagen("http://...");
     imageView.post(new Runnable() {
       public void run() {
         imageView.setDrawable(imagen);
@@ -160,7 +234,7 @@ Como alternativa, contamos también con el método `Activity.runOnUiThread(Runna
 ImageView imageView = (ImageView)findViewById(R.id.ImageView01);
 new Thread(new Runnable() {
   public void run() {
-    Drawable imagen = cargarLaImagen("http://...");
+    Drawable imagen = descargarImagen("http://...");
     runOnUiThread(new Runnable() {
       public void run() {
         imageView.setDrawable(imagen);
@@ -228,7 +302,7 @@ El primer tipo es el que se recibe como datos de entrada. Realmente se recibe un
 Por lo tando, el único método que se ejecuta en el segundo hilo de ejecución es el bucle del método `doInBackground(ENTRADA...)`. El resto de métodos se ejecutan en el mismo hilo que la interfaz gráfica y son los que tendremos que utilizar para actualizar los datos.
 
 
-> La notación `(String ... values)` indica que hay un número indeterminado de parámetros del tipo indicado, se accede a ellos con `values[0], values[1],` ..., y también podemos obtener el número de elementos con `values.length`. Esta notación forma parte de la sintaxis estándar de Java.
+> La notación `(String... values)` indica que hay un número indeterminado de parámetros del tipo indicado, se accede a ellos con `values[0], values[1],` ..., y también podemos obtener el número de elementos con `values.length`. Esta notación forma parte de la sintaxis estándar de Java.
 
 El segundo tipo de datos que se especifica en la declaración de la tarea es el tipo del progreso. Conforme avanza la tarea en segundo plano podemos publicar actualizaciones _visuales_ del progreso realizado. Hemos dicho que desde el método `doInBackground` no podemos modificar la interfaz, pero si que podemos llamar a `publishProgress` para solicitar que se actualice la información de progreso de la tarea, indicando como información de progreso una lista de elementos del tipo indicado como tipo de progreso. Tras hacer esto se ejecutará el método `onProgressUpdate` de la tarea, que recibirá la información que pasamos como parámetro. Este método si que se ejecuta dentro del hilo de la interfaz, por lo que podremos actualizar la visualización del progreso dentro de él, en función de la información recibida. Es importante entender que la ejecución de `onProgressUpdate(...)` no tiene por qué ocurrir inmediatamente después de la petición `publishProgress(...)`, o puede incluso no llegar a ocurrir.
 
@@ -256,7 +330,7 @@ private class DownloadTask extends AsyncTask<String, Void, String>
     {
         // Llamada al método de descarga de contenido que
         // se ejecutará en segundo plano
-        return prv_downloadContent( urls[0] );
+        return descargarContenido( urls[0] );
     }
 
     @Override
@@ -311,7 +385,7 @@ private class BajarImagenesTask extends
      protected List<Drawable> doInBackground(String... urls) {
          ArrayList<Drawable> imagenes = new ArrayList<Drawable>();
          for(int i=0;i<urls.length; i++) {
-           imagenes.add( cargarLaImagen(urls[i]) );
+           imagenes.add( descargarImagen(urls[i]) );
            publishProgress(i);
          }
          return imagenes;
@@ -325,7 +399,7 @@ private class BajarImagenesTask extends
 
      @Override
      protected void onProgressUpdate(Integer... values) {
-       textView.setText(values[0] + " imagenes cargadas...");
+       textView.setText(values[0] + " imágenes descargadas...");
      }
 
      @Override
@@ -413,29 +487,46 @@ Cuando desarrollemos una aplicación que acceda a la red deberemos tener en cuen
 
 En ciertas ocasiones esto puede implicar limitar ciertas funcionalidades de la aplicación a las zonas en las que contemos con conexión Wi-Fi, o por lo menos avisar al usuario en caso de que solicite una de estas operaciones mediante 3G, y darle la oportunidad de cancelarla.
 
+En primer lugar para comprobar el estado de la red tenemos que solicitar los permisos en el Manifest, fuera de la sección `application`: 
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+```
 
 A continuación se muestra cómo usar el `ConnectivityManager` para comprobar el estado de red en dispositivos Android.
 
 ```java
-ConnectivityManager cm = (ConnectivityManager)
-    getSystemService(Context.CONNECTIVITY_SERVICE);
-NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-NetworkInfo mobile = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-boolean hayWifi = wifi.isAvailable();
-boolean hayMobile = mobile.isAvailable();
-boolean noHay = (!hayWifi && !hayMobile); // Iiinteerneer!!
-```
+boolean checkStatus(Context ctx) {
+    ConnectivityManager cm = (ConnectivityManager)
+        ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-Por ejemplo, nos podríamos crear una función como la siguiente que nos devolviera directamente si el dispositivo tiene conexión o no:
+    NetworkInfo i = cm.getActiveNetworkInfo();
 
-```java
-public boolean isOnline() {
-    ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-    NetworkInfo netInfo = cm.getActiveNetworkInfo();
-    return (netInfo != null && netInfo.isConnected());
+    if (i == null || !i.isAvailable() || !i.isConnected())
+        return false;  // Inteerneer!!
+        
+    return true;
 }
 ```
 
+
+Con la función anterior podremos comprobar si el dispositivo tiene conexión o no, pero además podemos saber el tipo de conexión que está usando mediante la función `getType`, por ejemplo:
+
+```java
+ConnectivityManager cm = (ConnectivityManager)
+        ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+NetworkInfo i = cm.getActiveNetworkInfo();
+
+if( i.getType() == ConnectivityManager.TYPE_MOBILE )
+    // Conectado por datos
+else if( i.getType() == ConnectivityManager.TYPE_WIFI )
+    // Conectado a una red wifi
+```
+
+
+<!--
+DEPRECATED
 
 El `ConnectivityManager` también puede utilizarse para controlar el estado de red, o bien estableciendo una preferencia pero permitiéndole usar el tipo de conectividad que realmente está disponible,
 
@@ -450,6 +541,7 @@ cm.setRadio(NetworkType.MOBILE,false);
 cm.setRadio(NetworkType.WIFI,true);
 ```
 
+-->
 
 
 
@@ -546,7 +638,7 @@ Sin embargo, si queremos implementar carga _lazy_ deberemos hacer que al rellena
 ```java
 public class ImagenAdapter extends BaseAdapter
 {
-  private List<Pasta> mList;
+  private List<Elemento> mList;
   private Context mContext;
   // Mapa de tareas de carga en proceso
   private Map<Elemento, CargarImagenTask> mImagenesCargando;
@@ -569,7 +661,7 @@ public class ImagenAdapter extends BaseAdapter
       // Ponemos esta imagen de momento
       ivIcono.setImageResource(R.drawable.icon);
 
-      // Si la imagen no está cargada, comienza una tarea de carga
+      // Si la imagen no está descargando...
       if(mImagenesCargando.get(elemento)==null) {
           CargarImagenTask task = new CargarImagenTask();
           mImagenesCargando.put(elemento, task);
@@ -587,23 +679,27 @@ public class ImagenAdapter extends BaseAdapter
 
     @Override
     protected Bitmap doInBackground(Object... params) {
+      HttpURLConnection http = null;
+      Bitmap bitmap = null;
+      
       this.elemento = (Elemento)params[0];
       this.view = (ImageView)params[1];
 
-      HttpClient client = new DefaultHttpClient();
-      HttpGet request = new HttpGet(this.elemento.getUrlImagen());
       try {
-        HttpResponse response = client.execute(request);
-        Bitmap imagen = BitmapFactory
-                         .decodeStream(response.getEntity().getContent());
+        URL url = new URL( this.elemento.getUrlImagen() );
+        http = (HttpURLConnection)url.openConnection();
 
-        return imagen;
-      } catch(IOException e) {
-      } finally {
-        client.getConnectionManager().shutdown();
+        if( http.getResponseCode() == HttpURLConnection.HTTP_OK )
+           bitmap = BitmapFactory.decodeStream(http.getInputStream());
       }
-
-      return null;
+      catch(Exception e) {
+        e.printStackTrace();
+      }
+      finally {
+        if( http != null )
+            http.disconnect();
+      }
+      return bitmap;
     }
 
     @Override
@@ -622,14 +718,14 @@ public class ImagenAdapter extends BaseAdapter
 <!-- *********************************** -->
 ## Mejora: Carga _lazy_ solo cuando no se hace _scroll_
 
-Como mejora, se puede hacer que las imágenes sólo carguen si no se está haciendo _scroll_ en la lista. Para ello podemos hacer que el adaptador implemente un `AbsListView.OnScrollListener`, y registrarlo como oyente de la lista (esto lo tendremos que hacer desde la actividad que contiene a la lista):
+Como mejora se puede hacer que las imágenes solo se descarguen si no se está haciendo _scroll_ en la lista. Para ello podemos hacer que el adaptador implemente un `AbsListView.OnScrollListener`, y registrarlo como oyente de la lista (esto lo tendremos que hacer desde la actividad que contiene a la lista):
 
 ```java
-// En el constructor
+// En el constructor de la actividad
 miListView.setOnScrollListener(adaptador)
 ```
 
-En el adaptador podemos crear una variable que indique si está ocupado o no haciendo _scroll_, y que sólo descargue imágenes cuando no esté ocupado. Cuando pare el _scroll_, recargaremos los datos de la lista (`notifyDataSetChanged()`) para que carguen todas las imágenes que haya actualmente en pantalla:
+En el adaptador podemos crear una variable que indique si está ocupado o no haciendo _scroll_, y que sólo descargue imágenes cuando no esté ocupado. Cuando pare el _scroll_ recargaremos los datos de la lista (`notifyDataSetChanged()`) para que carguen todas las imágenes que haya actualmente en pantalla:
 
 ```java
 public class ImagenAdapter extends BaseAdapter
@@ -649,7 +745,7 @@ public class ImagenAdapter extends BaseAdapter
       ivIcono.setImageResource(R.drawable.icon);
 
       // Si la imagen no está cargada y no se está haciendo SCROLL...
-      if(mImagenesCargando.get(elemento)==null  && !mBusy) {
+      if(mImagenesCargando.get(elemento)==null && !mBusy) {
           CargarImagenTask task = new CargarImagenTask();
           mImagenesCargando.put(elemento, task);
           task.execute(elemento, ivIcono);
@@ -713,13 +809,13 @@ Para crear una nueva referencia débil a una imagen deberemos utilizar el constr
 ```java
 protected void onPostExecute(Bitmap result) {
   if(result!=null) {
-    this.elemento.setImagen(new SoftReference<ImagenCache>(result));
+    this.elemento.setImagen(new SoftReference<Bitmap>(result));
     this.view.setImageBitmap(result);
   }
 }
 ```
 
-Cuando el dispositivo se esté quedando sin memoria, podrá liberar automáticamente el contenido de todos los objetos `SoftReference`, y sus referencias se pondrán a `null`.
+Cuando el dispositivo se esté quedando sin memoria podrá liberar automáticamente el contenido de todos los objetos `SoftReference` y sus referencias se pondrán a `null`.
 
 
 
@@ -797,7 +893,10 @@ Vamos a empezar por la vista detalle:
   * `ivImageView` es el campo _ImageView_ del _layout_ donde se ha de colocar la imagen.
 * Por último, completa el método `prv_imageLoader` de `PastaLoader` para que descargue la imagen que se le pasa por parámetro y la devuelva como un Bitmap.
 
-Si lo probamos nos tendría que mostrar la imagen de la vista detalle.
+Si lo probamos nos tendría que mostrar la imagen de la vista detalle. 
+
+> Pista: ¿No descarga la imagen y te salta una excepción? ¿Te falta solicitar algún permiso en el Manifest?
+
 
 Ahora vamos a completar la descarga _lazy_ de la lista principal, para esto tenéis que editar la clase `PastaAdapter` para completar la descarga de imágenes añadiendo un mapa de las descargas activas y realizando la llamada a _PastaLoader_ solamente para las imágenes que no estén ya cargadas.
 
