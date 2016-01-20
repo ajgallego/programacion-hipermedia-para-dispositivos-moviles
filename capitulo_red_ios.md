@@ -8,30 +8,6 @@ Comenzaremos viendo cómo conectar con URLs desde aplicaciones iOS.
 
 En el API de Cocoa Touch encontramos diferentes objetos para representar las URLs y las conexiones a las mismas. Veremos que se trabaja con estos objetos de forma similar a las librerías para conectar a URLs de Java.
 
-En primer lugar, tenemos la clase `NSURL` que representa una URL. Esta clase se inicializa con la cadena de la URL:
-
-```objectivec
-NSURL *theUrl = [NSURL URLWithString:@"http://www.ua.es"];
-```
-
-Se puede usar directamente la URL, pero en general es conveniente filtrar la cadena por si ésta tiene caracteres no permitidos:
-
-```objectivec
-NSString *url = @"http://www.ua.es";
-NSString *encodedUrl = [url stringByAddingPercentEncodingWithAllowedCharacters:
-          [NSCharacterSet URLQueryAllowedCharacterSet]];
-NSURL *theURL = [NSURL URLWithString:encodedUrl];
-```
-
-Para hacer una petición a dicha URL, deberemos crear un objeto `NSURLRequest` a
-partir de la URL anterior. De la petición podemos especificar también la política de caché a seguir, o el _timeout_ de la conexión. Si queremos modificar más datos de la petición, deberíamos utilizar un objeto `NSMutableURLRequest`.
-
-```objectivec
-NSURLRequest *theRequest = [NSURLRequest requestWithURL: theURL];
-```
-
-En nuestra petición podemos añadir valores como el tipo de método (GET,POST,etc.), como veremos en la parte de servicios REST.
-
 Para crear la conexión, **antes de iOS7** teníamos la clase `NSURLConnection`, que permitía hacer las conexiones de forma síncrona o asíncrona. Sin embargo, la gestión de estas conexiones dejaba bastantes aspectos del código al programador, lo que daba lugar a problemas de seguridad. Para simplificar el código, la mayoría de desarrolladores empezaron a usar clases alternativas de terceros como _AFNetworking_, hasta que Apple decidió añadir una clase integrada en iOS que hiciera algo parecido mejorando así la gestión de las conexiones. Esta clase, que es la que debe usarse siempre en iOS, es `NSURLSession`.
 
 Se puede crear una nueva conexión del siguiente modo:
@@ -61,6 +37,30 @@ NSURLSession * session = [NSURLSession sharedSession];
 ```
 
 La sesión compartida puede usarse desde cualquier punto de nuestra aplicación, y es interesante cuando nuestras peticiones son sencillas y no requieren cambios en la configuración, ya que la sesión compartida no puede modificarse.
+
+Una vez tenemos creada la sesión podemos realizar una tarea mediante una petición. Para ello primero tenemos que crear un objeto de la clase `NSURL` que representa una URL, y que se inicializa con la cadena de la URL:
+
+```objectivec
+NSURL *theUrl = [NSURL URLWithString:@"http://www.ua.es"];
+```
+
+Se puede usar directamente la URL, pero en general es conveniente filtrar la cadena por si ésta tiene caracteres no permitidos:
+
+```objectivec
+NSString *url = @"http://www.ua.es";
+NSString *encodedUrl = [url stringByAddingPercentEncodingWithAllowedCharacters:
+          [NSCharacterSet URLQueryAllowedCharacterSet]];
+NSURL *theURL = [NSURL URLWithString:encodedUrl];
+```
+
+Para hacer una petición a dicha URL, deberemos crear un objeto `NSURLRequest` a
+partir de la URL anterior. De la petición podemos especificar también la política de caché a seguir, o el _timeout_ de la conexión. Si queremos modificar más datos de la petición, deberíamos utilizar un objeto `NSMutableURLRequest`.
+
+```objectivec
+NSURLRequest *theRequest = [NSURLRequest requestWithURL: theURL];
+```
+
+En nuestra petición podemos añadir valores como el tipo de método (GET,POST,etc.), como veremos en la parte de servicios REST.
 
 Una vez tenemos la petición y la sesión configurada, podemos lanzar la consulta mediante una tarea:
 
