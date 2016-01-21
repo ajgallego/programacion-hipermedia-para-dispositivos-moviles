@@ -308,7 +308,7 @@ El proyecto consistirá en hacer una aplicación para iOS que gestione el videoc
 
 Vamos a cambiar en el `MasterViewController` la carga de películas, de manera que esta vez se haga una petición GET al servidor. Puedes usar localhost si ya lo tienes implementado, o gbrain si no es así.
 
-Para empezar, añade al proyecto la clase `Connection` que hemos implementado en eel ejercicio anterior. Prepara `MasterViewController` para usar esta clase, añadiendo el protocolo `ConnectionDelegate` e implementando los métodos siguientes:
+Para empezar, añade al proyecto la clase `Connection` que hemos implementado en el ejercicio anterior. Prepara `MasterViewController` para usar esta clase, añadiendo el protocolo `ConnectionDelegate` e implementando los métodos siguientes:
 
 ```objectivec
 -(void)connectionSucceed:(Connection *)connection withData:(NSData *)data;
@@ -368,7 +368,7 @@ Al tener dos tipos de conexiones en el mismo controlador, necesitarás identific
 Y puedes saber desde qué conexión se ha recibido la respuesta en el método
 
 ```objectivec
--(void)connectionSucceed:(NSURLConnection *)connection withData:(NSData *)data
+-(void)connectionSucceed:(Connection *)connection withData:(NSData *)data
 {
     if (connection == self.theConnection) {
         // Hacer algo
