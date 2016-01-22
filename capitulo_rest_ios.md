@@ -270,7 +270,7 @@ Una vez tengamos la cadnea de las credenciales, si queremos añadir la autentifi
 NSURLSessionConfiguration *config=[NSURLSessionConfiguration defaultSessionConfiguration];
 
 config.HTTPAdditionalHeaders = @{@"Accept": @"application/json",
-                                 @"Authorization": authString};
+                                 @"Authorization": authValue};
 
  NSURLSession *session=[NSURLSession sessionWithConfiguration:config];
 ```
