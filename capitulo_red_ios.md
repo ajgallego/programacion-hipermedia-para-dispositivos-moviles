@@ -8,195 +8,186 @@ Comenzaremos viendo cómo conectar con URLs desde aplicaciones iOS.
 
 En el API de Cocoa Touch encontramos diferentes objetos para representar las URLs y las conexiones a las mismas. Veremos que se trabaja con estos objetos de forma similar a las librerías para conectar a URLs de Java.
 
-Para crear la conexión, **antes de iOS7** teníamos la clase `NSURLConnection`, que permitía hacer las conexiones de forma síncrona o asíncrona. Sin embargo, la gestión de estas conexiones dejaba bastantes aspectos del código al programador, lo que daba lugar a problemas de seguridad. Para simplificar el código, la mayoría de desarrolladores empezaron a usar clases alternativas de terceros como _AFNetworking_, hasta que Apple decidió añadir una clase integrada en iOS que hiciera algo parecido mejorando así la gestión de las conexiones. Esta clase, que es la que debe usarse siempre en iOS, es `NSURLSession`.
+Para crear la conexión, **antes de iOS7** teníamos la clase `NSURLConnection`, que permitía hacer las conexiones de forma síncrona o asíncrona. Sin embargo, la gestión de estas conexiones dejaba bastantes aspectos del código al programador, lo que daba lugar a problemas de seguridad. Para simplificar el código, la mayoría de desarrolladores empezaron a usar clases alternativas de terceros como _AFNetworking_, hasta que Apple decidió añadir una clase integrada en iOS que hiciera algo parecido mejorando así la gestión de las conexiones. Esta clase, que es la que debe usarse siempre en iOS, es `URLSession`.
 
 Se puede crear una nueva conexión del siguiente modo:
 
-```objectivec
+```swift
 // Creamos la configuración
-NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+let config = URLSessionConfiguration.default
+
 // Se pueden hacer cambios en la configuración, por ejemplo:
-config.allowsCellularAccess = NO;
+config.allowsCellularAccess = false
 
 // Creamos la sesión con esta configuración
-NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
+let session = URLSession(configuration: config)
 ```
 
 La configuración de la sesión puede ser de tres tipos:
 
-* `defaultSessionConfiguration`: Usa una caché persistente en disco y guarda las credenciales en el _keychain_. Es la que se suele usar en la mayoría de casos.
+* `default`: Usa una caché persistente en disco y guarda las credenciales en el _keychain_. Es la que se suele usar en la mayoría de casos.
 
-* `ephemeralSessionConfiguration`: No se guarda ningún dato en disco. Toda la caché, credenciales y demás datos se guardan en la RAM y se vinculan a la sesión. Cuando la sesión termina, estos datos se eliminan.
+* `ephemeral`: No se guarda ningún dato en disco. Toda la caché, credenciales y demás datos se guardan en la RAM y se vinculan a la sesión. Cuando la sesión termina, estos datos se eliminan.
 
-* `backgroundSessionConfiguration`: Son similares a las sesiones `default`, pero usan un proceso separado para gestionar todas la transferencia de datos. Se emplea cuando queremos descargar datos mientras la aplicación está suspendida.
+* `background`: Son similares a las sesiones `default`, pero usan un proceso separado para gestionar toda la transferencia de datos. Se emplea cuando queremos descargar datos mientras la aplicación está suspendida.
 
-Como alternativa, en iOS también podemos usar una sesión _singleton_ que está creada por defecto y que se llama _sharedSession_:
+Como alternativa, si necesitamos algo sencillo en iOS podemos usar también una sesión _singleton_ que está creada por defecto y que se llama _shared_:
 
-```objectivec
-NSURLSession * session = [NSURLSession sharedSession];
+```swift
+let session = URLSession.shared
 ```
 
 La sesión compartida puede usarse desde cualquier punto de nuestra aplicación, y es interesante cuando nuestras peticiones son sencillas y no requieren cambios en la configuración, ya que la sesión compartida no puede modificarse.
 
-Una vez tenemos creada la sesión podemos realizar una tarea mediante una petición. Para ello primero tenemos que crear un objeto de la clase `NSURL` que representa una URL, y que se inicializa con la cadena de la URL:
+Una vez tenemos creada la sesión podemos realizar una tarea mediante una petición. Para ello primero tenemos que crear un objeto de la clase `URL` que representa una URL, y que se inicializa con la cadena de la URL:
 
-```objectivec
-NSURL *theUrl = [NSURL URLWithString:@"http://www.ua.es"];
+```swift
+let theUrl = URL(string: "http://www.apple.com")
 ```
 
-Se puede usar directamente la URL, pero en general es conveniente filtrar la cadena por si ésta tiene caracteres no permitidos:
+Como hemos visto se puede usar directamente la URL, pero en general es conveniente filtrar la cadena por si ésta tiene caracteres no permitidos:
 
-```objectivec
-NSString *url = @"http://www.ua.es";
-NSString *encodedUrl = [url stringByAddingPercentEncodingWithAllowedCharacters:
-          [NSCharacterSet URLQueryAllowedCharacterSet]];
-NSURL *theURL = [NSURL URLWithString:encodedUrl];
+```swift
+let url = "http://www.apple.com"
+if let encodedString = url?.addingPercentEncoding( withAllowedCharacters: .urlQueryAllowed)
+{
+    let encodedUrl = URL(string: encodedString)!
+    // ...
+}        
 ```
 
-Para hacer una petición a dicha URL, deberemos crear un objeto `NSURLRequest` a
-partir de la URL anterior. De la petición podemos especificar también la política de caché a seguir, o el _timeout_ de la conexión. Si queremos modificar más datos de la petición, deberíamos utilizar un objeto `NSMutableURLRequest`.
+Para hacer una petición a dicha URL, deberemos crear un objeto `URLRequest` a
+partir de la URL anterior. En la creación de la petición podemos especificar también la política de caché a seguir, o el _timeout_ de la conexión.
 
-```objectivec
-NSURLRequest *theRequest = [NSURLRequest requestWithURL: theURL];
+```swift
+let request = URLRequest(url: encodedUrl)
 ```
 
-En nuestra petición podemos añadir valores como el tipo de método (GET,POST,etc.), como veremos en la parte de servicios REST.
+Si queremos modificar más datos de la petición, deberíamos utilizar un objeto `NSMutableURLRequest` en su lugar. En nuestra petición podemos añadir valores como el tipo de método (GET,POST,etc.), como veremos en la parte de servicios REST.
 
 Una vez tenemos la petición y la sesión configurada, podemos lanzar la consulta mediante una tarea:
 
-```objectivec
-  [[session dataTaskWithRequest:request
-   completionHandler:^(NSData *data,
-                  NSURLResponse *response,
-                  NSError *error)
-                  {
-                      // La respuesta del servidor se recibe en este punto
-                  }] resume];
+<!--- Buena ayuda actualizada: https://cocoacasts.com/networking-with-urlsession-meet-the-urlsession-family/ --->
+
+```swift
+  session.dataTask(with: request, completionHandler: { data, response, error in
+
+    // La respuesta del servidor se recibe en este punto.
+    // Se guardan los datos recibidos (data), la respuesta (response) y si ha habido algún error (error)
+
+    // Podemos comprobar el error
+    if let error = error {
+         print(error.localizedDescription)
+    }
+
+    // Si hay datos y estos están en formato UTF8, los guardamos
+    else if let data = data, let contents = String(data: data, encoding: String.Encoding.utf8) {
+
+        DispatchQueue.main.async { // Esperamos a que terminen de recibirse todos los datos
+            print (contents)
+        }
+    }
+  }).resume() // En esta línea lanzamos la petición asíncrona
 ```
 
-Este método lanza una petición asíncrona y recibe la respuesta del servidor, los datos, y un error si se ha producido algún problema. Además de `dataTaskWithRequest`, podemos usar otro tipos de tareas:
+Este método lanza una petición asíncrona y recibe la respuesta del servidor, los datos, y un error si se ha producido algún problema. Además de `dataTask(with:request)`, podemos elegir otro tipos de tareas:
 
-* `dataTaskWithRequest`, `dataTaskWithURL`: Se usan para peticiones puntuales al servidor. `dataTaskWithURL` es similar a `dataTaskWithRequest` pero no necesita una `URLRequest` sino sólo una `NSURL`, y por tanto puede usarse para conexiones sencillas que no requieren cabeceras o configuraciones específicas.
+* `dataTask(with:request)`, `dataTask(with:url)`: Se usan para peticiones puntuales al servidor. `dataTask(with: url)` es similar a `dataTask(with:request)` pero no necesita una `URLRequest` sino sólo una `URL`, y por tanto puede usarse para conexiones sencillas que no requieren cabeceras o configuraciones específicas.
 
-* `downloadTaskWithRequest`, `downloadTaskWithURL`: Descargan datos en forma de fichero y soportan descargas en segundo plano cuando la aplicación no se está ejecutando. Se usan por ejemplo cuando queremos descargar una serie de imágenes y mostrarlas en una tabla.
+* `downloadTask(with:request)`, `downloadTask(with:url)`: Descargan datos en forma de fichero y soportan descargas en segundo plano cuando la aplicación no se está ejecutando. Se usan por ejemplo cuando queremos descargar una serie de imágenes y mostrarlas en una tabla.
 
-* `uploadTaskWithRequest`, `uploadTaskWithURL`: Como la anterior, pero para subir ficheros al servidor en lugar de descargarlos.
+* `uploadTask(with:request)`, `uploadTask(with:url)`: Como la anterior, pero para subir ficheros al servidor en lugar de descargarlos.
 
 Vamos a ver un ejemplo completo de código, con una clase propia `Connection` que usaremos para gestionar las conexiones. Esta clase asumirá que la sesión y la petición están ya creadas. Tener esto separado en una clase nos va a permitir que nuestra app pueda crear conexiones desde distintos controladores dejando el código limpio.
 
-`Connection.m`
+`Connection.swift`
 
-```objectivec
-#import "Connection.h"
+```swift
+import Foundation
 
-@implementation Connection
-
-// Método que se llama cuando se ha producido algún error
--(void)connectionError:(NSString *)message
-{
-    if (self.delegate != nil && [self.delegate respondsToSelector:@selector(connectionFailed:withError:)])
-        [self.delegate connectionFailed:self withError:message];
+// Protocolo de Connection
+protocol ConnectionDelegate {
+    func connectionSucceed(_ connection : Connection, with data: Data)
+    func connectionFailed(_ connection: Connection, with error: String)
 }
 
-// Método para crear una conexión data una sesión y una petición
--(void)startConnection:(NSURLSession *)session withRequest:(NSURLRequest *)request
-{
-    [[session dataTaskWithRequest:request
-     completionHandler:^(NSData *data,
-                    NSURLResponse *response,
-                    NSError *error)
-    {
-                if (!error)
-                {
-                    NSHTTPURLResponse *httpResponse=(NSHTTPURLResponse *) response;
-                    if (httpResponse.statusCode == 200)
-                    {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (self.delegate!=nil && [self.delegate respondsToSelector:@selector(connectionSucceed:withData:)])
-                                [self.delegate connectionSucceed:self withData:data];
-                        });
-                    }
-                    else
-                    {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            NSString *errorMessage=[NSString stringWithFormat:@"Received code: %ld",(long)[httpResponse statusCode]];
-                            [self connectionError:errorMessage];
-                        });
+class Connection {
+
+    // Delegado
+    var delegate:ConnectionDelegate?
+
+    // Función de inicialización, necesita la clase delegada
+    init(delegate : ConnectionDelegate) {
+        self.delegate = delegate
+    }
+
+    // Función para lanzar una petición con un URLRequest
+    func startConnection(_ session: URLSession, with request:URLRequest) {
+
+        session.dataTask(with: request, completionHandler: { data, response, error in
+
+            if let error = error {
+                self.delegate?.connectionFailed(self, with: error.localizedDescription)
+            }
+            else {
+                let res = response as! HTTPURLResponse
+
+                if res.statusCode == 200 {
+                    DispatchQueue.main.async {
+                        self.delegate?.connectionSucceed(self, with: data!)
                     }
                 }
-                else
-                {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        NSString *errorMessage=[error localizedDescription];
-                        [self connectionError:errorMessage];
-                    });
+                else {
+                    let errorMessage=("Received status code: \(res.statusCode)")
+                    self.delegate?.connectionFailed(self, with: errorMessage)
                 }
+            }
+        }).resume()
+    }
 
-    }] resume];
+    // Función para lanzar una petición con una URL
+    func startConnection(_ session: URLSession, with url:URL) {
+        self.startConnection(session, with: URLRequest(url:url))
+    }
 
+    // Función para lanzar la petición con un String
+    func startConnection(_ session: URLSession, with urlString:String) {
+        if let encodedString = urlString.addingPercentEncoding( withAllowedCharacters: .urlQueryAllowed) {
+            if let url = URL(string: encodedString) {
+                self.startConnection(session, with: url)
+            }
+        }
+    }
 }
-
-@end
-```
-
-`Connection.h`
-
-```objectivec
-#import <Foundation/Foundation.h>
-
-@class Connection;
-
-@protocol ConnectionDelegate <NSObject>
-
-- (void)connectionSucceed:(Connection *)connection withData:(NSData *)data;
-- (void)connectionFailed:(Connection *)connection withError:(NSString *)errorMessage;
-
-@end
-
-@interface Connection : NSObject <NSURLSessionDelegate>
-
-@property (nonatomic, unsafe_unretained) id<ConnectionDelegate> delegate;
-
--(void)startConnection:(NSURLSession *)session withRequest:(NSURLRequest *)request;
-
-@end
 ```
 
 Con esta clase, desde cualquier punto de nuestra aplicación podemos crear una conexión básica. Por  ejemplo:
 
-```objectivec
-
--(void)createConnection
+```swift
+func createConnection()
 {
-  self.theConnection=[Connection alloc];
-  self.theConnection.delegate=self;
-
-  NSString *urlString=@"http://www.apple.com";
-
-  NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-  NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
-
-  NSURL *theUrl = [NSURL URLWithString:urlString];
-  NSMutableURLRequest *theRequest = [NSMutableURLRequest requestWithURL: theUrl];
-
-  [self.theConnection startConnection:session withRequest:theRequest];
+    // Creamos la conexión
+    let connection = Connection(delegate: self)
+    // Lanzamos una petición
+    connection.startConnection(URLSession.shared, with: "http://www.ua.es")
 }
 
-// Y tenemos que implementar los métodos delegados:
+// Debemos implementar los métodos delegados que se invocarán al recibir la respuesta:
 
--(void)connectionSucceed:(Connection *)connection withData:(NSData *)data
-{
-  // En 'data' tenemos los datos recibidos
+func connectionSucceed(_ connection: Connection, with data: Data) {
+    // En 'data' tenemos los datos recibidos
+    if let contents = String(data: data, encoding : .utf8) {
+        print (contents)
+    }
 }
 
--(void)connectionFailed:(Connection *)connection withError:(NSString *)error
-{
-  // En 'error' tenemos el mensaje de error
+func connectionFailed(_ connection: Connection, with error: String) {
+    // En 'error' tenemos el mensaje de error
+    print(error)
 }
-
 ```
 
-Evidentemente en algunos casos esto no es tan sencillo y necesitamos añadir bastante más código para gestionar las conexiones. Si quieres aprendar más sobre `NSURLSession`, puedes consular la referencia de esta clase en: <a href="https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/URLLoadingSystem/Articles/UsingNSURLSession.html">https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/URLLoadingSystem/Articles/UsingNSURLSession.html</a>.
+Evidentemente en algunos casos esto no es tan sencillo y necesitamos añadir bastante más código para gestionar las conexiones. Si quieres aprendar más sobre `URLSession`, puedes consular la referencia de esta clase <a href="https://developer.apple.com/reference/foundation/urlsession">aquí</a>.
 
 ### Apple Transport Security
 
@@ -213,269 +204,128 @@ Desde el visor de plist, se puede añadir del siguiente modo:
 
 ![disable TLS](images/ios_red/disable_ATS.png "Desactivar ATS")
 
-
 Esto sólo es necesario si nuestra aplicación permite la conexión a cualquier servidor y no tenemos control sobre ellos. Si sólo nos conectamos un servidor y este no tiene TLS, podemos añadir una excepción sólo para este mediante `NSExceptionDomains`. Por ejemplo:
 
 ![disable TLS](images/ios_red/custom_ATS.png "Configurar ATS")
 
-También es importante resaltar que a veces es necesario adoptar el protocolo `NSURLSessionDelegate` para usar alguno de sus métodos. En particular, el más habitual es `didReceiveChallenge` para autentificación, como veremos en la parte de REST.
+También es importante resaltar que a veces es necesario adoptar el <a href="https://developer.apple.com/reference/foundation/urlsessiondelegate">protocolo</a> `URLSessionDelegate` para usar algunos de sus métodos. En particular, el más habitual es `didReceiveChallenge` para autentificación, como veremos en la parte de REST.
 
 ### Indicador de actividad de red
 
 Mientras estamos descargando datos, debemos mostrar el indicador actividad de red en la barra de estado. Esto **no** se hace de forma automática, por lo que debemos añadir la siguiente instrucción:
 
 ```objectivec
- [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+UIApplication.shared.isNetworkActivityIndicatorVisible = true
 ```
 
-Cuando las descargas finalicen, devemos ocultar el indicador asignándole el valor `NO`.
+Evidentemente, cuando las descargas finalicen debemos ocultar el indicador asignándole el valor `false`.
 
 ## Comprobación de la conectividad en iOS
 
-En iOS también podemos comprobar el tipo de conexión con el que contamos. De hecho, uno de los ejemplos publicados en la documentación de Apple consiste precisamente en esto.
-El ejemplo se llama _Reachability_ (se puede encontrar en la sección _Sample Code_
-de la ayuda), y su código se puede utilizar directamente en nuestras aplicaciones. En el caso de iOS la comprobación no es tan sencilla como en Android, y se requiere el acceso a la conexión a bajo nivel. Por este motivo, lo más habitual entre los desarrolladores es incorporar el código del ejemplo _Reachability_.
+En iOS también podemos comprobar el tipo de conexión con el que contamos, aunque la comprobación no es tan sencilla como en Android. Uno de los ejemplos publicados en la documentación de Apple consiste precisamente en esto, se llama _Reachability_ y se puede encontrar en la sección _Sample Code_ de la ayuda. Lo más habitual entre los desarrolladores hasta hace poco era incorporar el código del ejemplo _Reachability_, pero no está actualizado para Swift.
 
-Lo que necesitaremos incorporar al proyecto son los ficheros `Reachability.m` y `Reachability.h`. Además, también necesitaremos el _framework_ `SystemConfiguration` (deberemos añadirlo en la pantalla _Build Phases_ del _Target_).
+Actualmente lo más sencillo es usar el siguiente código (fuente: <a href="http://stackoverflow.com/questions/39558868/check-internet-connection-ios-10">stack overflow</a>):
 
-```objectivec
-internetReach = [Reachability reachabilityForInternetConnection];
-[internetReach startNotifier];
-if ([internetReach currentReachabilityStatus] == ReachableViaWWAN) {
-    // Tenemos conexión a Internet
-}
+```swift
+import SystemConfiguration
 
-wifiReach = [Reachability reachabilityForLocalWiFi];
-[wifiReach startNotifier];
-if ([wifiReach currentReachabilityStatus] == ReachableViaWiFi) {
-    // Estamos conectados mediante Wi-Fi
+func isInternetAvailable() -> Bool
+{
+    var zeroAddress = sockaddr_in()
+    zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
+    zeroAddress.sin_family = sa_family_t(AF_INET)
+
+    let defaultRouteReachability = withUnsafePointer(to: &zeroAddress) {
+        $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {zeroSockAddress in
+            SCNetworkReachabilityCreateWithAddress(nil, zeroSockAddress)
+        }
+    }
+
+    var flags = SCNetworkReachabilityFlags()
+    if !SCNetworkReachabilityGetFlags(defaultRouteReachability!, &flags) {
+        return false
+    }
+    let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
+    let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
+    return (isReachable && !needsConnection)
 }
 ```
 
 ## Carga lazy de imágenes en iOS
 
-En iOS contamos en la documentación con un ejemplo proporcionado por Apple que realiza esta función. Vamos a ver aquí como ejemplo una solución simplificada y bastante menos código. La forma de trabajar será similar a la vista en el caso de Android. En el controlador de nuestra tabla podemos incluir un diccionario que contenga las imágenes que se estén descargando actualmente (equivale al mapa de tareas de descarga que teníamos en Android):
+En la documentación de iOS contamos con un ejemplo proporcionado por Apple que realiza esta función, pero es demasiado complejo y se puede hacer lo mismo con unas pocas líneas, así que vamos a ver esta solución simplificada.
 
-```objectivec
-@property (nonatomic,strong) NSMutableDictionary *downloadingImages;
-```
+Para descargar una imagen y mostrarla en la celda de en una tabla, debemos editar el método `cellForRowAt` para actualizar cada celda con su imagen correspondiente descargada en segundo plano. Por ejemplo, podemos añadir lo siguiente:
 
-Conforme se vayan rellenando las celdas, se solicita la carga de las imágenes que no hayan sido cargadas todavía:
+```swift
+cell.imageView?.image = UIImage(named: "Placeholder.png")
 
-```objectivec
-- (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-  ...
-
-  // Configure the cell.
-  Elemento *theItem = [self.listadoElementos objectAtIndex: indexPath.row];
-  cell.textLabel.text = theItem.texto;
-
-  if(theItem.imagen!=nil) {
-      cell.imageView.image = theItem.imagen;
-  }
-  else if(theItem.urlImagen!=nil) {
-      [self cargarImagen: theItem paraIndexPath: indexPath];
-      cell.imageView.image = [UIImage imageNamed: @"Placeholder.png"];
-  }
-
-  return cell;
+let urlString = "https://web.ua.es/secciones-ua/images/layout/logo-ua.jpg"
+if let url = URL(string:urlString) {
+    session.dataTask( with:url, completionHandler: { data, response, error in
+              if error == nil, let data = data, let response = response as? HTTPURLResponse, response.statusCode == 200 {
+                    DispatchQueue.main.async {
+                            cell.imageView?.image = UIImage(data: data)
+                            print ("Downloaded \(urlString)")
+                        }
+                    }
+            }).resume()
 }
 ```
 
-En caso de no contar todavía con la imagen, podemos poner una imagen temporal en la celda (en este ejemplo, `Placeholder.png`). La carga de imágenes se puede hacer de la siguiente forma:
+Primero inicializamos la celda con una imagen que se mostrará hasta que no termine la descarga, y usamos el método `dataTask` para lanzar la petición. Cuando se reciba la respuesta del servidor, la tendremos en el bloque `completionHandler`. Si no hay ningún error, se han recibido datos y además la el código de respuesta es 200, entonces esperamos a que termine la descarga (con `DispatchQueue.main.async`) y guardamos los datos en la imagen de la celda. Este método es simple, eficiente y se hace todo en segundo plano. Añadiendo este código al método `cellForRowAt` se descargarán sólo las imágenes correspondientes a las celdas de la vista actual de la tabla.
 
-```objectivec
-- (void) cargarImagen: (Elemento *) item
-        paraIndexPath: (NSIndexPath *) indexPath
-{
-    if ([self.downloadingImages objectForKey: indexPath] == nil)
-    {
-        UAImageDownloader *theDownloader = [[UAImageDownloader alloc] initWithUrl:item.urlImagen indexPath:indexPath session:self.session delegate:self];
-        [self.downloadingImages setObject: theDownloader forKey: indexPath];
+
+## Descargar y subir archivos por red
+
+Cuando queremos hacer una descarga o subir un archivo (por ejemplo, un documento), es recomendable que usemos `downloadTask` o `uploadTask` en lugar de `dataTask`. La ventaja sobre `dataTask` es que así podemos retomar la descarga o la subida si se produce alguna interrupción o si se supera el tiempo de espera. Podemos inicializar una conexión con `downloadTask` del siguiente modo:
+
+```swift
+  // Inicializamos la configuración y la sesión
+  let configuration = URLSessionConfiguration.background(withIdentifier: "bgSessionConfiguration") // Importante: Las descargas de archivos grandes deben ir en background
+  let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+
+  // downloadTask es un objeto de la clase URLSessionDownloadTask
+  let downloadTask = session.downloadTask(with: URL(string: "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_1mb.mp4")!)
+  downloadTask.resume()
+```
+
+Necesitaremos también adoptar el protocolo `URLSessionDownloadDelegate`, y cuando el fichero se descargue se invocará el siguiente método, que podemos editar para lo que queramos hacer:
+
+```swift
+  func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+
+           print("Download finished")
+
+           if let originalURL = downloadTask.originalRequest?.url?.absoluteString, let destinationURL = localFilePathForUrl(originalURL) {
+
+               print("Stored in: \(destinationURL)")
+
+               do {
+                   try FileManager.default.copyItem(at: location, to: destinationURL)
+               } catch let error as NSError {
+                   print("Could not copy file to disk: \(error.localizedDescription)")
+               }
+           }
+   }
+```
+
+Como puede verse en este código, `downloadTask` no devuelve los datos sino una url con el contenido que se almacena localmente en el móvil. En el ejemplo, esta dirección se guarda en `location`. Como puede verse, una vez tenemos la localización, podemos guardar permanentemente el fichero en el sistema de archivos (`FileManager`) con el nombre que escojamos. El código anterior necesita que implementemos la función `localFilePathForUrl` para obtener la ruta local del fichero que queremos guardar:
+
+```swift
+func localFilePathForUrl(_ previewUrl: String) -> URL? {
+    let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
+    if let url = URL(string: previewUrl) {
+        let lastPathComponent = url.lastPathComponent
+        let fullPath = documentsPath.appendingPathComponent(lastPathComponent)
+
+        return URL(fileURLWithPath:fullPath)
     }
+    return nil
 }
 ```
 
-Cada descarga es gestionada por un objeto de la clase `UAImageDownloader`, que se encargará de gestionar la descarga asíncrona de la imagen cuya URL se le pasa en el inicializador, y estos objetos se introducen en el diccionario de descargas en progreso. Utilizamos el patrón delegado para que, una vez se haya finalizado la descarga, se nos proporcione la imagen obtenida. Definimos el protocolo para el delegado junto a la clase
-`UAImageDownloader`:
-
-```objectivec
-@class UAImageDownloader;
-
-@protocol UAImageDownloaderDelegate
-
-- (void) imageDownloader: (UAImageDownloader *) downloader
-   didFinishDownloadingImage: (UIImage *) image
-                forIndexPath: (NSIndexPath *) indexPath;
-
--(void) imageDownloader:(UAImageDownloader *)downloader
-   didFailDownloadingImage: (NSString *)url
-                forIndexPath : (NSIndexPath *)indexPath;
-
-@end
-
-@interface UAImageDownloader : NSObject <NSURLSessionDelegate>
-
-- (id)initWithUrl: (NSString *) url
-        indexPath: (NSIndexPath *)indexPath
-          session: (NSURLSession *)session
-         delegate: (id<UAImageDownloaderDelegate>) delegate;
-
-@property(nonatomic,strong) NSString *url;
-@property(nonatomic,strong) UIImage *image;
-
-@property(nonatomic,unsafe_unretained) id<UAImageDownloaderDelegate> delegate;
-
-@end
-```
-
-
-Podemos implementar esta clase de la siguiente forma:
-
-```objectivec
-@implementation UAImageDownloader
-
-- (id)initWithUrl: (NSString *) url
-        indexPath: (NSIndexPath *)indexPath
-          session: (NSURLSession *)session
-         delegate: (id<UAImageDownloaderDelegate>) delegate
-{
-    self = [super init];
-
-    if (self)
-    {
-        self.url = url;
-        self.delegate = delegate;
-
-        NSString *encodedUrl = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-        NSURL *imageURL = [NSURL URLWithString:encodedUrl];
-
-        NSURLSessionDownloadTask *downloadPhotoTask =
-            [session downloadTaskWithURL:imageURL
-                       completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error)
-        {
-            NSHTTPURLResponse *httpResponse=(NSHTTPURLResponse *) response;
-            if (httpResponse.statusCode == 200)
-            {
-                if (!error)
-                {
-                        UIImage *downloadedImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:location]];
-
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [self.delegate imageDownloader:self didFinishDownloadingImage:downloadedImage forIndexPath:indexPath];
-                    });
-                }
-                else
-                {
-                    NSLog(@"Image %@ not found", imageURL);
-                    [self.delegate imageDownloader:self didFailDownloadingImage:url forIndexPath:indexPath];
-                }
-            }
-            else
-            {
-                NSLog(@"Received code %ld for url %@",(long)httpResponse.statusCode,imageURL);
-                [self.delegate imageDownloader:self didFailDownloadingImage:url forIndexPath:indexPath];
-            }
-        }];
-
-        [downloadPhotoTask resume];
-    }
-
-    return self;
-}
-
-@end
-```
-
-
-La carga de la imagen se realiza de la misma forma que hemos visto anteriormente para descargar contenido de una URL, pero usando `downloadTaskWithURL` en lugar de `dataTaskWithRequest`, ya que en realidad vamos a descargar ficheros que contienen imágenes. Una  vez finalizada la descarga se notifica al delegado. Utilizaremos el controlador de la tabla como delegado, que responderá de la siguiente forma cuando una imagen haya sido descargada:
-
-```objectivec
-- (void) imageDownloader:(UAImageDownloader *)downloader
-      didFinishDownloadingImage:(UIImage *)image
-                   forIndexPath:(NSIndexPath *)indexPath
-{
-    Elemento *theItem = [self.listadoElementos objectAtIndex: indexPath.row];
-    theItem.imagen = image;
-
-    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath: indexPath];
-    cell.imageView.image = image;
-}
-
--(void)imageDownloader:(UAImageDownloader *)downloader
-     didFailDownloadingImage: (NSString *)url
-                forIndexPath: (NSIndexPath *)indexPath
-{
-    Elemento *theItem = [self.listadoElementos objectAtIndex: indexPath.row];
-    theItem.image=[UIImage imageNamed:@"not-found.png"];
-
-    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath: indexPath];
-    cell.imageView.image = theItem.image;
-}
-
-```
-
-Al recibir la imagen descargada la almacena en el item correspondiente, y la muestra en la tabla. Si no se puede descargar la imagen, entonces se invoca el método `didFailDownloadingImage` para poner una imagen vacía (llamada `not_found.png`) en la celda.
-
-Tal como hemos visto en el caso de Android, podemos evitar que se descarguen las imágenes mientras se está haciendo _scroll_ con un código como el siguiente:
-
-```objectivec
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-  ...
-  // Configure the cell.
-  Elemento *theItem = [self.listadoElementos objectAtIndex: indexPath.row];
-  cell.textLabel.text = theItem.texto;
-
-  if(theItem.imagen!=nil) {
-    cell.imageView.image = theItem.imagen;
-  }
-  else if(theItem.urlImagen!=nil) {
-    if (self.tableView.dragging == NO && self.tableView.decelerating == NO) {
-      [self cargarImagen: theItem paraIndexPath: indexPath];
-    }
-    cell.imageView.image = [UIImage imageNamed: @"Placeholder.png"];
-  }
-
-  return cell;
-}
-```
-
-Como podemos observar, impedimos la carga tanto si el usuario está arrastrando la lista, como si el _scroll_ se está realizando por la inercia de un movimiento anterior. Cuando el scroll pare deberemos hacer que carguen las imágenes de todas las celdas visibles en pantalla. Para ello deberemos implementar los siguientes métodos del protocolo `UIScrollViewDelegate`:
-
-```objectivec
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
-{
-    if (!decelerate)
-        [self cargarImagenesEnPantalla];
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-    [self cargarImagenesEnPantalla];
-}
-
-- (void)cargarImagenesEnPantalla
-{
-    if ([self.listadoElementos count] > 0)
-    {
-        NSArray *visiblePaths = [self.tableView indexPathsForVisibleRows];
-        for (NSIndexPath *indexPath in visiblePaths) {
-            Elemento *theItem = [self.listadoElementos objectAtIndex:indexPath.row];
-
-            if (!theItem.imagen)
-                [self cargarImagen: theItem paraIndexPath: indexPath];
-        }
-    }
-}
-```
-
-Si queremos evitar que las imágenes de una tabla puedan acabar con la memoria disponible (aunque esto es poco probable) tenemos implementar el método `didReceiveMemoryWarning`. En él deberíamos detener las descargas pendientes, y liberar de memoria las imágenes que no sean necesarias. En este caso la liberación de los objetos la deberemos implementar manualmente nosotros.
-
-Hemos visto que en ambos casos utilizamos un mapa o diccionario para almacenar todas las descargas que ya se han iniciado, y así evitar que se repita una descarga para la misma entrada de la tabla. Hemos utilizado la entrada de la tabla para indexar este mapa o diccionario. Sin embargo, en algunos casos podría ocurrir que existan múltiples entradas con la misma imagen (por ejemplo varios _tweets_ de una misma persona). Si es probable que distintas entradas tengan la misma imagen, sería recomendable utilizar la propia URL de la imagen para indexar el mapa o diccionario de descargas.
+Tal como hemos comentado, las descargas o subidas de archivos se pueden pausar o cancelar. Puedes descargar un ejemplo de una app completa que gestiona descargas de música <a href="http://www.dlsi.ua.es/~pertusa/master/HalfTunes-Final.zip">aquí</a>. El código es una versión de <a href=" https://www.raywenderlich.com/110458/nsurlsession-tutorial-getting-started">este tutorial</a> actualizado a la versión más reciente de XCode. Abre el proyecto, mira el código y ejecútalo para ver las acciones más comunes que se pueden realizar con las descargas.
 
 # Ejercicios de acceso a la red en iOS
 
@@ -497,28 +347,24 @@ Vamos a implementar una aplicación que nos permita visualizar una lista de imá
 
 Se proporciona una plantilla `Pelis` que utilizaremos como base. En esta sesión no usaremos servicios REST, ya que esto lo haremos en la siguiente. Todos los datos de las películas estarán almacenados en nuestro programa, y sólo accederemos a la red para descargar las imágenes del servidor.
 
-<!-- Primero debemos implementar la carga (**no lazy**) de las imágenes en la vista detalle, y en la parte final haremos la carga lazy en la vista maestra. Cuando se abra una vista detalle, tendremos que cargar la imagen correspondiente, mostrando la carátula en el `ImageView` destinado a tal fin. Puedes usar la clase UAImageDownloader con `indexPath:nil`. No olvides mostrar y ocultar el indicador de actividad de red.
+Primero actualizaremos las imágenes de la tabla de forma _lazy_, es decir, cargándolas conforme se solicita que se muestren las celdas en pantalla.
 
-> Ayuda: Trabajaremos con la clase `DetailViewController`, en su método `configureView` deberemos inicializar la conexión para obtener la imagen.
+<!--Recuerda mostrar el indicador de actividad de la red cuando se estén descargando las imágenes.-->
 
-Cuando hayas terminado la carga de la imagen en la vista detalle, carga las imágenes conforme visualizamos el listado de películas en la vista maestra, y no sólo al entrar en los detalles de cada una de ellas.
--->
+<!--Cuando lo tengas implementado, es posible que al pinchar sobre una imagen y volver, se descoloque en la celda. Para evitar esto, añade la instrucción ``[cell layoutSubviews];`` cuando actualices la imagen de la celda.-->
 
-Primero actualizaremos las imágenes de la tabla de forma _lazy_, es decir, cargándolas conforme se solicita que se muestren las celdas en pantalla. Esta carga deberá hacerse en segundo plano.
+Una vez implementada la carga lazy, asigna la imagen correspondiente en la vista detalle para que se muestre cuando se pulse sobre ella en la tabla maestra.
 
- <!--Recuerda mostrar el indicador de actividad de la red cuando se estén descargando las imágenes. -->
-
-Cuando lo tengas implementado, es posible que al pinchar sobre una imagen y volver, se descoloque en la celda. Para evitar esto, añade la instrucción ``[cell layoutSubviews];`` cuando actualices la imagen de la celda.
-
-Una vez implementada la carga lazy, puedes asignar la imagen correspondiente en la vista detalle para que se muestre cuando se pulse sobre ella en la tabla maestra.
-
-<!-- Puedes comentar el código para hacer la conexión en el método `configureView` de `DetailViewController`, y en su lugar asignar la imagen correspondiente.-->
-
-Implementa la funcionalidad para no descargar las imágenes mientras se hace _scroll_.
-
-<!--También debes permitir que se eliminen todas las imágenes en condiciones de baja memoria.-->
+Tras actualizar una celda con una nueva imagen descargada, imprime (con `print`) el título de la película. Si ejecutas el programa verás que la misma imagen se descarga varias veces cuando hacemos scroll. Para evitar esto, cuando se descargue una imagen almacénala en el campo `image` de la película correspondiente del array, y en `cellForRowAt` haz la descarga sólo si la imagen de la película no se había descargado antes.
 
 <!--
-* Guardar las imágenes de forma persistente en el directorio de caché (se puede utilizar la URL como nombre de los ficheros).
-*
+lo siguiente dentro del bloque de la cola principal (`DispatchQueue.main`):
+
+```sift
+ print ("Downloaded \(object.title)")
+```
+-->
+
+<!--
+* Guardar las imágenes de forma persistente en el directorio de caché (se puede utilizar la URL como nombre de los ficheros)?
 -->
