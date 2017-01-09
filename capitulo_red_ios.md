@@ -184,7 +184,7 @@ func connectionFailed(_ connection: Connection, with error: String) {
 }
 ```
 
-Evidentemente en algunos casos esto no es tan sencillo y necesitamos añadir bastante más código para gestionar las conexiones. Si quieres aprendar más sobre `URLSession`, puedes consular la referencia de esta clase <a href="https://developer.apple.com/reference/foundation/urlsession">aquí</a>.
+Evidentemente en algunos casos esto no es tan sencillo y necesitamos añadir bastante más código para gestionar las conexiones. Si quieres aprendar más sobre `URLSession`, puedes consultar la referencia de esta clase <a href="https://developer.apple.com/reference/foundation/urlsession">aquí</a>.
 
 ### Apple Transport Security
 
@@ -226,8 +226,7 @@ Actualmente lo más sencillo es usar el siguiente código (fuente: <a href="http
 ```swift
 import SystemConfiguration
 
-func isInternetAvailable() -> Bool
-{
+func isInternetAvailable() -> Bool {
     var zeroAddress = sockaddr_in()
     zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
     zeroAddress.sin_family = sa_family_t(AF_INET)
@@ -244,6 +243,7 @@ func isInternetAvailable() -> Bool
     }
     let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
     let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
+
     return (isReachable && !needsConnection)
 }
 ```
@@ -345,9 +345,7 @@ Primero actualizaremos las imágenes de la tabla de forma _lazy_, es decir, carg
 
 Una vez implementada la carga lazy, asigna la imagen correspondiente en la vista detalle para que se muestre cuando se pulse sobre ella en la tabla maestra.
 
-Tras actualizar una celda con una nueva imagen descargada, imprime (con `print`) el título de la película. Si ejecutas el programa verás que la misma imagen se descarga varias veces cuando hacemos scroll. Para evitar esto, cuando se descargue una imagen almacénala en el campo `image` de la película correspondiente del array, y en `cellForRowAt` haz la descarga sólo si la imagen de la película no se había descargado antes.
-
-Para ver si lo has hecho bien, añade lo siguiente dentro del bloque de la cola principal (`DispatchQueue.main`):
+Tras actualizar una celda con una nueva imagen descargada, imprime (con `print`) el título de la película. Si ejecutas el programa verás que la misma imagen se descarga varias veces cuando hacemos scroll. Para evitar esto, cuando se descargue una imagen almacénala en el campo `image` de la película correspondiente del array, y en `cellForRowAt` haz la descarga sólo si la imagen de la película no se había descargado antes. Para comprobar que has hecho bien esto, añade el siguiente código dentro del bloque de la cola principal (`DispatchQueue.main`):
 
 ```swift
  print ("Downloaded \(object.title)")
