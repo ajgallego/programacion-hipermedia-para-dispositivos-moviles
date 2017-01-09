@@ -335,9 +335,9 @@ Vamos a hacer una aplicación que nos permita visualizar el código HTML de la U
 
 _a)_ Implementar el código necesario para que cuando se pulse el botón se realice una conexión a la URL indicada, se obtenga el resultado como texto, y se muestre en el visor de texto. Para ello puedes añadir la clase `Connection` que hemos visto anteriormente.
 
-> Ayuda: Trabajaremos con la clase `UAViewController`. Concretamente la conexión deberá ser iniciada en el método `conectarUrl`.
+> Ayuda: Trabajaremos con la clase `ViewController`. Concretamente la conexión deberá ser iniciada en el método `connectUrl`.
 
-_b)_ Desactivar ATS en el fichero info.plist para poder conectarnos a cualquier servidor.
+_b)_ Desactivar ATS en el fichero `info.plist` para poder conectarnos a cualquier servidor.
 
 _c)_ Mostrar en la barra de estado un indicador de actividad de red mientras se descarga el HTML. Haz también que el botón se deshabilite mientras dura la descarga.
 
@@ -345,26 +345,16 @@ _c)_ Mostrar en la barra de estado un indicador de actividad de red mientras se 
 
 Vamos a implementar una aplicación que nos permita visualizar una lista de imágenes de carátulas de películas, y que al pulsar sobre cada una de ellas nos aparezca la información de la película.
 
-Se proporciona una plantilla `Pelis` que utilizaremos como base. En esta sesión no usaremos servicios REST, ya que esto lo haremos en la siguiente. Todos los datos de las películas estarán almacenados en nuestro programa, y sólo accederemos a la red para descargar las imágenes del servidor.
+Se proporciona una plantilla `Pelis` que utilizaremos como base. En esta sesión no usaremos servicios REST, ya que esto lo haremos en la siguiente sesión. Todos los datos de las películas estarán almacenados en nuestro programa, y sólo accederemos a la red para descargar las imágenes del servidor.
 
 Primero actualizaremos las imágenes de la tabla de forma _lazy_, es decir, cargándolas conforme se solicita que se muestren las celdas en pantalla.
-
-<!--Recuerda mostrar el indicador de actividad de la red cuando se estén descargando las imágenes.-->
-
-<!--Cuando lo tengas implementado, es posible que al pinchar sobre una imagen y volver, se descoloque en la celda. Para evitar esto, añade la instrucción ``[cell layoutSubviews];`` cuando actualices la imagen de la celda.-->
 
 Una vez implementada la carga lazy, asigna la imagen correspondiente en la vista detalle para que se muestre cuando se pulse sobre ella en la tabla maestra.
 
 Tras actualizar una celda con una nueva imagen descargada, imprime (con `print`) el título de la película. Si ejecutas el programa verás que la misma imagen se descarga varias veces cuando hacemos scroll. Para evitar esto, cuando se descargue una imagen almacénala en el campo `image` de la película correspondiente del array, y en `cellForRowAt` haz la descarga sólo si la imagen de la película no se había descargado antes.
 
-<!--
-lo siguiente dentro del bloque de la cola principal (`DispatchQueue.main`):
+Para ver si lo has hecho bien, añade lo siguiente dentro del bloque de la cola principal (`DispatchQueue.main`):
 
 ```sift
  print ("Downloaded \(object.title)")
 ```
--->
-
-<!--
-* Guardar las imágenes de forma persistente en el directorio de caché (se puede utilizar la URL como nombre de los ficheros)?
--->
