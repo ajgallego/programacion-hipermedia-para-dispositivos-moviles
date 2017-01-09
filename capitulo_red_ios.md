@@ -49,8 +49,7 @@ Como hemos visto se puede usar directamente la URL, pero en general es convenien
 
 ```swift
 let url = "http://www.apple.com"
-if let encodedString = url?.addingPercentEncoding( withAllowedCharacters: .urlQueryAllowed)
-{
+if let encodedString = url?.addingPercentEncoding( withAllowedCharacters: .urlQueryAllowed) {
     let encodedUrl = URL(string: encodedString)!
     // ...
 }        
@@ -82,7 +81,6 @@ Una vez tenemos la petición y la sesión configurada, podemos lanzar la consult
 
     // Si hay datos y estos están en formato UTF8, los guardamos
     else if let data = data, let contents = String(data: data, encoding: String.Encoding.utf8) {
-
         DispatchQueue.main.async { // Esperamos a que terminen de recibirse todos los datos
             print (contents)
         }
@@ -164,8 +162,7 @@ class Connection {
 Con esta clase, desde cualquier punto de nuestra aplicación podemos crear una conexión básica. Por  ejemplo:
 
 ```swift
-func createConnection()
-{
+func createConnection() {
     // Creamos la conexión
     let connection = Connection(delegate: self)
     // Lanzamos una petición
@@ -214,7 +211,7 @@ También es importante resaltar que a veces es necesario adoptar el <a href="htt
 
 Mientras estamos descargando datos, debemos mostrar el indicador actividad de red en la barra de estado. Esto **no** se hace de forma automática, por lo que debemos añadir la siguiente instrucción:
 
-```objectivec
+```swift
 UIApplication.shared.isNetworkActivityIndicatorVisible = true
 ```
 
@@ -275,7 +272,6 @@ if let url = URL(string:urlString) {
 
 Primero inicializamos la celda con una imagen que se mostrará hasta que no termine la descarga, y usamos el método `dataTask` para lanzar la petición. Cuando se reciba la respuesta del servidor, la tendremos en el bloque `completionHandler`. Si no hay ningún error, se han recibido datos y además la el código de respuesta es 200, entonces esperamos a que termine la descarga (con `DispatchQueue.main.async`) y guardamos los datos en la imagen de la celda. Este método es simple, eficiente y se hace todo en segundo plano. Añadiendo este código al método `cellForRowAt` se descargarán sólo las imágenes correspondientes a las celdas de la vista actual de la tabla.
 
-
 ## Descargar y subir archivos por red
 
 Cuando queremos hacer una descarga o subir un archivo (por ejemplo, un documento), es recomendable que usemos `downloadTask` o `uploadTask` en lugar de `dataTask`. La ventaja sobre `dataTask` es que así podemos retomar la descarga o la subida si se produce alguna interrupción o si se supera el tiempo de espera. Podemos inicializar una conexión con `downloadTask` del siguiente modo:
@@ -298,9 +294,7 @@ Necesitaremos también adoptar el protocolo `URLSessionDownloadDelegate`, y cuan
            print("Download finished")
 
            if let originalURL = downloadTask.originalRequest?.url?.absoluteString, let destinationURL = localFilePathForUrl(originalURL) {
-
                print("Stored in: \(destinationURL)")
-
                do {
                    try FileManager.default.copyItem(at: location, to: destinationURL)
                } catch let error as NSError {
@@ -355,6 +349,6 @@ Tras actualizar una celda con una nueva imagen descargada, imprime (con `print`)
 
 Para ver si lo has hecho bien, añade lo siguiente dentro del bloque de la cola principal (`DispatchQueue.main`):
 
-```sift
+```swift
  print ("Downloaded \(object.title)")
 ```
