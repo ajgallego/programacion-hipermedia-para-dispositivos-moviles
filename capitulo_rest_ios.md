@@ -6,9 +6,9 @@ En la primera parte de esta sesión veremos cómo parsear la información recibi
 
 ### Parsing de JSON
 
-El parsing de JSON no se incorporó al SDK de iOS hasta la versión 5.0. Anteriormente contábamos con diferentes librerías que podíamos incluir para realizar esta tarea, como *JSONKit* (<a href="https://github.com/johnezang/JSONKit">`https://github.com/johnezang/JSONKit`</a>) o *json-framework* (<a href="https://github.com/stig/json-framework/">`https://github.com/stig/json-framework/`</a>). Sin embargo, ahora podemos trabajar con JSON directamente con las clases de Cocoa Touch, sin necesidad de incluir ninguna librería adicional. Vamos a centrarnos en esta forma de trabajar.
+El parsing de JSON no se incorporó al SDK de iOS hasta la versión 5.0. Anteriormente contábamos con diferentes librerías que podíamos incluir para realizar esta tarea, como  (<a href="https://github.com/johnezang/JSONKit">*JSONKit*</a>) o (<a href="https://github.com/stig/json-framework/">*JSON-framework* </a>). Sin embargo, actualmente podemos trabajar con JSON directamente con las clases de Cocoa Touch sin necesidad de incluir ninguna librería adicional.
 
-Simplemente necesitaremos la clase `JSONSerialization`. A partir de ella obtendremos el contenido del JSON en una jerarquía de objetos. El método `jsonObject` de la clase `JSONSerialization` nos devolverá un diccionario o un array según si el elemento principal del JSON es un objeto o una lista, respectivamente.
+Para esto simplemente necesitaremos la clase `JSONSerialization`. A partir de ella obtendremos el contenido del JSON en una jerarquía de objetos. El método `jsonObject` de la clase `JSONSerialization` nos devolverá un diccionario o un array según si el elemento principal del JSON es un objeto o una lista, respectivamente.
 
 <!--- https://developer.apple.com/swift/blog/?id=37 -->
 
@@ -35,16 +35,15 @@ En este caso, nuestro código podría ser el siguiente:
 
 ```swift
 if let dictionary = json as? [String: Any] {
-
   if let number = dictionary["someKey"] as? Double {
     // Procesamos el valor number
   }
   if let nestedDictionary = dictionary["anotherKey"] as? [String: Any] {
     // Accedemos al diccionario anotherKey para hacer algo con sus valores
-  }  
-	for (key, value) in dictionary {
-		// Si quisiéramos acceder a todos los pares clave/valor del diccionario raiz
-	}
+  }
+  for (key, value) in dictionary {
+		// Si quisiéramos acceder a todos los pares clave/valor del diccionario raíz
+  }
 }
 ```
 
@@ -142,7 +141,7 @@ Puedes encontrar más ejemplos de cómo trabajar con JSON en <a href="https://de
 
 ### Parsing de XML
 
-Para analizar XML en iOS contamos con `XMLParser` en el SDK de iOS. Con esta librería el análisis se realiza de forma parecida a los parsers SAX de Java. Este es el parser principal incluido en el SDK, aunque también contamos dentro del SDK con libxml2, escrito en C, que incluye tanto un parser SAX como DOM. También encontramos otras librerías que podemos incluir en nuestro proyecto como parsers DOM XML:
+Para analizar XML en iOS contamos con `XMLParser` en el SDK de iOS. Con esta librería el análisis se realiza de forma parecida a los parsers SAX de Java. Este es el parser principal incluido en el SDK, aunque también contamos dentro del SDK con libxml2, escrito en C, que incluye tanto un parser SAX como DOM. Además encontramos otras librerías que podemos incluir en nuestro proyecto como parsers DOM XML:
 
 <table>
 		<tr><th>Parser</th><th>URL</th><th></th><th></th></tr>
@@ -294,7 +293,7 @@ Podemos ver que en la petición POST hemos establecido todos los datos necesario
 
 ## Seguridad HTTP
 
-Vamos a ver en primer lugar cómo acceder a servicios protegidos con seguridad HTTP estándar. En estos casos, deberemos proporcionar en la llamada al servicio las cabeceras de autentificación al servidor, con las credenciales que nos den acceso a las operaciones solicitadas.
+Vamos a ver en primer lugar cómo acceder a servicios protegidos con seguridad HTTP estándar. En estos casos, deberemos proporcionar en la llamada al servicio las cabeceras de autenticación al servidor, con las credenciales que nos den acceso a las operaciones solicitadas.
 
 Para quienes no estén muy familiarizados con la seguridad en HTTP, conviene mencionar el funcionamiento del protocolo a grandes rasgos. Cuando realizamos una petición HTTP a un recurso protegido con seguridad básica, HTTP nos devuelve una respuesta indicándonos que necesitamos autentificarnos para acceder. Es entonces cuando el cliente solicita al usuario las credenciales (usuario y password), y entonces se realiza una nueva petición con dichas credenciales incluidas en una cabecera _Authorization_. Si las credenciales son válidas, el servidor nos dará acceso al contenido solicitado.
 
@@ -304,7 +303,7 @@ la librerÌa lanzar· una nueva peticiÛn con las credenciales especificadas en 
 --->
 
 
-Sin embargo, si sabemos de antemano que un recurso va a necesitar autentificación, podemos tambiçen autentificarnos de forma preventiva. La autentificación preventiva consiste en mandar las credenciales en la primera petición, antes de que el servidor nos las solicite. Con esto ahorramos una petición, pero podríamos estar mandando las credenciales en casos en los que no resulta necesario.
+Sin embargo, si sabemos de antemano que un recurso va a necesitar autenticación, podemos tambiçen autentificarnos de forma preventiva. La autenticación preventiva consiste en mandar las credenciales en la primera petición, antes de que el servidor nos las solicite. Con esto ahorramos una petición, pero podríamos estar mandando las credenciales en casos en los que no resulta necesario.
 
 
 <!---
@@ -313,15 +312,15 @@ Con HttpClient podemos activar o desactivar la autentificaciÛn preventiva con e
 <source lang="java">client.getParams().setAuthenticationPreemptive(true);</source>
 --->
 
-### Autentificación no preventiva
+### Autenticación no preventiva
 
-En iOS, la autentificación la puede hacer el delegado de la conexión. Cuando enviamos una petición sin credenciales, el sevidor nos responderá que necesita autentificación invocando al método delegado `didReceive challenge` del protocolo `URLSessionDelegate`. En este método, que puede ser a nivel de sesión o de tarea, podremos especificar los datos de la acreditación.
+En iOS, la autenticación la puede hacer el delegado de la conexión. Cuando enviamos una petición sin credenciales, el sevidor nos responderá que necesita autenticación invocando al método delegado `didReceive challenge` del protocolo `URLSessionDelegate`. En este método, que puede ser a nivel de sesión o de tarea, podremos especificar los datos de la acreditación.
 
-* A nivel de sesión, se invoca ``URLSession:didReceive challenge:completionHandler`` cuando el servidor requiere autentificación. Este método debe usarse para servidores con SSL/TLS, o cuando todas las peticiones que hagamos para una sesión necesiten la misma acreditación.
+* A nivel de sesión, se invoca ``URLSession:didReceive challenge:completionHandler`` cuando el servidor requiere autenticación. Este método debe usarse para servidores con SSL/TLS, o cuando todas las peticiones que hagamos para una sesión necesiten la misma acreditación.
 
-* A nivel de petición, podemos usar el método ``URLSession:task:didReceive challenge:completionHandler:`` si el servidor requiere autentificación para una tarea en concreto. Esto es necesario si las peticiones de una misma sesión requieren acreditaciones distintas.
+* A nivel de petición, podemos usar el método ``URLSession:task:didReceive challenge:completionHandler:`` si el servidor requiere autenticación para una tarea en concreto. Esto es necesario si las peticiones de una misma sesión requieren acreditaciones distintas.
 
-Para usar estos métodos con autentificación Basic debemos crear un objeto `URLCredential` a partir de nuestras credenciales (usuario y password). A continuación vemos un ejemplo típico de implementación de una autenticación a nivel de sesión:
+Para usar estos métodos con autenticación Basic debemos crear un objeto `URLCredential` a partir de nuestras credenciales (usuario y password). A continuación vemos un ejemplo típico de implementación de una autenticación a nivel de sesión:
 
 
 ```swift
@@ -342,7 +341,7 @@ func urlSession(
 }
 ```
 
-Podemos observar que comprobamos los fallos previos de autentificación que hemos tenido. Es decir, si con los credenciales que tenemos en el código ha fallado la autentificación, será mejor que cancelemos el acceso, ya que si volvemos a intentar acceder con los mismos credenciales vamos a tener el mismo error. En caso de que sea el primer intento, creamos los credenciales (podemos ver que se puede indicar que se guarden de forma persistente para los próximos accesos), y los utilizamos para responder al reto de autentificación (`URLAuthenticationChallenge`).
+Podemos observar que comprobamos los fallos previos de autenticación que hemos tenido. Es decir, si con los credenciales que tenemos en el código ha fallado la autenticación, será mejor que cancelemos el acceso, ya que si volvemos a intentar acceder con los mismos credenciales vamos a tener el mismo error. En caso de que sea el primer intento, creamos los credenciales (podemos ver que se puede indicar que se guarden de forma persistente para los próximos accesos), y los utilizamos para responder al reto de autenticación (`URLAuthenticationChallenge`).
 
 <!---
 completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust)) // TLS?
@@ -358,7 +357,7 @@ func urlSession(
     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 ```
 
-Si es necesaria la autentificación y no implementamos el método a nivel de sesión, entonces iOS llama automáticamente al método a nivel de tarea.
+Si es necesaria la autenticación y no implementamos el método a nivel de sesión, entonces iOS llama automáticamente al método a nivel de tarea.
 
 El tipo de persistencia (``URLCredential.Persistence``) puede ser:
 * ``none``: Las credenciales no se guardan
@@ -366,11 +365,11 @@ El tipo de persistencia (``URLCredential.Persistence``) puede ser:
 * ``permanent``: Las credenciales se guardan en el _keychain_
 * ``synchronizable``: Las credenciales se guardan en el _keychain_, y además se comparten entre dispositivos iOS.
 
-### Autentificación preventiva
+### Autenticación preventiva
 
-Este tipo de autentificación se suele usar para servicios REST, y consiste en enviar las credenciales antes de que las pida el servidor. De este modo nos ahorramos un mensaje de petición y de respuesta, por lo que es más eficiente y ahorramos ancho de banda. Este esquema es recomendable cuando sabemos de antemano que nuestra petición va a necesitar autentificación.
+Este tipo de autenticación se suele usar para servicios REST, y consiste en enviar las credenciales antes de que las pida el servidor. De este modo nos ahorramos un mensaje de petición y de respuesta, por lo que es más eficiente y ahorramos ancho de banda. Este esquema es recomendable cuando sabemos de antemano que nuestra petición va a necesitar autenticación.
 
-Al igual que en el caso anterior, también podemos hacer la autentificación a nivel de sesión o de tarea. En cualquier caso, deberemos codificar en Base64 la cadena para autentificación. En el caso de autentificación Basic, dados un usuario y una contraseña podemos generar la cadena del siguiente modo:
+Al igual que en el caso anterior, también podemos hacer la autenticación a nivel de sesión o de tarea. En cualquier caso, deberemos codificar en Base64 la cadena para autenticación. En el caso de autenticación Basic, dados un usuario y una contraseña podemos generar la cadena del siguiente modo:
 
 ```swift
 let login = "my_login"
@@ -382,7 +381,7 @@ if let authData = authStr.data(using: .utf8) {
 }
 ```
 
-En el código podemos ver que primero se genera la cadena de credenciales, concatenando `login:password`. A continuación esta cadena se codifica en base64, y con esto ya podemos añadir una cabecera `Authorization` cuyo valor es la cadena `Basic <credenciales_base64>`. Una vez tengamos la cadena de las credenciales, si queremos añadir la autentificación preventiva a la sesión podemos especificarla en la configuración:
+En el código podemos ver que primero se genera la cadena de credenciales, concatenando `login:password`. A continuación esta cadena se codifica en base64, y con esto ya podemos añadir una cabecera `Authorization` cuyo valor es la cadena `Basic <credenciales_base64>`. Una vez tengamos la cadena de las credenciales, si queremos añadir la autenticación preventiva a la sesión podemos especificarla en la configuración:
 
 ```swift
 let config = URLSessionConfiguration.default
@@ -391,14 +390,14 @@ config.httpAdditionalHeaders = ["Accept" : "application/json",
 let session = URLSession(configuration: config)
 ```
 
-Si en lugar de hacerlo a nivel de sesión lo que queremos es añadir esta autentificación a una petición, tenemos que modificar su request:
+Si en lugar de hacerlo a nivel de sesión lo que queremos es añadir esta autenticación a una petición, tenemos que modificar su request:
 
 ```swift
 var request = URLRequest(url: URL(string:"http://www.ua.es")!)
 request.addValue(authValue, forHTTPHeaderField:"Authorization")
 ```
 
-#### Autentificación TLS
+#### Autenticación TLS
 
 Si necesitas conectarte a un servidor con seguridad TLS o hacer peticiones más complejas que las vistas anteriormente, actualmente la mejor opción es usar el framework <a href="https://github.com/Alamofire/Alamofire">AlamoFire</a>, que simplifica mucho las operaciones de conexión en iOS. Para los siguientes ejercicios no se permite usar este framework, por motivos pedagógicos deben usarse los métodos nativos que hemos visto anteriormente.
 
@@ -439,7 +438,7 @@ Implementa el código para hacer la petición del listado de películas desde el
 self.tableView.reloadData()
 ```
 
-Los datos JSON de las películas están almacenados en un array. Por cada elemento del array crea una nueva película mediante un constructor de la clase `Pelicula` que reciba un diccionario con el contenido de la posición correspondiente de dicho array. Añade el campo `identif` (de tipo _String_) a la clase `Peli` y guárdalo cuando leas del JSON el valor del `id`. Esto te hará falta para implementar el resto de opciones.
+Los datos JSON de las películas están almacenados en un array. Por cada elemento del array crea una nueva película mediante un constructor de la clase `Pelicula` que reciba un diccionario con el contenido de la posición correspondiente de dicho array. Añade el campo `identif` (de tipo _Int?_) a la clase `Peli` y guárdalo cuando leas del JSON el valor del `id`. Esto te hará falta para implementar el resto de opciones.
 
 #### Alquilar / devolver
 
@@ -447,7 +446,7 @@ En la vista `DetailViewController` implementa la opción de alquiler mostrando u
 
 Si la conexión ha sido válida y se ha alquilado o devuelto la película, se debe actualizar su campo `rented` y el título del botón en el interfaz.
 
-Esta petición requiere autentificación Basic. Puedes hacerla de tipo preventivo y a nivel de tarea, añadiendo un método adicional a la clase `Connection` que acepte usuario y contraseña para hacer la petición:
+Esta petición requiere autenticación Basic. Puedes hacerla de tipo preventivo y a nivel de tarea, añadiendo un método adicional a la clase `Connection` que acepte usuario y contraseña para hacer la petición:
 
 ```swift
 func startConnection(_ session:URLSession, with request:URLRequest, login:String, password:String)
