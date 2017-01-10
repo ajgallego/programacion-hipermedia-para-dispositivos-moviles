@@ -199,28 +199,28 @@ class UAMensaje
     var listaMensajes = [Any]()
     var currentMessage : UAMensaje?
 
-    func parserDidStartDocument(_ parser: XMLParser) { // Se invoca al comenzar el parsing
+    func parserDidStartDocument(_: XMLParser) { // Se invoca al comenzar el parsing
     }
 
-    func parserDidEndDocument(_ parser: XMLParser) { // Se invoca cuando hemos terminado el parsing
+    func parserDidEndDocument(_: XMLParser) { // Se invoca cuando hemos terminado el parsing
     }
 
-    func parser(_ parser: XMLParser,
+    func parser(_: XMLParser,
                 didStartElement elementName: String,
                 namespaceURI: String?,
                 qualifiedName: String?,
                 attributes attributeDict: [String : String] = [:])
     {
-        if elementName.lowercased() == "messages" {
+        if elementName.lowercased() == "mensajes" {
             // Ok, no hacer nada
         }
-        else if elementName.lowercased() == "message" {
+        else if elementName.lowercased() == "mensaje" {
 
             self.currentMessage = UAMensaje()
             self.currentMessage!.usuario = attributeDict["usuario"]
         }
-        else { // Si no puede haber etiquetas distintas a message o menssages
-                parser.abortParsing()
+        else { // Si no puede haber etiquetas distintas a mensaje o mensajes
+            parser.abortParsing()
         }
     }
 
@@ -229,14 +229,14 @@ class UAMensaje
                 namespaceURI: String?,
                 qualifiedName: String?)
     {
-        if elementName.lowercased() == "message" {
+        if elementName.lowercased() == "mensaje" {
             if let message = self.currentMessage {
                 self.listaMensajes.append(message)
             }
         }
     }
 
-    func parser(_:XMLParser,
+    func parser(_: XMLParser,
                 foundCharacters characters: String)
     {
         // Quitamos espacios en blanco
@@ -258,7 +258,7 @@ parser.delegate = self
 let result = parser.parse()
 ```
 
-Tras inicializar el _parser_, lo ejecutamos llamando el método `parse`, que realizará el análisis de forma síncrona, y nos devolverá `true` si todo ha ido bien, o `false` si ha habido algún error al procesar la información (se producirá un error si en el delegado durante el _parsing_ llamamos a `parser.abortParsing`).
+Tras inicializar el _parser_, lo ejecutamos llamando el método `parse`, que realizará el análisis de forma síncrona, y nos devolverá `true` si todo ha ido bien, o `false` si ha habido algún error al procesar la información. También devolverá `false` si durante el _parsing_ llamamos al método `parser.abortParsing()`.
 
 
 ## Acceso a servicios REST desde iOS
@@ -325,7 +325,7 @@ Para usar estos métodos con autenticación Basic debemos crear un objeto `URLCr
 
 ```swift
 func urlSession(
-    _ session: URLSession,
+    _ : URLSession,
     didReceive challenge: URLAuthenticationChallenge,
     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 {
@@ -334,7 +334,8 @@ func urlSession(
     if challenge.previousFailureCount > 0 {
         print("Error: Please check the credential")
         completionHandler(.cancelAuthenticationChallenge, nil)
-    } else {
+    }
+    else {
         let credential = URLCredential(user:"mi_login", password:"mi_password", persistence: .forSession)
         completionHandler(.useCredential, credential)
     }
@@ -351,7 +352,7 @@ A nivel de tarea sería exactamente igual, pero usando el siguiente prototipo, e
 
 ```swift
 func urlSession(
-  _ session: URLSession,
+    _ : URLSession,
     task: URLSessionTask,
     didReceive challenge: URLAuthenticationChallenge,
     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
