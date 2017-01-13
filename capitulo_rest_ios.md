@@ -17,7 +17,12 @@ Para esto simplemente necesitaremos la clase `JSONSerialization`. A partir de el
 
 ```swift
 let data: Data // Contenido JSON obtenido de la red, por ejemplo
-let json = try? JSONSerialization.jsonObject(with: data, options: [])
+do {
+    let json = try JSONSerialization.jsonObject(with: data, options: [])
+   // Hacer algo con la variable json
+} catch {
+    print (error.localizedDescription)
+}
 ```
 
 A veces la información JSON está en forma de diccionario (el elemento principal del JSON es un objeto), y otras organizada como un array (el elemento principal es una lista).  Vamos a ver un ejemplo cuando el elemento principal es un objeto:
@@ -71,7 +76,7 @@ El objeto `JSONSerialization` también nos permite realizar la transformación e
 var dict : [String : AnyObject] = ["someKey": 42.0, "anotherKey": "prueba"]
 
 do {
-        let data = try? JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
+        let data = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
         if let str = String(data: data!, encoding: .utf8) { // Para imprimirlo por pantalla
             print (str)
         }
@@ -157,18 +162,18 @@ Nos vamos a centrar en el estudio de `XMLParser`, por ser el parser principal in
 Para implementar un parser con esta librería deberemos crear una clase que adopte el protocolo `XMLParserDelegate`, el cual define, entre otros, los siguientes métodos:
 
 ```swift
-func parser(_: XMLParser,
+func parser(_ parser: XMLParser,
     didStartElement: String,
        namespaceURI: String?,
       qualifiedName: String?,
          attributes: [String : String] = [:])
 
-func parser(_: XMLParser,
+func parser(_ parser: XMLParser,
      didEndElement: String,
       namespaceURI: String?,
      qualifiedName: String?)
 
-func parser(_:XMLParser,
+func parser(_ parser: XMLParser,
    foundCharacters: String)
 ```
 
@@ -199,13 +204,13 @@ class UAMensaje
     var listaMensajes = [Any]()
     var currentMessage : UAMensaje?
 
-    func parserDidStartDocument(_: XMLParser) { // Se invoca al comenzar el parsing
+    func parserDidStartDocument(_ parser: XMLParser) { // Se invoca al comenzar el parsing
     }
 
-    func parserDidEndDocument(_: XMLParser) { // Se invoca cuando hemos terminado el parsing
+    func parserDidEndDocument(_ parser: XMLParser) { // Se invoca cuando hemos terminado el parsing
     }
 
-    func parser(_: XMLParser,
+    func parser(_ parser: XMLParser,
                 didStartElement elementName: String,
                 namespaceURI: String?,
                 qualifiedName: String?,
@@ -215,7 +220,6 @@ class UAMensaje
             // Ok, no hacer nada
         }
         else if elementName.lowercased() == "mensaje" {
-
             self.currentMessage = UAMensaje()
             self.currentMessage!.usuario = attributeDict["usuario"]
         }
@@ -224,7 +228,7 @@ class UAMensaje
         }
     }
 
-    func parser(_: XMLParser,
+    func parser(_ parser: XMLParser,
                 didEndElement elementName: String,
                 namespaceURI: String?,
                 qualifiedName: String?)
@@ -236,7 +240,7 @@ class UAMensaje
         }
     }
 
-    func parser(_: XMLParser,
+    func parser(_ parser: XMLParser,
                 foundCharacters characters: String)
     {
         // Quitamos espacios en blanco
@@ -325,7 +329,7 @@ Para usar estos métodos con autenticación Basic debemos crear un objeto `URLCr
 
 ```swift
 func urlSession(
-    _ : URLSession,
+    _ session: URLSession,
     didReceive challenge: URLAuthenticationChallenge,
     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
 {
@@ -352,7 +356,7 @@ A nivel de tarea sería exactamente igual, pero usando el siguiente prototipo, e
 
 ```swift
 func urlSession(
-    _ : URLSession,
+    _ session: URLSession,
     task: URLSessionTask,
     didReceive challenge: URLAuthenticationChallenge,
     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)

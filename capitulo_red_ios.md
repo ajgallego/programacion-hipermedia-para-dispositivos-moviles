@@ -69,23 +69,30 @@ Una vez tenemos la petición y la sesión configurada, podemos lanzar la consult
 <!--- Buena ayuda actualizada: https://cocoacasts.com/networking-with-urlsession-meet-the-urlsession-family/ --->
 
 ```swift
-  session.dataTask(with: request, completionHandler: { data, response, error in
+session.dataTask(with: request, completionHandler: {
+    data, response, error in
 
     // La respuesta del servidor se recibe en este punto.
     // Se guardan los datos recibidos (data), la respuesta (response) y si ha habido algún error (error)
 
-    // Podemos comprobar el error
     if let error = error {
-         print(error.localizedDescription)
+        print(error.localizedDescription)
     }
+    else {
+        let res = response as! HTTPURLResponse
 
-    // Si hay datos y estos están en formato UTF8, los guardamos
-    else if let data = data, let contents = String(data: data, encoding: String.Encoding.utf8) {
-        DispatchQueue.main.async { // Esperamos a que terminen de recibirse todos los datos
-            print (contents)
+        if res.statusCode == 200 {
+            DispatchQueue.main.async { // Esperamos a que terminen de recibirse todos los datos
+                // Guardamos los datos en formato UTF8
+                let contents = String(data: data!, encoding: String.Encoding.utf8)!
+                print (contents)
+            }
+        }
+        else {
+            print("Received status code: \(res.statusCode)")
         }
     }
-  }).resume() // En esta línea lanzamos la petición asíncrona
+}).resume() // Con esta instrucción lanzamos la petición asíncrona
 ```
 
 Este método lanza una petición asíncrona y recibe la respuesta del servidor, los datos, y un error si se ha producido algún problema. Además de `dataTask(with:request)`, podemos elegir otro tipos de tareas:
