@@ -13,7 +13,7 @@ Para esto simplemente necesitaremos la clase `JSONSerialization`. A partir de el
 <!--- https://developer.apple.com/swift/blog/?id=37 -->
 
 
-<!--let response = try JSONSerialization.jsonObject(with: data, options:JSONSerialization.ReadingOptions(rawValue:0)) as? [String: AnyObject]-->
+<!--let response = try JSONSerialization.jsonObject(with: data, options:JSONSerialization.ReadingOptions(rawValue:0)) as? [String: Any]-->
 
 ```swift
 let data: Data // Contenido JSON obtenido de la red, por ejemplo
@@ -73,11 +73,11 @@ if let array = json as? [Any] {
 El objeto `JSONSerialization` también nos permite realizar la transformación en el sentido inverso, permitiendo transformar una jerarquía de objetos `Array` y `Dictionary` en una representación JSON. Para eso contaremos con el método `jsonObject`:
 
 ```swift
-var dict : [String : AnyObject] = ["someKey": 42.0, "anotherKey": "prueba"]
+var dict = ["someKey": 42.0, "anotherKey": "prueba"] as [String :Any]
 
 do {
         let data = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
-        if let str = String(data: data!, encoding: .utf8) { // Para imprimirlo por pantalla
+        if let str = String(data: data, encoding: .utf8) { // Para imprimirlo por pantalla
             print (str)
         }
 
@@ -95,12 +95,12 @@ Hemos visto la forma básica de serializar o deserializar datos en JSON. Sin emb
 class Restaurant
 {
   let name: String
-	let location: (latitude: Double, longitude: Double)
+  let location: (latitude: Double, longitude: Double)
   let meals: [String]
 }
 ```
 
-Y el siguiente JSON:
+Y el siguiente documento JSON:
 
 ```json
 {
