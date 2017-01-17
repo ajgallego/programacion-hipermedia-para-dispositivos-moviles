@@ -537,6 +537,3 @@ Para actualizar la tabla necesitarás acceder al `MasterViewController` desde `D
 
 * Usar un formulario para pedir usuario y contraseña la primera vez que se necesite. Se puede usar un `UIAlertController`, y guardar el usuario y la contraseña en `NSUserDefaults.standardUserDefaults()`. En realidad, la información sensible como las contraseñas debe guardarse en el _KeyChain_, pero esto se verá más adelante en la asignatura de persistencia.
 
-<!---
-* Añadir opción de búsqueda de películas con servicios REST. Para esto se debe implementar la búsqueda en el servidor mediante querystring. En la app se puede mostrar esta opción en la escena `MasterViewController`, reemplazando el botón _Edit_, ya que en realidad el borrado se puede hacer sin él (mediante un gesto hacia la izquierda en la fila a eliminar).
--->
