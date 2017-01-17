@@ -83,8 +83,8 @@ session.dataTask(with: request, completionHandler: {
 
         if res.statusCode == 200 {
             DispatchQueue.main.async { // Esperamos a que terminen de recibirse todos los datos
-                // Guardamos los datos en formato UTF8
-                let contents = String(data: data!, encoding: String.Encoding.utf8)!
+                // Guardamos los datos en un string con formato ASCII o UTF8
+                let contents = String(data: data!, encoding: .ascii)!
                 print (contents)
             }
         }
