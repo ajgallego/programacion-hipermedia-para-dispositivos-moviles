@@ -426,9 +426,9 @@ El proyecto consistirá en hacer una aplicación para iOS que gestione el videoc
 
 #### Listado
 
-Vamos a cambiar en el `MasterViewController` la carga de películas, de manera que esta vez se haga una petición GET al servidor. Puedes usar localhost si ya lo tienes implementado, o gbrain si no es así.
+Vamos a cambiar en el `MasterViewController` la carga de películas. Esta vez haremos una petición GET al servidor _gbrain.dlsi.ua.es_, que implementa la gestión de un videoclub.
 
-Para empezar, añade al proyecto la clase `Connection` que hemos implementado en el ejercicio anterior.
+Para empezar, añade al proyecto la clase `Connection` que hemos implementado en el ejercicio anterior (si no lo habías hecho anteriormente en el ejercicio de _pelis_).
 
 Prepara `MasterViewController` para usar esta clase, añadiendo el protocolo `ConnectionDelegate` e implementando los métodos siguientes:
 
@@ -457,13 +457,13 @@ Esta petición requiere autenticación Basic. Puedes hacerla de tipo preventivo 
 func startConnection(_ session:URLSession, with request:URLRequest, login:String, password:String)
 ```
 
-Recuerda que si usas gbrain esto sólo funcionará para las películas del final del listado. En las del principio (las añadidas por los profesores inicialmente) fallará la autorización por falta de permisos.
+Recuerda que en _gbrain_ esto sólo funcionará para las películas del final del listado. En las del principio (las añadidas inicialmente por los profesores) siempre fallará la autenticación por falta de permisos.
 
 #### Añadir
 
 Vamos a implementar la opción para añadir una película. Para esto, puedes descomentar el código de `addButton` en `viewDidLoad`.
 
-En el método `insertNewObject` tendremos que mostrar una vista  para pedir los datos de la película a añadir. Para ello se proporciona como material la clase `PelisTableViewController`. El método quedaría así:
+En el método `insertNewObject` tendremos que mostrar una vista para pedir los datos de la película a añadir. Para ello se proporciona en los materiales la clase `PelisTableViewController`. El método quedaría de la siguiente forma:
 
 ```swift
 func insertNewObject(_ sender: Any) {
@@ -473,7 +473,7 @@ func insertNewObject(_ sender: Any) {
 }
 ```
 
-Hay que crear un nuevo método `init` en la clase `Pelicula` para inicializar los datos de una película vacía. Las nuevas películas estarán libres por defecto.
+Hace falta crear un nuevo método `init` (sin parámetros) en la clase `Pelicula` para inicializar los datos de una película vacía. Las nuevas películas estarán libres por defecto.
 
 En `PelisTableViewController` debes implementar el método `save` que se llama cuando el usuario pulsa el botón para guardar la película. También debes modificar `connectionSucceed` para actualizar el identificador de la película que se ha recibido, antes de devolverla al delegado mediante el método `saved`.
 
@@ -485,13 +485,13 @@ Descomenta el código de edición de las tablas en `MasterViewController`, tanto
 
 Haz los cambios correspondientes para que cuando se elimine una película en la tabla también se haga en el servidor, de modo que si falla en el servidor no se llegue a borrar en la tabla.
 
-Al tener dos tipos de conexiones en el mismo controlador, en el método `connectionSucceed` necesitarás identificar cuál de ellas es la que ha hecho la petición. Para ello, lo más sencillo es crear una nueva variable en la clase `Connection` para almacenar el nombre de la conexión:
+Al tener dos tipos de conexiones en el mismo controlador, en el método `connectionSucceed` necesitarás identificar cuál de ellas es la que ha hecho la petición. Para ello, lo más sencillo es crear una nueva variable en la clase `Connection` que almacene el nombre de la conexión:
 
 ```swift
 var name : String?
 ```
 
-Añadimos un nuevo método init en `Connection`:
+Añadimos un nuevo método `init` en `Connection`:
 
 ```swift
 init(name:String, delegate:ConnectionDelegate) {
@@ -506,15 +506,16 @@ Ahora, podemos crear una conexión para borrar, por ejemplo:
 let connectionDelete = Connection(name : "delete", delegate : self)
 ```
 
-Y podemos saber desde qué conexión se ha recibido la respuesta en el método `connectionSucceed`:
+Y podremos saber desde qué conexión se ha recibido la respuesta en el método `connectionSucceed`:
 
 ```swift
 func connectionSucceed(_ connection: Connection, with data: Data) {
-
        if connection.name == "delete" {
           // Gestionar borrado
        }
-       else ...
+       else {
+         // Gestionar otra conexión
+       }
 }
 ```
 
@@ -522,7 +523,7 @@ func connectionSucceed(_ connection: Connection, with data: Data) {
 
 Añade un botón `Edit` en `DetailViewController` a la derecha de la barra de navegación para editar una película. Cuando el usuario lo pulse, deberá poder modificar los datos de la película usando el mismo controlador que para añadirla (`PelisTableViewController`). Ojo, tendrás que hacer una copia de la película a modificar por si el usuario cancela los cambios volviendo atrás sin guardarla.
 
-En esta opción, en lugar de mostrar en la barra de navegación _Add movie_ deberá indicarse el nombre de la película, y cuando se guarde deberá actualizarse tanto en el listado local como en el servidor.
+En esta opción, en lugar de mostrar en la barra de navegación _Add movie_, deberá indicarse el nombre de la película, y cuando se guarde deberá actualizarse tanto en el listado local como en el servidor.
 
 Para actualizar la tabla necesitarás acceder al `MasterViewController` desde `DetailViewController`. Puedes hacerlo del siguiente modo:
 
