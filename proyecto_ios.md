@@ -3,7 +3,7 @@
 
 El proyecto consistirá en hacer una aplicación para iOS que gestione el videoclub que se ha implementado en sesiones anteriores. Partiremos del código de la aplicación `Pelis` que hicimos en la sesión anterior.
 
-### Listado
+## Listado
 
 Vamos a cambiar en el `MasterViewController` la carga de películas. Esta vez haremos una petición GET al servidor _gbrain.dlsi.ua.es_, que gestiona los servicios del videoclub.
 
@@ -24,7 +24,7 @@ self.tableView.reloadData()
 
 Los datos JSON de las películas están almacenados en un array. Por cada elemento del array crea una nueva película mediante un constructor de la clase `Pelicula` que reciba un diccionario con el contenido de la posición correspondiente de dicho array. Añade el campo `identif` (de tipo _Int?_) a la clase `Peli` y guárdalo cuando leas el valor de `id` del JSON. Esto te hará falta para implementar el resto de opciones.
 
-### Alquilar / devolver
+## Alquilar / devolver
 
 En la vista `DetailViewController` implementa la opción de alquiler mostrando un botón (en cualquier parte visible) que indique el estado actual con el texto _Alquilada_ o _Libre_, y que pueda pulsarse para cambiar su estado.
 
@@ -38,7 +38,7 @@ func startConnection(_ session:URLSession, with request:URLRequest, login:String
 
 Recuerda que en _gbrain_ esto sólo funcionará para las películas del final del listado. En las del principio (las añadidas inicialmente por los profesores) siempre fallará la autenticación por falta de permisos.
 
-### Añadir
+## Añadir
 
 Vamos a implementar la opción para añadir una película. Para esto, puedes descomentar el código de `addButton` en `viewDidLoad`.
 
@@ -58,7 +58,7 @@ En `PelisTableViewController` debes implementar el método `save` que se llama c
 
 Este método `saved` hay que implementarlo en `MasterViewController` para actualizar el array local de películas sin tener que volver a hacer una llamada al servidor.
 
-### Eliminar
+## Eliminar
 
 Descomenta el código de edición de las tablas en `MasterViewController`, tanto en el método `viewDidLoad` como `commit editingStyle`, y devolviendo `true` en `canEditRowAtIndexPath`.
 
@@ -98,7 +98,7 @@ func connectionSucceed(_ connection: Connection, with data: Data) {
 }
 ```
 
-### Editar
+## Editar
 
 Añade un botón `Edit` en `DetailViewController` a la derecha de la barra de navegación para editar una película. Cuando el usuario lo pulse, deberá poder modificar los datos de la película usando el mismo controlador que para añadirla (`PelisTableViewController`). Ojo, tendrás que hacer una copia de la película a modificar por si el usuario cancela los cambios volviendo atrás sin guardarla.
 
@@ -112,6 +112,6 @@ Para actualizar la tabla necesitarás acceder al `MasterViewController` desde `D
   masterController.tableView.reloadData()
 ```
 
-### Apartado opcional:
+## Apartado opcional
 
 * Añade un formulario para pedir usuario y contraseña la primera vez que se necesite. Se puede usar un `UIAlertController`, y guardar el usuario y la contraseña en `NSUserDefaults.standardUserDefaults()`. En realidad, la información sensible como las contraseñas debería guardarse en el _KeyChain_, pero esto se verá más adelante en la asignatura de persistencia.
