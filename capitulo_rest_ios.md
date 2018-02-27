@@ -410,7 +410,7 @@ Si necesitas conectarte a un servidor con seguridad TLS o hacer peticiones más 
 
 ## Weather app (2 puntos)
 
-En este primer ejercicio vamos a practicar el parsing de XML y JSON. Para ello haremos una aplicación que nos permita visualizar el tiempo de una ciudad accediendo a la API de <a href="http://openweathermap.org/api">Openweathermap</a>.
+En este ejercicio vamos a practicar el parsing de XML y JSON. Para ello haremos una aplicación que nos permita visualizar el tiempo de una ciudad accediendo a la API de <a href="http://openweathermap.org/api">Openweathermap</a>.
 
 Se proporciona una plantilla `Weather` que ya realiza la llamada asíncrona a la API. Según el usuario elija XML o JSON, la respuesta del servidor se recibirá en el formato correspondiente. Crea una nueva conexión y lánzala en el método `search`.
 
