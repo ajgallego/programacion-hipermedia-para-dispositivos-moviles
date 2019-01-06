@@ -1,5 +1,5 @@
 
-# Proyecto en iOS (7 puntos)
+# Proyecto en iOS (10 puntos)
 
 El proyecto consistirá en hacer una aplicación para iOS que gestione el videoclub que se ha implementado en sesiones anteriores. Partiremos del código de la aplicación `Pelis` que hicimos en la sesión anterior.
 
@@ -112,6 +112,18 @@ Para actualizar la tabla necesitarás acceder al `MasterViewController` desde `D
   masterController.tableView.reloadData()
 ```
 
-## Apartado opcional
+<!---- ## Apartado opcional --->
 
-* Añade un formulario para pedir usuario y contraseña la primera vez que se necesite. Se puede usar un `UIAlertController`, y guardar el usuario y la contraseña en `NSUserDefaults.standardUserDefaults()`. En realidad, la información sensible como las contraseñas debería guardarse en el _KeyChain_, pero esto se verá más adelante en la asignatura de persistencia.
+## Pedir login/password con formulario
+
+Añade un formulario para pedir usuario y contraseña la primera vez que se necesite. Para esto se puede usar un `UIAlertController`, guardando el usuario y la contraseña en `NSUserDefaults.standardUserDefaults()`. En realidad, la información sensible como las contraseñas debería guardarse en el _KeyChain_, pero esto se verá más adelante en la asignatura de persistencia.
+
+Para pedir la contraseña al usuario debes usar la opción `isSecureTextEntry`, por ejemplo:  `miCampoDeTexto.isSecureTextEntry = true`.
+
+## Integración con OpenMovieDatabase
+
+Añadir películas a mano es un poco tedioso. Para acelerar este proceso vamos a usar [OpenMovieDatabase](http://www.omdbapi.com), una web que permite buscar cualquier película de forma gratuita mediante su API abierta. Para empezar, registrate y consigue tu API Key desde [este enlace](http://www.omdbapi.com/apikey.aspx). Una vez tengamos nuestro usuario podremos hacer una búsqueda por título, por ejemplo: http://www.omdbapi.com/?t=The+Godfather&plot=full&apikey=XXXXXXX
+
+En la tabla maestra, cuando se pulse el botón `+`, ahora deberá aparecer un popover con las opciones `Open Movie DB` y `Manual` (para esto puedes basarte en el ejercicio popover que vimos en la asignatura de interfaz azanzado). Si el usuario elige `Manual` se mostrará la tabla `PelisTableViewController`, igual que antes. Si en cambio elige `Open Movie DB` se abrirá un nuevo formulario que contiene un único campo de texto y un botón llamado `Search` para que el usuario añada el nombre de la película que desea buscar. Cuando se pulse este botón haremos una petición al servidor como en el ejemplo anterior, y si funciona correctamente (si la película se ha encontrado) se abrirá la tabla `PelisTableViewController` ya rellenada con la información que se ha recibido. En este controlador, si el usuario pulsa `Save` la película se guardará normalmente. Ojo con los espacios en el título, hay que sustituirlos por el caracter `+` para enviar la petición al servidor.
+
+También hay que gestionar que no se encuentre la película buscada por el usuario. En este caso, el campo `Response` del JSON será `False` y deberemos mostrar directamente la tabla maestra sin realizar ninguna acción adicional. Este campo `Response` debes leerlo como `String`, no como `Bool` porque dará error.
